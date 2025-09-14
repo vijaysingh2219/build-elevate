@@ -1,0 +1,20 @@
+{
+  "name": "@workspace/prettier-config",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": "./index.js"
+  },
+  "scripts": {
+    "clean": "rm -rf node_modules"
+  },
+  "dependencies": {
+    "prettier": "3.6.2"
+  },
+  "devDependencies": {
+    "prettier-plugin-organize-imports": "^4.1.0",
+    "prettier-plugin-packagejson": "^2.5.10",
+    "prettier-plugin-tailwindcss": "^0.6.11"
+  }
+}
