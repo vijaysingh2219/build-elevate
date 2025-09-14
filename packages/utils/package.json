@@ -1,0 +1,25 @@
+{
+  "name": "@workspace/utils",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "check-types": "tsc --noEmit",
+    "dev": "tsc --build --watch",
+    "lint": "eslint . --max-warnings 0"
+  },
+  "prettier": "@workspace/prettier-config",
+  "dependencies": {
+    "date-fns": "^4.1.0"
+  },
+  "devDependencies": {
+    "@workspace/eslint-config": "workspace:^",
+    "@workspace/prettier-config": "workspace:*",
+    "@workspace/typescript-config": "workspace:*",
+    "typescript": "5.9.2"
+  }
+}
