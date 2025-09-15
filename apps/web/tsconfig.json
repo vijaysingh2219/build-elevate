@@ -4,7 +4,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"],
-      "@workspace/ui/*": ["../../packages/ui/src/*"]
+      "@workspace/ui/*": ["../../packages/ui/src/*"],
+      "@workspace/utils/*": ["../../packages/utils/src/*"]
     },
     "plugins": [
       {
@@ -12,6 +13,19 @@
       }
     ]
   },
-  "include": ["next-env.d.ts", "next.config.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "references": [
+    {
+      "path": "../../packages/utils"
+    }
+  ],
+  "include": [
+    "next-env.d.ts",
+    "next.config.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "../../packages/db/src/**/*",
+    "../../packages/ui/src/**/*"
+  ],
   "exclude": ["node_modules"]
 }

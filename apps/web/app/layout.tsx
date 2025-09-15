@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono } from 'next/font/google';
 
+import Header from '@/components/header';
 import { Providers } from '@/components/providers';
 import { siteConfig } from '@/config/site';
 import { viewportConfig } from '@/config/viewport';
@@ -30,6 +31,7 @@ export default function RootLayout({
       <body className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased`}>
         <Providers>
           <main className="flex h-screen w-screen flex-col">
+            <Header />
             {children}
           </main>
         </Providers>
