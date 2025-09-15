@@ -1,4 +1,4 @@
-import { emailSchema } from './schemas/auth';
+import { emailSchema } from '../schemas';
 
 export function getUsernameFromEmail(email: string): string {
   const parsed = emailSchema.safeParse(email);
