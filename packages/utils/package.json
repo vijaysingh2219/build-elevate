@@ -14,7 +14,9 @@
   },
   "prettier": "@workspace/prettier-config",
   "dependencies": {
-    "date-fns": "^4.1.0"
+    "bcryptjs": "^3.0.2",
+    "date-fns": "^4.1.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:^",
