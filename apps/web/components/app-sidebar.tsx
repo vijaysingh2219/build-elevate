@@ -2,6 +2,7 @@
 
 import Logo from '@/components/logo';
 import { NavUser } from '@/components/nav-user';
+import ThemeSwitcher from '@/components/theme-switcher';
 import { config } from '@/config/site';
 import { useAuthUser } from '@/hooks/use-auth-user';
 import { Button } from '@workspace/ui/components/button';
@@ -64,9 +65,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarFooter>
         {isAuthenticated ? (
-          <NavUser />
+          <>
+            <ThemeSwitcher />
+            <NavUser />
+          </>
         ) : (
           <div className="flex flex-col gap-2">
+            <ThemeSwitcher />
             <Button className="">
               <Link
                 href="/sign-up"
