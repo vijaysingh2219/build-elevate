@@ -16,6 +16,17 @@ This template is for creating a monorepo with
 
 ---
 
+## 🖼 Screenshots
+
+| Page    | Light Theme                          | Dark Theme                               |
+| ------- | ------------------------------------ | ---------------------------------------- |
+| Home    | ![Home Light](assets/home.png)       | ![Home Dark](assets/home-dark.png)       |
+| Sign Up | ![Sign Up Light](assets/sign-up.png) | ![Sign Up Dark](assets/sign-up-dark.png) |
+| Sign In | ![Sign In Light](assets/sign-in.png) | ![Sign In Dark](assets/sign-in-dark.png) |
+| Profile | ![Profile Light](assets/profile.png) | ![Profile Dark](assets/profile-dark.png) |
+
+---
+
 ## Project Structure
 
 This monorepo is structured into the following applications and packages:
