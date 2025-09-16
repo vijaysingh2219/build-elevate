@@ -34,7 +34,7 @@ export default function Logo({ variant, classes }: LogoProps) {
 function getDefaults(variant: LogoProps['variant']) {
   const containerBaseClass = 'flex items-center space-x-2';
   const logoBaseClass =
-    'from-primary via-primary/50 to-secondary drop-shadow-primary rounded-xl p-1 bg-gradient-to-br drop-shadow text-foreground flex items-center justify-center flex-shrink-0';
+    'from-primary via-primary/50 to-secondary drop-shadow-primary rounded-xl p-1 bg-gradient-to-br drop-shadow text-white flex items-center justify-center flex-shrink-0';
   const iconBaseClass = 'size-8';
   const textBaseClass = 'text-2xl sm:text-3xl font-semibold tracking-tight';
 
