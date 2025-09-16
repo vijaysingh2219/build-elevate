@@ -13,6 +13,49 @@ This template is for creating a monorepo with
 - [Prettier](https://prettier.io/) for code formatting
 - [pnpm](https://pnpm.io/) as the package manager
 
+---
+
+## Project Structure
+
+This monorepo is structured into the following applications and packages:
+
+### Applications
+
+- `apps/web`: Next.js web application.
+
+### Packages
+
+- `packages/eslint-config`: Centralized ESLint config.
+- `packages/prettier-config`: Shared Prettier formatting rules.
+- `packages/typescript-config`: Base TypeScript configuration.
+- `packages/db`: Shared Prisma-based database access layer.
+- `packages/ui`: Reusable UI components built with `shadcn/ui`.
+- `packages/utils`: Common utilities and shared TypeScript types.
+
+---
+
+## Getting Started
+
+### Setting up `apps/web`
+
+To set up and run the web application (`apps/web`), follow the instructions in [apps/web/README.md](apps/web/README.md).
+
+---
+
+## Root-Level Scripts
+
+The following scripts are available at the root of the monorepo:
+
+| Script        | Description                                                 |
+| ------------- | ----------------------------------------------------------- |
+| `pnpm build`  | Runs `turbo build` to build all apps and packages.          |
+| `pnpm clean`  | Clears the Turborepo cache and outputs.                     |
+| `pnpm dev`    | Runs `turbo dev` to start development servers concurrently. |
+| `pnpm lint`   | Lints all workspaces using the shared ESLint config.        |
+| `pnpm format` | Formats code using Prettier across the monorepo.            |
+
+---
+
 ## UI Components (shadcn/ui)
 
 ### Usage
