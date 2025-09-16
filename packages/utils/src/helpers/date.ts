@@ -1,1 +1,1 @@
-export { format as formatDate } from 'date-fns';
+export { format as formatDate, formatDuration, intervalToDuration } from 'date-fns';
