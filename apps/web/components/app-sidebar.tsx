@@ -21,6 +21,7 @@ import {
   SidebarTrigger,
   useSidebar,
 } from '@workspace/ui/components/sidebar';
+import { cn } from '@workspace/ui/lib/utils';
 import { LogIn, UserPlus } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
@@ -70,9 +71,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <NavUser />
           </>
         ) : (
-          <div className="flex flex-col gap-2">
+          <div className={cn('flex flex-col gap-2', { 'self-center': !isSidebarExpanded })}>
             <ThemeSwitcher />
-            <Button className="">
+            <Button size={isSidebarExpanded ? 'sm' : 'icon'} aria-label="Sign up">
               <Link
                 href="/sign-up"
                 className={`flex flex-row items-center justify-center ${isSidebarExpanded ? 'space-x-2' : ''}`}
@@ -81,7 +82,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <span>{isSidebarExpanded ? 'Sign up' : ''}</span>
               </Link>
             </Button>
-            <Button variant="secondary">
+            <Button
+              variant="secondary"
+              size={isSidebarExpanded ? 'sm' : 'icon'}
+              aria-label="Sign in"
+            >
               <Link
                 href="/sign-in"
                 className={`flex flex-row items-center justify-center ${isSidebarExpanded ? 'space-x-2' : ''}`}

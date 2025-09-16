@@ -38,7 +38,7 @@ export default function ThemeSwitcher() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger asChild className={isSidebarExpanded ? '' : 'self-center'}>
         <Button
           variant={'ghost'}
           size={isSidebarExpanded ? 'sm' : 'icon'}
