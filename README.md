@@ -52,13 +52,15 @@ To set up and run the API server (`apps/api`), follow the instructions in [apps/
 
 The following scripts are available at the root of the monorepo:
 
-| Script        | Description                                                 |
-| ------------- | ----------------------------------------------------------- |
-| `pnpm build`  | Runs `turbo build` to build all apps and packages.          |
-| `pnpm clean`  | Clears the Turborepo cache and outputs.                     |
-| `pnpm dev`    | Runs `turbo dev` to start development servers concurrently. |
-| `pnpm lint`   | Lints all workspaces using the shared ESLint config.        |
-| `pnpm format` | Formats code using Prettier across the monorepo.            |
+| Script             | Description                                                 |
+| ------------------ | ----------------------------------------------------------- |
+| `pnpm build`       | Runs `turbo build` to build all apps and packages.          |
+| `pnpm clean`       | Clears the Turborepo cache and outputs.                     |
+| `pnpm dev`         | Runs `turbo dev` to start development servers concurrently. |
+| `pnpm lint`        | Lints all workspaces using the shared ESLint config.        |
+| `pnpm format`      | Formats code using Prettier across the monorepo.            |
+| `pnpm check-types` | Checks types across all workspaces using TypeScript.        |
+| `pnpm start`       | Starts the production server for all apps.                  |
 
 ---
 
