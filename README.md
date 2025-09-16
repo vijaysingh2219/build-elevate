@@ -4,6 +4,7 @@ This template is for creating a monorepo with
 
 - [Turborepo](https://turborepo.com/) for monorepo management
 - [Next.js](https://nextjs.org/) (with Turbopack) for the web application
+- [Express](https://expressjs.com/) for the API server
 - [TypeScript](https://www.typescriptlang.org/) for type safety
 - [shadcn/ui](https://ui.shadcn.com/) for UI components
 - [Tailwind CSS](https://tailwindcss.com/) for styling
@@ -22,6 +23,7 @@ This monorepo is structured into the following applications and packages:
 ### Applications
 
 - `apps/web`: Next.js web application.
+- `apps/api`: Express API server.
 
 ### Packages
 
@@ -39,6 +41,10 @@ This monorepo is structured into the following applications and packages:
 ### Setting up `apps/web`
 
 To set up and run the web application (`apps/web`), follow the instructions in [apps/web/README.md](apps/web/README.md).
+
+### Setting up `apps/api`
+
+To set up and run the API server (`apps/api`), follow the instructions in [apps/api/README.md](apps/api/README.md).
 
 ---
 
