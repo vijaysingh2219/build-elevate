@@ -4,9 +4,12 @@
   "private": true,
   "scripts": {
     "build": "turbo build",
+    "clean": "turbo clean",
     "dev": "turbo dev",
     "lint": "turbo lint",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "check-types": "turbo check-types",
+    "start": "turbo start"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",

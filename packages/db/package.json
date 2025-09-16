@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc --build",
     "check-types": "tsc --noEmit",
-    "clean": "rm -rf dist && rm -rf generated",
+    "clean": "rm -rf dist generated .turbo node_modules",
     "db:deploy": "prisma migrate deploy",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev --skip-generate",

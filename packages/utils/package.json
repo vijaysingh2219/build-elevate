@@ -8,6 +8,7 @@
   "scripts": {
     "build": "tsc --build",
     "check-types": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo node_modules",
     "dev": "tsc --build --watch",
     "lint": "eslint . --max-warnings 0"
   },
