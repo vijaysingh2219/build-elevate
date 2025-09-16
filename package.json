@@ -14,12 +14,12 @@
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
-    "prettier": "^3.6.2",
-    "prettier-plugin-organize-imports": "^4.1.0",
-    "prettier-plugin-packagejson": "^2.5.10",
-    "prettier-plugin-tailwindcss": "^0.6.11",
-    "turbo": "^2.5.5",
-    "typescript": "5.7.3"
+    "prettier": "catalog:prettier",
+    "prettier-plugin-organize-imports": "catalog:prettier",
+    "prettier-plugin-packagejson": "catalog:prettier",
+    "prettier-plugin-tailwindcss": "catalog:prettier",
+    "turbo": "catalog:core",
+    "typescript": "catalog:dev"
   },
   "packageManager": "pnpm@10.4.1",
   "engines": {

@@ -16,7 +16,7 @@
   },
   "prettier": "@workspace/prettier-config",
   "dependencies": {
-    "@prisma/client": "6.16.1"
+    "@prisma/client": "catalog:core"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
