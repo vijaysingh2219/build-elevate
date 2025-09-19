@@ -35,6 +35,10 @@
     },
     "start": {
       "cache": false
+    },
+     "test": {
+      "outputs": ["coverage/**"],
+      "dependsOn": []
     }
   }
 }

@@ -1,0 +1,17 @@
+{
+  "name": "@workspace/jest-presets",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "files": [
+    "node/jest-preset.js"
+  ],
+  "exports": {
+    "./node": "./node/jest-preset.js",
+    "./node/jest-preset": "./node/jest-preset.js"
+  },
+  "dependencies": {
+    "jest": "catalog:dev",
+    "ts-jest": "catalog:dev"
+  }
+}

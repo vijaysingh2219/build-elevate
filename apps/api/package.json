@@ -8,9 +8,13 @@
     "dev": "nodemon --exec \"node -r esbuild-register ./src/index.ts\" -e .ts",
     "lint": "tsc --noEmit && eslint \"src/**/*.ts*\" --max-warnings 0",
     "check-types": "tsc --noEmit",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "test": "jest --detectOpenHandles"
   },
   "prettier": "@workspace/prettier-config",
+  "jest": {
+    "preset": "@workspace/jest-presets/node"
+  },
   "dependencies": {
     "@workspace/db": "workspace:*",
     "@workspace/utils": "workspace:*",
@@ -21,16 +25,21 @@
     "morgan": "catalog:server"
   },
   "devDependencies": {
+    "@jest/globals": "catalog:dev",
     "@types/cors": "catalog:server",
     "@types/express": "catalog:server",
     "@types/morgan": "catalog:server",
     "@types/node": "catalog:dev",
+    "@types/supertest": "catalog:dev",
     "@workspace/eslint-config": "workspace:*",
+    "@workspace/jest-presets": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "esbuild": "catalog:dev",
     "esbuild-register": "catalog:dev",
     "eslint": "catalog:eslint",
     "nodemon": "catalog:dev",
+    "supertest": "catalog:dev",
+    "ts-jest": "catalog:dev",
     "typescript": "catalog:dev"
   }
 }

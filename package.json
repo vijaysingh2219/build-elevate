@@ -9,7 +9,8 @@
     "lint": "turbo lint",
     "format": "prettier --write .",
     "check-types": "turbo check-types",
-    "start": "turbo start"
+    "start": "turbo start",
+    "test": "turbo test"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",
