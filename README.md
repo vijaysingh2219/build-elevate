@@ -12,6 +12,7 @@ This template is for creating a monorepo with
 - [Tanstack Query](https://tanstack.com/query/latest) for data fetching and state management
 - [ESLint](https://eslint.org/) for linting
 - [Prettier](https://prettier.io/) for code formatting
+- [Jest](https://jestjs.io/) for testing
 - [pnpm](https://pnpm.io/) as the package manager
 
 ---
@@ -39,6 +40,7 @@ This monorepo is structured into the following applications and packages:
 ### Packages
 
 - `packages/eslint-config`: Centralized ESLint config.
+- `packages/jest-presets`: Shared Jest configuration for Node.js and React.
 - `packages/prettier-config`: Shared Prettier formatting rules.
 - `packages/typescript-config`: Base TypeScript configuration.
 - `packages/db`: Shared Prisma-based database access layer.
@@ -72,6 +74,7 @@ The following scripts are available at the root of the monorepo:
 | `pnpm format`      | Formats code using Prettier across the monorepo.            |
 | `pnpm check-types` | Checks types across all workspaces using TypeScript.        |
 | `pnpm start`       | Starts the production server for all apps.                  |
+| `pnpm test`        | Runs tests across all workspaces using Jest.                |
 
 ---
 
