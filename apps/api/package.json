@@ -9,7 +9,7 @@
     "lint": "tsc --noEmit && eslint \"src/**/*.ts*\" --max-warnings 0",
     "check-types": "tsc --noEmit",
     "start": "node dist/index.js",
-    "test": "jest --detectOpenHandles"
+    "test": "jest --detectOpenHandles --coverage"
   },
   "prettier": "@workspace/prettier-config",
   "jest": {

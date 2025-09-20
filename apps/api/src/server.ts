@@ -45,6 +45,10 @@ export const createServer = (): Express => {
     });
   });
 
+  app.use((req, res) => {
+    res.status(404).json({ error: 'Route not found', path: req.originalUrl });
+  });
+
   // Error handler
   app.use(errorHandler);
 
