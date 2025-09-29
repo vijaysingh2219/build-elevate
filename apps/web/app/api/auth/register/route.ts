@@ -1,4 +1,5 @@
-import { getUsernameFromEmail, hashToken, loginSchema } from '@workspace/utils';
+import { getUsernameFromEmail, hashToken } from '@workspace/utils/helpers';
+import { loginSchema } from '@workspace/utils/schemas';
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../../../../packages/db/src';
 

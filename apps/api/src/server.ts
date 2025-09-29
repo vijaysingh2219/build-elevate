@@ -1,4 +1,4 @@
-import { formatDuration } from '@workspace/utils';
+import { formatDuration } from '@workspace/utils/helpers';
 import cors from 'cors';
 import express, { type Express, json, urlencoded } from 'express';
 import helmet from 'helmet';

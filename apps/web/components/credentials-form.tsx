@@ -14,7 +14,8 @@ import {
   FormMessage,
 } from '@workspace/ui/components/form';
 import { Input } from '@workspace/ui/components/input';
-import { LoginFormValues, loginSchema } from '@workspace/utils';
+import { loginSchema } from '@workspace/utils/schemas';
+import { LoginFormValues } from '@workspace/utils/types';
 import { Eye, EyeOff, Loader2, Lock, Mail, User } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 import Link from 'next/link';

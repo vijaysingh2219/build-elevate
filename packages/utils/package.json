@@ -3,7 +3,22 @@
   "version": "0.0.1",
   "private": true,
   "exports": {
-    ".": "./dist/index.js"
+    ".": {
+      "default": "./dist/index.js",
+      "types": "./src/index.ts"
+    },
+    "./helpers": {
+      "default": "./dist/helpers/index.js",
+      "types": "./src/helpers/index.ts"
+    },
+    "./schemas": {
+      "default": "./dist/schemas/index.js",
+      "types": "./src/schemas/index.ts"
+    },
+    "./types": {
+      "default": "./dist/types/index.js",
+      "types": "./src/types/index.ts"
+    }
   },
   "scripts": {
     "build": "tsc --build",

@@ -1,5 +1,6 @@
 import { PrismaAdapter } from '@auth/prisma-adapter';
-import { getUsernameFromEmail, loginSchema, verifyToken } from '@workspace/utils';
+import { getUsernameFromEmail, verifyToken } from '@workspace/utils/helpers';
+import { loginSchema } from '@workspace/utils/schemas';
 import type { NextAuthResult, Session } from 'next-auth';
 import NextAuth from 'next-auth';
 import { AdapterUser } from 'next-auth/adapters';
