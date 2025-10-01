@@ -1,0 +1,58 @@
+services:
+  web:
+    container_name: turborepo-web
+    build:
+      context: .
+      dockerfile: ./apps/web/Dockerfile.prod
+    env_file:
+      - ./apps/web/.env.production
+    ports:
+      - 3000:3000
+    networks:
+      - app_network
+    depends_on:
+      - postgres
+      - api # Optional: If your web app communicates with the API
+
+  api:
+    container_name: turborepo-api
+    build:
+      context: .
+      dockerfile: ./apps/api/Dockerfile.prod
+    env_file:
+      - ./apps/api/.env.local
+    ports:
+      - 4000:4000
+    networks:
+      - app_network
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres
+    container_name: turborepo-postgres
+    environment:
+      POSTGRES_DB: turborepo-app
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - turborepo-app_postgres_data:/var/lib/postgresql/data
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  turborepo-app_postgres_data:
+
+# Define a network, which allows containers to communicate
+# with each other, by using their container name as a hostname
+networks:
+  app_network:
+    driver: bridge

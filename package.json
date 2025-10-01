@@ -6,6 +6,7 @@
     "build": "turbo build",
     "clean": "turbo clean",
     "dev": "turbo dev",
+    "docker:prod": "docker-compose -f docker-compose.prod.yml up --build",
     "lint": "turbo lint",
     "format": "prettier --write .",
     "check-types": "turbo check-types",
