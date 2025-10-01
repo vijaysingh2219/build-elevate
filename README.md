@@ -6,6 +6,9 @@ This template is for creating a monorepo with
 - [Next.js](https://nextjs.org/) (with Turbopack) for the web application
 - [Express](https://expressjs.com/) for the API server
 - [TypeScript](https://www.typescriptlang.org/) for type safety
+- [Docker](https://www.docker.com/) for containerization
+- [Prisma](https://www.prisma.io/) as the ORM for database access
+- [PostgreSQL](https://www.postgresql.org/) as the database
 - [shadcn/ui](https://ui.shadcn.com/) for UI components
 - [Tailwind CSS](https://tailwindcss.com/) for styling
 - [Auth.js](https://authjs.dev/) for authentication
@@ -61,20 +64,50 @@ To set up and run the API server (`apps/api`), follow the instructions in [apps/
 
 ---
 
+## Docker Setup
+
+This project includes mutiple Dockerfile and a production `docker-compose` setup for the apps.
+
+### 1. Production
+
+To build and run the production container:
+
+```bash
+pnpm docker:prod
+```
+
+This will:
+
+- Build the Docker image using `docker-compose.prod.yml`
+- Start the web container on `localhost:3000`
+- Start the API container on `localhost:4000`
+- Start the PostgreSQL database container on `localhost:5432`
+
+Make sure you have `.env.production` in `apps/web`, `apps/api`, `packages/db`.
+
+#### Notes
+
+- The Dockerfile uses a **multi-stage build** for minimal image size.
+- The containers runs as a **non-root user** (`nextjs`, `expressjs`) for security.
+- The Docker build context includes the whole monorepo, and Turbo prunes the workspace to include only the necessary dependencies, ensuring PNPM and workspaces are resolved correctly.
+
+---
+
 ## Root-Level Scripts
 
 The following scripts are available at the root of the monorepo:
 
-| Script             | Description                                                 |
-| ------------------ | ----------------------------------------------------------- |
-| `pnpm build`       | Runs `turbo build` to build all apps and packages.          |
-| `pnpm clean`       | Clears the Turborepo cache and outputs.                     |
-| `pnpm dev`         | Runs `turbo dev` to start development servers concurrently. |
-| `pnpm lint`        | Lints all workspaces using the shared ESLint config.        |
-| `pnpm format`      | Formats code using Prettier across the monorepo.            |
-| `pnpm check-types` | Checks types across all workspaces using TypeScript.        |
-| `pnpm start`       | Starts the production server for all apps.                  |
-| `pnpm test`        | Runs tests across all workspaces using Jest.                |
+| Script             | Description                                                       |
+| ------------------ | ----------------------------------------------------------------- |
+| `pnpm build`       | Runs `turbo build` to build all apps and packages.                |
+| `pnpm clean`       | Clears the Turborepo cache and outputs.                           |
+| `pnpm dev`         | Runs `turbo dev` to start development servers concurrently.       |
+| `pnpm docker:prod` | Builds production Docker images and runs containers for all apps. |
+| `pnpm lint`        | Lints all workspaces using the shared ESLint configuration.       |
+| `pnpm format`      | Formats code using Prettier across the monorepo.                  |
+| `pnpm check-types` | Checks TypeScript types across all workspaces.                    |
+| `pnpm start`       | Starts the production servers for all apps.                       |
+| `pnpm test`        | Runs tests across all workspaces using Jest.                      |
 
 ---
 
