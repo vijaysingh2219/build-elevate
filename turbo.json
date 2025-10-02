@@ -9,7 +9,7 @@
       "env": ["DATABASE_URL"]
     },
     "check-types": {
-      "dependsOn": ["^check-types"]
+      "dependsOn": ["^build"]
     },
     "clean": {
       "cache": false
@@ -30,8 +30,8 @@
       "persistent": true
     },
     "lint": {
-      "dependsOn": ["^lint"],
-      "env": ["GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "AUTH_SECRET", "NODE_ENV", "PORT"]
+      "dependsOn": ["^build"],
+      "env": ["GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "AUTH_SECRET", "NODE_ENV", "PORT", "ALLOWED_ORIGINS"]
     },
     "start": {
       "cache": false
