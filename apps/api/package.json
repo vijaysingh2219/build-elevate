@@ -37,6 +37,7 @@
     "esbuild": "catalog:dev",
     "esbuild-register": "catalog:dev",
     "eslint": "catalog:eslint",
+    "jest": "catalog:dev",
     "nodemon": "catalog:dev",
     "supertest": "catalog:dev",
     "ts-jest": "catalog:dev",
