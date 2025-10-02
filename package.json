@@ -9,6 +9,7 @@
     "docker:prod": "docker-compose -f docker-compose.prod.yml up --build",
     "lint": "turbo lint",
     "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "check-types": "turbo check-types",
     "start": "turbo start",
     "test": "turbo test"
