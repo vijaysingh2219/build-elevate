@@ -6,6 +6,7 @@ import Logo from '@/components/logo';
 import { config } from '@/config/site';
 import { useAuthUser } from '@/hooks/use-auth-user';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { signIn } from '@workspace/auth';
 import { Button } from '@workspace/ui/components/button';
 import {
   Card,
@@ -15,7 +16,6 @@ import {
   CardTitle,
 } from '@workspace/ui/components/card';
 import { cn } from '@workspace/ui/lib/utils';
-import { signIn } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
@@ -69,7 +69,7 @@ export function AuthForm({ mode, className, ...props }: AuthFormProps) {
                 <Button
                   variant="outline"
                   className="w-full"
-                  onClick={() => signIn('google', { callbackUrl })}
+                  onClick={() => signIn.social({ provider: 'google', callbackURL: callbackUrl })}
                 >
                   <Google />
                   {mode === 'sign-in' ? 'Sign in' : 'Sign up'} with Google

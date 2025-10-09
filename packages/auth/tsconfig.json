@@ -1,0 +1,15 @@
+{
+  "extends": "@workspace/typescript-config/base.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "baseUrl": "."
+  },
+  "references": [
+    {
+      "path": "../db"
+    }
+  ],
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}

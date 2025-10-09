@@ -1,8 +1,8 @@
 'use client';
 
-import { registerUser } from '@/lib/auth';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
+import { signIn, signUp } from '@workspace/auth';
 import { Button } from '@workspace/ui/components/button';
 import {
   Form,
@@ -14,10 +14,9 @@ import {
   FormMessage,
 } from '@workspace/ui/components/form';
 import { Input } from '@workspace/ui/components/input';
-import { loginSchema } from '@workspace/utils/schemas';
-import { LoginFormValues } from '@workspace/utils/types';
+import { signInSchema, signUpSchema } from '@workspace/utils/schemas';
+import { SignInFormValues, SignUpFormValues } from '@workspace/utils/types';
 import { Eye, EyeOff, Loader2, Lock, Mail, User } from 'lucide-react';
-import { signIn } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
@@ -28,74 +27,49 @@ export function CredentialsForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const callbackUrl = searchParams.get('callbackUrl') || '/';
-  const form = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-      ...(mode === 'sign-up' ? { username: undefined } : {}),
-    },
+
+  const form = useForm<SignInFormValues | SignUpFormValues>({
+    resolver: zodResolver(mode === 'sign-up' ? signUpSchema : signInSchema),
+    defaultValues:
+      mode === 'sign-up' ? { name: '', email: '', password: '' } : { email: '', password: '' },
   });
 
   const [showPassword, setShowPassword] = useState(false);
 
   const { mutate, isPending } = useMutation({
-    mutationFn: registerUser,
-    onSuccess: () => {
-      toast.success('Account created! Please sign in.');
-      router.push('/sign-in');
+    mutationFn: async (values: SignInFormValues | SignUpFormValues) => {
+      if (mode === 'sign-up') {
+        const signUpValues = values as SignUpFormValues;
+        return signUp.email({
+          email: signUpValues.email,
+          password: signUpValues.password,
+          name: signUpValues.name,
+        });
+      }
+      const signInValues = values as SignInFormValues;
+      return signIn.email({
+        email: signInValues.email,
+        password: signInValues.password,
+        callbackURL: callbackUrl,
+      });
     },
-    onError: (error) => {
-      toast.error(error.message || 'Something went wrong');
+    onSuccess: (data) => {
+      if (data?.error) {
+        toast.error(data.error.message || 'Something went wrong');
+      } else {
+        toast.success(
+          mode === 'sign-in' ? 'Signed in successfully!' : 'Account created successfully!',
+        );
+        router.push(callbackUrl);
+      }
+    },
+    onError: (error: Error) => {
+      toast.error(error?.message || 'Something went wrong');
     },
   });
 
-  async function onSubmit(values: LoginFormValues) {
-    if (mode === 'sign-in') {
-      const result = await signIn('credentials', {
-        email: values.email,
-        password: values.password,
-        redirect: false,
-        callbackUrl,
-      });
-
-      if (result?.error) {
-        switch (result.error) {
-          case 'CredentialsSignin':
-            toast.error('Sign in failed. Please check your credentials.');
-            break;
-          case 'user_not_found':
-            toast.error('No account found with that email.');
-            break;
-          case 'invalid_password':
-            toast.error('Incorrect password.');
-            break;
-          case 'invalid_format':
-            toast.error('Invalid email or password format.');
-            break;
-          case 'missing_credentials':
-            toast.error('Please enter both email and password.');
-            break;
-          default:
-            toast.error('Something went wrong. Please try again.');
-        }
-      } else if (result?.ok) {
-        const url = new URL(result.url || '');
-        if (url.pathname.startsWith('/error')) {
-          router.push('/error' + url.search);
-        } else {
-          toast.success('Signed in!');
-          router.push('/dashboard');
-        }
-      } else if (!result?.ok) {
-        toast.error('Something went wrong. Please try again.');
-      }
-    } else {
-      if (values.username?.trim() === '') {
-        values.username = undefined;
-      }
-      mutate(values);
-    }
+  async function onSubmit(values: SignInFormValues | SignUpFormValues) {
+    mutate(values);
   }
 
   return (
@@ -104,19 +78,21 @@ export function CredentialsForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
         {mode === 'sign-up' && (
           <FormField
             control={form.control}
-            name="username"
+            name="name"
             render={({ field }) => (
               <FormItem className="grid gap-3">
-                <FormLabel>Username</FormLabel>
+                <FormLabel>
+                  Name <span className="text-primary">*</span>
+                </FormLabel>
                 <FormControl>
                   <div className="relative">
                     <User className="text-muted-foreground absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform" />
                     <Input
                       type="text"
-                      placeholder="e.g. your-name"
+                      placeholder="e.g. Your Name"
                       autoComplete="name"
                       className="pl-10"
-                      required={false}
+                      required
                       {...field}
                     />
                   </div>

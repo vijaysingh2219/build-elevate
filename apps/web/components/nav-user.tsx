@@ -1,6 +1,5 @@
-'use client';
-
-import { useAuthUser } from '@/hooks/use-auth-user';
+import { useRequiredAuthUser } from '@/hooks/use-auth-user';
+import { signOut } from '@workspace/auth/client';
 import { Avatar, AvatarFallback, AvatarImage } from '@workspace/ui/components/avatar';
 import {
   DropdownMenu,
@@ -18,8 +17,8 @@ import {
   useSidebar,
 } from '@workspace/ui/components/sidebar';
 import { ChevronsUpDown, LogOut, User2 } from 'lucide-react';
-import { signOut } from 'next-auth/react';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
 type DropdownItem = {
   label: string;
@@ -30,7 +29,8 @@ type DropdownItem = {
 
 export function NavUser() {
   const { isMobile } = useSidebar();
-  const { user, isLoading } = useAuthUser();
+  const { user, isLoading, refetch } = useRequiredAuthUser();
+
   if (isLoading) return null;
 
   const dropdownItems: DropdownItem[][] = [
@@ -45,12 +45,22 @@ export function NavUser() {
       {
         label: 'Log out',
         onClick: async () => {
-          await signOut({ callbackUrl: '/' });
+          await signOut({
+            fetchOptions: {
+              onSuccess: () => {
+                refetch();
+                redirect('/');
+              },
+            },
+          });
         },
         icon: LogOut,
       },
     ],
   ];
+
+  const displayName = user.name || user.email?.split('@')[0] || 'User';
+  const avatarFallback = displayName.charAt(0).toUpperCase();
 
   return (
     <SidebarMenu>
@@ -62,11 +72,11 @@ export function NavUser() {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user.image ?? ''} alt={user.username ?? ''} />
-                <AvatarFallback className="rounded-lg">{user.username?.charAt(0)}</AvatarFallback>
+                <AvatarImage src={user.image ?? ''} alt={displayName} />
+                <AvatarFallback className="rounded-lg">{avatarFallback}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.name ?? user.username}</span>
+                <span className="truncate font-medium">{displayName}</span>
                 <span className="truncate text-xs">{user.email}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
@@ -81,11 +91,11 @@ export function NavUser() {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.image ?? ''} alt={user.username ?? ''} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  <AvatarImage src={user.image ?? ''} alt={displayName} />
+                  <AvatarFallback className="rounded-lg">{avatarFallback}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.name ?? user.username}</span>
+                  <span className="truncate font-medium">{displayName}</span>
                   <span className="truncate text-xs">{user.email}</span>
                 </div>
               </div>

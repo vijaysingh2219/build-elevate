@@ -1,21 +1,25 @@
 'use client';
 
-import { useAuthUser } from '@/hooks/use-auth-user';
+import { useRequiredAuthUser } from '@/hooks/use-auth-user';
 import { Avatar, AvatarFallback, AvatarImage } from '@workspace/ui/components/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
+import { formatDate } from '@workspace/utils';
 import ProfileLoading from './loading';
 
 export default function ProfilePage() {
-  const { user, isLoading } = useAuthUser();
+  const { user, isLoading } = useRequiredAuthUser();
+
   if (isLoading) {
     return <ProfileLoading />;
   }
 
   const cardDetails = [
-    { label: 'Username', value: user.username || '—' },
+    { label: 'Name', value: user.name || '—' },
     { label: 'User ID', value: user.id },
-    { label: 'OAuth', value: user.isOAuth ? 'Yes' : 'No' },
+    { label: 'Email Verified', value: user.emailVerified ? 'Yes' : 'No' },
     { label: 'Profile Image', value: user.image ? 'Available' : 'No image set' },
+    { label: 'Created At', value: formatDate(user.createdAt, 'PPpp') },
+    { label: 'Updated At', value: formatDate(user.updatedAt, 'PPpp') },
   ];
 
   return (
@@ -24,14 +28,14 @@ export default function ProfilePage() {
         <CardHeader className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-center gap-4">
             <Avatar className="ring-border h-20 w-20 rounded-md ring-2">
-              <AvatarImage src={user.image ?? ''} alt={user.username ?? ''} />
+              <AvatarImage src={user.image ?? ''} alt={user.name ?? ''} />
               <AvatarFallback className="text-3xl capitalize">
-                {user.username?.[0] ?? '?'}
+                {user.name?.[0] ?? '?'}
               </AvatarFallback>
             </Avatar>
             <div>
               <CardTitle className="text-2xl font-semibold">
-                {user.name || user.username || 'Unnamed User'}
+                {user.name || 'Unnamed User'}
               </CardTitle>
               <p className="text-muted-foreground">{user.email}</p>
             </div>

@@ -1,10 +1,10 @@
 'use client';
 
-import { useAuthUser } from '@/hooks/use-auth-user';
+import { useRequiredAuthUser } from '@/hooks/use-auth-user';
 import DashboardLoading from './loading';
 
 export default function DashboardPage() {
-  const { user, isLoading } = useAuthUser();
+  const { user, isLoading } = useRequiredAuthUser();
   if (isLoading) {
     return <DashboardLoading />;
   }
@@ -15,7 +15,7 @@ export default function DashboardPage() {
       <div className="rounded-md py-4">
         <p>
           <span>Welcome back, </span>
-          <span className="font-bold">{user.name || user.username || user.email}</span>!
+          <span className="font-bold">{user.name || user.email}</span>!
         </p>
       </div>
     </section>

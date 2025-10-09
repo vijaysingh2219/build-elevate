@@ -3,15 +3,10 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./*"
-      ],
-      "@workspace/ui/*": [
-        "../../packages/ui/src/*"
-      ],
-      "@workspace/utils/*": [
-        "../../packages/utils/src/*"
-      ]
+      "@/*": ["./*"],
+      "@workspace/auth/*": ["../../packages/auth/src/*"],
+      "@workspace/ui/*": ["../../packages/ui/src/*"],
+      "@workspace/utils/*": ["../../packages/utils/src/*"]
     },
     "plugins": [
       {
@@ -30,11 +25,10 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
+    "../../packages/auth/src/**/*",
     "../../packages/db/src/**/*",
     "../../packages/ui/src/**/*",
     "../../packages/utils/src/**/*"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }

@@ -13,16 +13,22 @@ export const passwordSchema = z
     message: 'Password must be less than 100 characters.',
   });
 
-export const loginSchema = z.object({
-  username: z
-    .string()
-    .min(3, {
-      message: 'Username must be at least 3 characters.',
-    })
-    .max(100, {
-      message: 'Username must be less than 100 characters.',
-    })
-    .optional(),
+export const nameSchema = z
+  .string()
+  .min(3, {
+    message: 'Name must be at least 3 characters.',
+  })
+  .max(100, {
+    message: 'Name must be less than 100 characters.',
+  });
+
+export const signInSchema = z.object({
+  email: emailSchema,
+  password: passwordSchema,
+});
+
+export const signUpSchema = z.object({
+  name: nameSchema,
   email: emailSchema,
   password: passwordSchema,
 });

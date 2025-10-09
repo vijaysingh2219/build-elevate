@@ -1,4 +1,4 @@
-import { getToken } from 'next-auth/jwt';
+import { auth } from '@workspace/auth';
 import { NextRequest, NextResponse } from 'next/server';
 
 // Public routes that anyone can access
@@ -9,8 +9,8 @@ const AUTH_ROUTES = ['/sign-in', '/sign-up'];
 
 export async function middleware(req: NextRequest) {
   const { nextUrl } = req;
-  const token = await getToken({ req, secret: process.env.AUTH_SECRET });
-  const isLoggedIn = !!token;
+  const session = await auth.api.getSession({ headers: req.headers });
+  const isLoggedIn = !!session?.user;
 
   const { pathname, search } = req.nextUrl;
 
@@ -35,4 +35,5 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: ['/((?!_next|favicon.ico|public|api).*)'],
+  runtime: 'nodejs',
 };
