@@ -11,7 +11,7 @@ This template is for creating a monorepo with
 - [PostgreSQL](https://www.postgresql.org/) as the database
 - [shadcn/ui](https://ui.shadcn.com/) for UI components
 - [Tailwind CSS](https://tailwindcss.com/) for styling
-- [Auth.js](https://authjs.dev/) for authentication
+- [Better Auth](https://www.better-auth.com/) for authentication
 - [Tanstack Query](https://tanstack.com/query/latest) for data fetching and state management
 - [ESLint](https://eslint.org/) for linting
 - [Prettier](https://prettier.io/) for code formatting
@@ -46,6 +46,7 @@ This monorepo is structured into the following applications and packages:
 - `packages/jest-presets`: Shared Jest configuration for Node.js and React.
 - `packages/prettier-config`: Shared Prettier formatting rules.
 - `packages/typescript-config`: Base TypeScript configuration.
+- `packages/auth`: Authentication package using Better Auth.
 - `packages/db`: Shared Prisma-based database access layer.
 - `packages/ui`: Reusable UI components built with `shadcn/ui`.
 - `packages/utils`: Common utilities and shared TypeScript types.
