@@ -1,25 +1,18 @@
 {
-    "extends": "@workspace/typescript-config/base.json",
-    "compilerOptions": {
-        "rootDir": "./src",
-        "outDir": "./dist",
-        "baseUrl": ".",
-        "paths": {
-            "@workspace/utils/*": [
-                "../../packages/utils/src/*"
-            ]
-        }
-    },
-    "references": [
-        {
-            "path": "../../packages/utils"
-        }
-    ],
-    "include": [
-        "src"
-    ],
-    "exclude": [
-        "node_modules",
-        "dist"
-    ]
+  "extends": "@workspace/typescript-config/base.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "baseUrl": ".",
+    "paths": {
+      "@workspace/utils/*": ["../../packages/utils/src/*"]
+    }
+  },
+  "references": [
+    {
+      "path": "../../packages/utils"
+    }
+  ],
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
 }

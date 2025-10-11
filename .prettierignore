@@ -28,3 +28,4 @@ packages/db/generated
 *.config.js
 *.config.mjs
 *.json
+!tsconfig.json
