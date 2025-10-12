@@ -1,0 +1,30 @@
+{
+  "name": "@workspace/email",
+  "version": "0.0.1",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "clean": "rm -rf dist generated .turbo node_modules",
+    "dev": "tsc --watch"
+  },
+  "prettier": "@workspace/prettier-config",
+  "dependencies": {
+    "@react-email/components": "catalog:web",
+    "dotenv": "catalog:core",
+    "react": "catalog:web",
+    "react-dom": "catalog:web",
+    "resend": "catalog:web",
+    "zod": "catalog:core"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:dev",
+    "@workspace/eslint-config": "workspace:^",
+    "@workspace/prettier-config": "workspace:*",
+    "@workspace/typescript-config": "workspace:*",
+    "@types/react": "catalog:web",
+    "@types/react-dom": "catalog:web",
+    "typescript": "catalog:dev"
+  }
+}
