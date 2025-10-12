@@ -1,6 +1,6 @@
 services:
   web:
-    container_name: turborepo-web
+    container_name: build-elevate-web
     build:
       context: .
       dockerfile: ./apps/web/Dockerfile.prod
@@ -15,7 +15,7 @@ services:
       - api # Optional: If your web app communicates with the API
 
   api:
-    container_name: turborepo-api
+    container_name: build-elevate-api
     build:
       context: .
       dockerfile: ./apps/api/Dockerfile.prod
@@ -30,15 +30,15 @@ services:
 
   postgres:
     image: postgres
-    container_name: turborepo-postgres
+    container_name: build-elevate-postgres
     environment:
-      POSTGRES_DB: turborepo-app
+      POSTGRES_DB: build-elevate-app
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
     ports:
       - 5432:5432
     volumes:
-      - turborepo-app_postgres_data:/var/lib/postgresql/data
+      - build-elevate-app_postgres_data:/var/lib/postgresql/data
     networks:
       - app_network
     healthcheck:
@@ -49,7 +49,7 @@ services:
     restart: unless-stopped
 
 volumes:
-  turborepo-app_postgres_data:
+  build-elevate-app_postgres_data:
 
 # Define a network, which allows containers to communicate
 # with each other, by using their container name as a hostname

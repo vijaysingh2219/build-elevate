@@ -1,6 +1,6 @@
 # Next.js Turborepo App
 
-This is a Next.js application managed in a Turborepo monorepo setup. It comes with database and authentication setup using Auth.js.
+This is a Next.js application managed in a Turborepo monorepo setup. It comes with database and authentication setup.
 
 ## Setup
 
@@ -39,10 +39,10 @@ DATABASE_URL=postgresql://user:password@localhost:5432/mydb
 
 #### Auth.js Secret
 
-Set your Auth.js development secret:
+Set your Better Auth development secret:
 
 ```env
-AUTH_SECRET=your-dev-secret
+BETTER_AUTH_SECRET=your-dev-secret
 ```
 
 You can generate a random secret using Node.js:

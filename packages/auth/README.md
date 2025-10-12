@@ -1,6 +1,6 @@
 # @workspace/auth
 
-A comprehensive authentication package built on top of [Better Auth](https://www.better-auth.com/) for the Turborepo starter. This package provides a complete authentication solution with support for email/password authentication and Google OAuth, seamlessly integrated with PostgreSQL and Prisma.
+A comprehensive authentication package built on top of [Better Auth](https://www.better-auth.com/) for the build-elevate template. This package provides a complete authentication solution with support for email/password authentication and Google OAuth, seamlessly integrated with PostgreSQL and Prisma.
 
 ---
 
