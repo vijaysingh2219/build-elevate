@@ -12,10 +12,13 @@ This template is for creating a monorepo with
 - [shadcn/ui](https://ui.shadcn.com/) for UI components
 - [Tailwind CSS](https://tailwindcss.com/) for styling
 - [Better Auth](https://www.better-auth.com/) for authentication
+- [React Email](https://react.email/) for email templates
+- [Resend](https://resend.com/) for sending emails
 - [Tanstack Query](https://tanstack.com/query/latest) for data fetching and state management
 - [ESLint](https://eslint.org/) for linting
 - [Prettier](https://prettier.io/) for code formatting
 - [Jest](https://jestjs.io/) for testing
+- [GitHub Actions](https://github.com/features/actions) for CI/CD
 - [pnpm](https://pnpm.io/) as the package manager
 
 ---
@@ -48,6 +51,7 @@ This monorepo is structured into the following applications and packages:
 - `packages/typescript-config`: Base TypeScript configuration.
 - `packages/auth`: Authentication package using Better Auth.
 - `packages/db`: Shared Prisma-based database access layer.
+- `packages/email`: Email features with React Email & Resend.
 - `packages/ui`: Reusable UI components built with `shadcn/ui`.
 - `packages/utils`: Common utilities and shared TypeScript types.
 
