@@ -48,27 +48,6 @@ services:
       retries: 5
     restart: unless-stopped
 
-  migrate:
-    image: node:22-alpine
-    container_name: turborepo-migrate
-    depends_on:
-      postgres:
-        condition: service_healthy
-    working_dir: /app
-    volumes:
-      - .:/app
-    command: >
-      sh -c "
-        npm install -g pnpm
-        pnpm --filter @workspace/db install &&
-        pnpm --filter @workspace/db exec prisma generate &&
-        pnpm --filter @workspace/db exec prisma migrate deploy
-      "
-    environment:
-      DATABASE_URL: postgresql://postgres:password@postgres:5432/turborepo-app
-    networks:
-      - app_network
-
 volumes:
   turborepo-app_postgres_data:
 
