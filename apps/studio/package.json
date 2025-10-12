@@ -1,0 +1,12 @@
+{
+  "name": "studio",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "clean": "rm -rf .turbo node_modules",
+    "dev": "prisma studio --schema ../../packages/db/prisma/schema.prisma --port 5555"
+  },
+  "devDependencies": {
+    "prisma": "catalog:core"
+  }
+}
