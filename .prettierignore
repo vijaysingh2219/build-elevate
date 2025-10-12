@@ -29,3 +29,6 @@ packages/db/generated
 *.config.mjs
 *.json
 !tsconfig.json
+
+# React Email
+.react-email

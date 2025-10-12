@@ -1,0 +1,4 @@
+{
+  "extends": "@workspace/typescript-config/nextjs.json",
+  "exclude": ["node_modules"]
+}
