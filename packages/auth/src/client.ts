@@ -4,4 +4,5 @@ export const authClient = createAuthClient({
   baseURL: process.env.NEXT_PUBLIC_BASE_URL,
 });
 
-export const { signIn, signOut, signUp, useSession, getSession, $Infer } = authClient;
+export const { signIn, signOut, signUp, useSession, getSession, sendVerificationEmail, $Infer } =
+  authClient;

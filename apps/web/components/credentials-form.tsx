@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { signIn, signUp } from '@workspace/auth';
+import { sendVerificationEmail, signIn, signUp } from '@workspace/auth';
 import { Button } from '@workspace/ui/components/button';
 import {
   Form,
@@ -53,14 +53,35 @@ export function CredentialsForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
         callbackURL: callbackUrl,
       });
     },
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
       if (data?.error) {
+        if (data.error.status === 403 && data.error.code === 'EMAIL_NOT_VERIFIED') {
+          toast.error('Please verify your email address before signing in.', {
+            action: {
+              label: 'Resend email',
+              onClick: async () => {
+                try {
+                  await sendVerificationEmail({ email: variables.email });
+                  toast.success('Verification email resent. Please check your inbox.');
+                } catch (error) {
+                  console.error('Error resending verification email: ', error);
+                  toast.error('Failed to resend verification email.');
+                }
+              },
+            },
+          });
+          return;
+        }
         toast.error(data.error.message || 'Something went wrong');
       } else {
-        toast.success(
-          mode === 'sign-in' ? 'Signed in successfully!' : 'Account created successfully!',
-        );
-        router.push(callbackUrl);
+        if (mode === 'sign-up') {
+          toast.success(
+            'Account created successfully! Please check your email to verify your account.',
+          );
+          router.push('/sign-in');
+        } else {
+          toast.success('Signed in successfully!');
+        }
       }
     },
     onError: (error: Error) => {

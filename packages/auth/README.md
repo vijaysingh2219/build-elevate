@@ -7,6 +7,7 @@ A comprehensive authentication package built on top of [Better Auth](https://www
 ## Features
 
 - 🔐 **Email & Password Authentication** - Secure credential-based authentication
+- ✉️ **Email Verification** - Required email verification for new accounts
 - 🌐 **Google OAuth Integration** - One-click social login
 - 🗄️ **PostgreSQL Database** - Persistent session storage via Prisma
 - ⚡ **Better Auth Integration** - Modern, type-safe authentication library
@@ -43,6 +44,10 @@ NEXT_PUBLIC_BASE_URL=http://localhost:3000
 
 # Database connection (inherited from @workspace/db)
 DATABASE_URL=postgresql://username:password@localhost:5432/database
+
+# Email configuration (inherited from @workspace/email)
+RESEND_TOKEN=your-resend-api-token
+RESEND_EMAIL_FROM=noreply@yourdomain.com
 ```
 
 ---

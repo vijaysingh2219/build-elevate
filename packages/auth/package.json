@@ -15,6 +15,7 @@
   "prettier": "@workspace/prettier-config",
   "dependencies": {
     "@workspace/db": "workspace:*",
+    "@workspace/email": "workspace:*",
     "@workspace/utils": "workspace:*",
     "better-auth": "catalog:web",
     "zod": "catalog:core"
