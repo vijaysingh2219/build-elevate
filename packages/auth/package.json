@@ -16,6 +16,7 @@
   "dependencies": {
     "@workspace/db": "workspace:*",
     "@workspace/email": "workspace:*",
+    "@workspace/rate-limit": "workspace:*",
     "@workspace/utils": "workspace:*",
     "better-auth": "catalog:web",
     "zod": "catalog:core"

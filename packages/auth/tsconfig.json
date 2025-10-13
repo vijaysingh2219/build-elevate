@@ -12,6 +12,9 @@
     },
     {
       "path": "../email"
+    },
+    {
+      "path": "../rate-limit"
     }
   ],
   "include": ["src"],

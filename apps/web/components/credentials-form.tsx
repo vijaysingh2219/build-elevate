@@ -61,8 +61,12 @@ export function CredentialsForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
               label: 'Resend email',
               onClick: async () => {
                 try {
-                  await sendVerificationEmail({ email: variables.email });
-                  toast.success('Verification email resent. Please check your inbox.');
+                  const { error } = await sendVerificationEmail({ email: variables.email });
+                  if (error) {
+                    toast.error('Too many requests. Please try again later.');
+                    return;
+                  }
+                  toast.success('Verification email sent. Please check your inbox.');
                 } catch (error) {
                   console.error('Error resending verification email: ', error);
                   toast.error('Failed to resend verification email.');

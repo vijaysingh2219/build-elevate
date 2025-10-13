@@ -1,4 +1,5 @@
 import { getTemplate, sendEmail, verifyEmailSchema } from '@workspace/email';
+import { verifyEmailRateLimiter } from '@workspace/rate-limit';
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { prisma } from '../../db/src/client';
@@ -13,6 +14,7 @@ export const auth = betterAuth({
   },
   emailVerification: {
     sendOnSignUp: true,
+    autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, url }) => {
       const { data, success, error } = verifyEmailSchema.safeParse({
         email: user.email,
@@ -22,6 +24,13 @@ export const auth = betterAuth({
       if (error || !success) {
         throw new Error('Failed to send verification email');
       }
+
+      const { success: rateLimitSuccess } = await verifyEmailRateLimiter.limit(user.email);
+      if (!rateLimitSuccess) {
+        console.log('Rate limit exceeded. Please try again later.');
+        return;
+      }
+
       const emailTemplate = getTemplate('verify-email');
       await sendEmail({
         to: user.email,
