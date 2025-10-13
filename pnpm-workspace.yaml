@@ -52,6 +52,8 @@ catalogs:
     prisma: ^6.16.1
     "@prisma/client": ^6.16.1
     date-fns: ^4.1.0
+    "@upstash/ratelimit": ^2.0.6
+    "@upstash/redis": ^1.35.5
 
   dev:
     typescript: ^5.9.2

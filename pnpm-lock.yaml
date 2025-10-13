@@ -9,6 +9,12 @@ catalogs:
     '@prisma/client':
       specifier: ^6.16.1
       version: 6.16.1
+    '@upstash/ratelimit':
+      specifier: ^2.0.6
+      version: 2.0.6
+    '@upstash/redis':
+      specifier: ^1.35.5
+      version: 1.35.5
     date-fns:
       specifier: ^4.1.0
       version: 4.1.0
@@ -463,6 +469,9 @@ importers:
       '@workspace/email':
         specifier: workspace:*
         version: link:../email
+      '@workspace/rate-limit':
+        specifier: workspace:*
+        version: link:../rate-limit
       '@workspace/utils':
         specifier: workspace:*
         version: link:../utils
@@ -516,6 +525,9 @@ importers:
       '@react-email/components':
         specifier: catalog:web
         version: 0.5.6(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+      '@workspace/rate-limit':
+        specifier: workspace:*
+        version: link:../rate-limit
       dotenv:
         specifier: catalog:core
         version: 17.2.3
@@ -620,6 +632,37 @@ importers:
       prettier-plugin-tailwindcss:
         specifier: catalog:prettier
         version: 0.6.14(prettier-plugin-organize-imports@4.2.0(prettier@3.6.2)(typescript@5.9.2))(prettier@3.6.2)
+
+  packages/rate-limit:
+    dependencies:
+      '@upstash/ratelimit':
+        specifier: catalog:core
+        version: 2.0.6(@upstash/redis@1.35.5)
+      '@upstash/redis':
+        specifier: catalog:core
+        version: 1.35.5
+      dotenv:
+        specifier: catalog:core
+        version: 17.2.3
+      zod:
+        specifier: catalog:core
+        version: 3.25.76
+    devDependencies:
+      '@types/node':
+        specifier: catalog:dev
+        version: 20.19.9
+      '@workspace/eslint-config':
+        specifier: workspace:^
+        version: link:../eslint-config
+      '@workspace/prettier-config':
+        specifier: workspace:*
+        version: link:../prettier-config
+      '@workspace/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      typescript:
+        specifier: catalog:dev
+        version: 5.9.2
 
   packages/typescript-config: {}
 
@@ -3089,6 +3132,18 @@ packages:
     resolution: {integrity: sha512-lrW200hZdbfRtztbygyaq/6jP6AKE8qQN2KvPcJ+x7wiD038YtnYtZ82IMNJ69GJibV7bwL3y9FgK+5w/pYt6g==}
     cpu: [x64]
     os: [win32]
+
+  '@upstash/core-analytics@0.0.10':
+    resolution: {integrity: sha512-7qJHGxpQgQr9/vmeS1PktEwvNAF7TI4iJDi8Pu2CFZ9YUGHZH4fOP5TfYlZ4aVxfopnELiE4BS4FBjyK7V1/xQ==}
+    engines: {node: '>=16.0.0'}
+
+  '@upstash/ratelimit@2.0.6':
+    resolution: {integrity: sha512-Uak5qklMfzFN5RXltxY6IXRENu+Hgmo9iEgMPOlUs2etSQas2N+hJfbHw37OUy4vldLRXeD0OzL+YRvO2l5acg==}
+    peerDependencies:
+      '@upstash/redis': ^1.34.3
+
+  '@upstash/redis@1.35.5':
+    resolution: {integrity: sha512-KdLdNAspQGOTGeC++o2LDBzNbMXrfInnmW5nUJfNXabnVh8X4NPrlJ0X4j75cBUShiMpXB3uI1ql4KpFQeqrHQ==}
 
   '@webassemblyjs/ast@1.14.1':
     resolution: {integrity: sha512-nuBEDgQfm1ccRp/8bCQrx1frohyufl4JlbMMZ4P1wpeOfDhF6FQkxZJ1b/e+PLwr6X1Nhw6OLme5usuBWYBvuQ==}
@@ -9444,6 +9499,19 @@ snapshots:
 
   '@unrs/resolver-binding-win32-x64-msvc@1.11.1':
     optional: true
+
+  '@upstash/core-analytics@0.0.10':
+    dependencies:
+      '@upstash/redis': 1.35.5
+
+  '@upstash/ratelimit@2.0.6(@upstash/redis@1.35.5)':
+    dependencies:
+      '@upstash/core-analytics': 0.0.10
+      '@upstash/redis': 1.35.5
+
+  '@upstash/redis@1.35.5':
+    dependencies:
+      uncrypto: 0.1.3
 
   '@webassemblyjs/ast@1.14.1':
     dependencies:
