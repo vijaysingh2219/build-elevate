@@ -2,7 +2,7 @@
   "name": "@workspace/db",
   "version": "0.0.1",
   "exports": {
-    ".": "./dist/index.js"
+    ".": "./src/index.ts"
   },
   "scripts": {
     "build": "tsc --build",
@@ -19,10 +19,10 @@
     "@prisma/client": "catalog:core"
   },
   "devDependencies": {
-    "@types/node": "^22.10.2",
+    "@types/node": "catalog:dev",
     "@workspace/typescript-config": "workspace:*",
-    "prisma": "^6.16.1",
-    "tsx": "^4.19.2",
-    "typescript": "^5.7.2"
+    "prisma": "catalog:core",
+    "tsx": "catalog:dev",
+    "typescript": "catalog:dev"
   }
 }

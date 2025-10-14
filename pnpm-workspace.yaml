@@ -43,7 +43,6 @@ catalogs:
     morgan: ^1.10.1
     "@types/morgan": ^1.9.10
     bcryptjs: ^3.0.2
-    tsx: ^4.19.2
 
   core:
     turbo: ^2.5.5
@@ -60,6 +59,7 @@ catalogs:
     esbuild: ^0.20.1
     esbuild-register: ^3.5.0
     "@types/node": ^20.19.9
+    tsx: ^4.19.2
     nodemon: ^3.1.10
     "@turbo/gen": ^2.5.5
     jest: ^30.1.3
