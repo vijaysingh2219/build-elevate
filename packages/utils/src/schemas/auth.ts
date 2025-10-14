@@ -57,3 +57,8 @@ export const changePasswordSchema = z
     message: 'New password must be different from current password',
     path: ['password'],
   });
+
+export const updateProfileSchema = z.object({
+  name: nameSchema,
+  email: emailSchema,
+});

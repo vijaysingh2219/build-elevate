@@ -24,3 +24,10 @@ export const verifyEmailSchema = z.object({
   name: z.string().min(1).max(100),
   verificationUrl: z.string().url(),
 });
+
+export const changeEmailSchema = z.object({
+  currentEmail: emailSchema,
+  newEmail: emailSchema,
+  name: z.string().min(1).max(100),
+  verificationUrl: z.string().url(),
+});

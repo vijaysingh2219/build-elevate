@@ -10,12 +10,7 @@ import {
   Tailwind,
   Text,
 } from '@react-email/components';
-
-type VerificationEmailProps = {
-  readonly name: string;
-  readonly email: string;
-  readonly verificationUrl: string;
-};
+import { VerificationEmailProps } from '../types';
 
 export const VerificationEmail = ({ name, verificationUrl }: VerificationEmailProps) => {
   return (
