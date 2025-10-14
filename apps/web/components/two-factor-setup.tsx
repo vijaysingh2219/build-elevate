@@ -1,7 +1,9 @@
 'use client';
 
+import { useHasPassword } from '@/hooks/use-has-password';
 import { useMutation } from '@tanstack/react-query';
 import { twoFactor } from '@workspace/auth';
+import { Alert, AlertDescription, AlertTitle } from '@workspace/ui/components/alert';
 import { Button } from '@workspace/ui/components/button';
 import {
   Card,
@@ -23,8 +25,9 @@ import { Input } from '@workspace/ui/components/input';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@workspace/ui/components/input-otp';
 import { Label } from '@workspace/ui/components/label';
 import { Spinner } from '@workspace/ui/components/spinner';
-import { Shield, ShieldCheck } from 'lucide-react';
+import { AlertCircle, Shield, ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import QRCode from 'qrcode';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -42,6 +45,9 @@ export function TwoFactorSetup({ isEnabled, onStatusChange }: TwoFactorSetupProp
   const [totpCode, setTotpCode] = useState('');
   const [password, setPassword] = useState('');
   const [step, setStep] = useState<'qr' | 'verify' | 'backup'>('qr');
+
+  // Check if user has a password set
+  const { data: hasPassword, isLoading: checkingPassword } = useHasPassword();
 
   const enableMutation = useMutation({
     mutationFn: async (password: string) => {
@@ -131,6 +137,20 @@ export function TwoFactorSetup({ isEnabled, onStatusChange }: TwoFactorSetupProp
     onStatusChange?.(true);
   };
 
+  const handleEnableClick = () => {
+    if (checkingPassword) return;
+
+    if (hasPassword === false) {
+      toast.error('Please set a password first to enable 2FA', {
+        description:
+          'OAuth users need to set a password before enabling two-factor authentication.',
+      });
+      return;
+    }
+
+    setShowSetupDialog(true);
+  };
+
   const copyBackupCodes = () => {
     navigator.clipboard.writeText(backupCodes.join('\n'));
     toast.success('Backup codes copied to clipboard');
@@ -163,13 +183,28 @@ export function TwoFactorSetup({ isEnabled, onStatusChange }: TwoFactorSetupProp
             Add an extra layer of security to your account by enabling two-factor authentication.
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <div className="text-sm">
             Status:{' '}
             <span className={isEnabled ? 'font-medium text-green-600' : 'text-muted-foreground'}>
               {isEnabled ? 'Enabled' : 'Disabled'}
             </span>
           </div>
+
+          {/* Show warning if user doesn't have a password */}
+          {!checkingPassword && hasPassword === false && !isEnabled && (
+            <Alert variant="default">
+              <AlertCircle />
+              <AlertTitle>Password Required</AlertTitle>
+              <AlertDescription>
+                You signed in with Google OAuth and don&apos;t have a password set. Please set a
+                password first to enable two-factor authentication.
+                <Button asChild variant="link" className="h-auto p-0">
+                  <Link href="#set-password">Set Password</Link>
+                </Button>
+              </AlertDescription>
+            </Alert>
+          )}
         </CardContent>
         <CardFooter>
           {isEnabled ? (
@@ -177,14 +212,26 @@ export function TwoFactorSetup({ isEnabled, onStatusChange }: TwoFactorSetupProp
               Disable 2FA
             </Button>
           ) : (
-            <Button onClick={() => setShowSetupDialog(true)}>Enable 2FA</Button>
+            <Button
+              onClick={handleEnableClick}
+              disabled={checkingPassword || hasPassword === false}
+            >
+              {checkingPassword ? (
+                <>
+                  <Spinner />
+                  Checking...
+                </>
+              ) : (
+                'Enable 2FA'
+              )}
+            </Button>
           )}
         </CardFooter>
       </Card>
 
       {/* Enable 2FA Dialog */}
       <Dialog open={showSetupDialog} onOpenChange={setShowSetupDialog}>
-        <DialogContent className="px-2 py-6 sm:max-w-md">
+        <DialogContent className="px-2 py-6 sm:max-w-md sm:px-6">
           <DialogHeader className="items-center">
             <DialogTitle>
               {step === 'qr' && 'Enable Two-Factor Authentication'}

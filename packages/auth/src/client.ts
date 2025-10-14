@@ -14,5 +14,6 @@ export const {
   getSession,
   sendVerificationEmail,
   twoFactor,
+  changePassword,
   $Infer,
 } = authClient;

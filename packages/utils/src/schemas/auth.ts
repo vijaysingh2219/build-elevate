@@ -32,3 +32,28 @@ export const signUpSchema = z.object({
   email: emailSchema,
   password: passwordSchema,
 });
+
+export const setPasswordSchema = z
+  .object({
+    password: passwordSchema,
+    confirmPassword: passwordSchema,
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  });
+
+export const changePasswordSchema = z
+  .object({
+    currentPassword: passwordSchema,
+    password: passwordSchema,
+    confirmPassword: passwordSchema,
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  })
+  .refine((data) => data.currentPassword !== data.password, {
+    message: 'New password must be different from current password',
+    path: ['password'],
+  });

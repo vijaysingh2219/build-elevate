@@ -1,7 +1,9 @@
 'use client';
 
+import { PasswordForm } from '@/components/password-form';
 import { TwoFactorSetup } from '@/components/two-factor-setup';
 import { useRequiredAuthUser } from '@/hooks/use-auth-user';
+import { useHasPassword } from '@/hooks/use-has-password';
 import {
   Card,
   CardContent,
@@ -13,8 +15,9 @@ import { Skeleton } from '@workspace/ui/components/skeleton';
 
 export default function SecurityPage() {
   const { user, isLoading } = useRequiredAuthUser();
+  const { isLoading: checkingPassword, refetch: refetchPasswordStatus } = useHasPassword();
 
-  if (isLoading) {
+  if (isLoading || checkingPassword) {
     return (
       <section className="w-xl mx-auto max-w-3xl space-y-6 px-4 py-10">
         <div>
@@ -35,6 +38,9 @@ export default function SecurityPage() {
           Manage your account security settings and two-factor authentication.
         </p>
       </div>
+
+      {/* Password management - shows Set Password or Change Password based on user's current state */}
+      <PasswordForm onSuccess={() => refetchPasswordStatus()} />
 
       <TwoFactorSetup isEnabled={user.twoFactorEnabled ?? false} />
 
