@@ -5,9 +5,11 @@
     ".": "./src/index.ts"
   },
   "scripts": {
+    "build": "tsc --build",
     "check-types": "tsc --noEmit",
     "clean": "rm -rf dist generated .turbo node_modules",
-    "dev": "tsc --watch"
+    "dev": "tsc --watch",
+    "lint": "eslint . --max-warnings 0"
   },
   "prettier": "@workspace/prettier-config",
   "dependencies": {
