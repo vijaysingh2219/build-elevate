@@ -25,6 +25,7 @@
     "@radix-ui/react-tooltip": "catalog:web",
     "class-variance-authority": "catalog:web",
     "clsx": "catalog:web",
+    "input-otp": "catalog:web",
     "lucide-react": "catalog:web",
     "next-themes": "catalog:web",
     "react": "catalog:web",

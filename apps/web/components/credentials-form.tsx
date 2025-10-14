@@ -14,9 +14,10 @@ import {
   FormMessage,
 } from '@workspace/ui/components/form';
 import { Input } from '@workspace/ui/components/input';
+import { Spinner } from '@workspace/ui/components/spinner';
 import { signInSchema, signUpSchema } from '@workspace/utils/schemas';
 import { SignInFormValues, SignUpFormValues } from '@workspace/utils/types';
-import { Eye, EyeOff, Loader2, Lock, Mail, User } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, User } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
@@ -84,6 +85,15 @@ export function CredentialsForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
           );
           router.push('/sign-in');
         } else {
+          const signInData = data.data;
+
+          // Check if 2FA is required
+          if ('twoFactorRedirect' in signInData && signInData.twoFactorRedirect === true) {
+            toast.info('Two-factor authentication required');
+            router.push(`/two-factor?callbackUrl=${encodeURIComponent(callbackUrl)}`);
+            return;
+          }
+
           toast.success('Signed in successfully!');
         }
       }
@@ -199,7 +209,7 @@ export function CredentialsForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
         <Button type="submit" className="mb-6 w-full" disabled={isPending}>
           {isPending ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Spinner />
               {mode === 'sign-in' ? 'Signing in...' : 'Creating account...'}
             </>
           ) : mode === 'sign-in' ? (

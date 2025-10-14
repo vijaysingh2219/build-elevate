@@ -2,10 +2,10 @@ import { auth } from '@workspace/auth';
 import { NextRequest, NextResponse } from 'next/server';
 
 // Public routes that anyone can access
-const PUBLIC_ROUTES = ['/sign-in', '/sign-up', '/error'];
+const PUBLIC_ROUTES = ['/sign-in', '/sign-up', '/two-factor', '/error'];
 
 // Routes only for unauthenticated users
-const AUTH_ROUTES = ['/sign-in', '/sign-up'];
+const AUTH_ROUTES = ['/sign-in', '/sign-up', '/two-factor'];
 
 export async function middleware(req: NextRequest) {
   const { nextUrl } = req;
