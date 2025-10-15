@@ -77,6 +77,9 @@ export const auth = betterAuth({
         });
       },
     },
+    deleteUser: {
+      enabled: true,
+    },
   },
   socialProviders: {
     google: {

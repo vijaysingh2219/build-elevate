@@ -62,3 +62,13 @@ export const updateProfileSchema = z.object({
   name: nameSchema,
   email: emailSchema,
 });
+
+export const deleteAccountSchema = z
+  .object({
+    password: passwordSchema,
+    confirmation: z.string(),
+  })
+  .refine((data) => data.confirmation === 'DELETE', {
+    message: 'Please type DELETE to confirm',
+    path: ['confirmation'],
+  });

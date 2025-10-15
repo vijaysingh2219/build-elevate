@@ -1,5 +1,6 @@
 'use client';
 
+import { DeleteAccountForm } from '@/components/delete-account-form';
 import { PasswordForm } from '@/components/password-form';
 import { TwoFactorSetup } from '@/components/two-factor-setup';
 import { useRequiredAuthUser } from '@/hooks/use-auth-user';
@@ -60,6 +61,9 @@ export default function SecurityPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Danger Zone - Delete Account */}
+      <DeleteAccountForm />
     </section>
   );
 }
