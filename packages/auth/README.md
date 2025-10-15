@@ -9,6 +9,7 @@ A comprehensive authentication package built on top of [Better Auth](https://www
 - 🔐 **Email & Password Authentication** - Secure credential-based authentication
 - ✉️ **Email Verification** - Required email verification for new accounts
 - 🌐 **Google OAuth Integration** - One-click social login
+- 🔐 **Two-Factor Authentication (2FA)** - Additional security layer for user accounts
 - 🗄️ **PostgreSQL Database** - Persistent session storage via Prisma
 - ⚡ **Better Auth Integration** - Modern, type-safe authentication library
 - 🎯 **TypeScript Support** - Full type safety throughout

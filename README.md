@@ -25,12 +25,14 @@ This template is for creating a monorepo with
 
 ## 🖼 Screenshots
 
-| Page    | Light Theme                          | Dark Theme                               |
-| ------- | ------------------------------------ | ---------------------------------------- |
-| Home    | ![Home Light](assets/home.png)       | ![Home Dark](assets/home-dark.png)       |
-| Sign Up | ![Sign Up Light](assets/sign-up.png) | ![Sign Up Dark](assets/sign-up-dark.png) |
-| Sign In | ![Sign In Light](assets/sign-in.png) | ![Sign In Dark](assets/sign-in-dark.png) |
-| Profile | ![Profile Light](assets/profile.png) | ![Profile Dark](assets/profile-dark.png) |
+| Page                | Light Theme                                              | Dark Theme                                                   |
+| ------------------- | -------------------------------------------------------- | ------------------------------------------------------------ |
+| Home                | ![Home Light](assets/home.png)                           | ![Home Dark](assets/home-dark.png)                           |
+| Sign Up             | ![Sign Up Light](assets/sign-up.png)                     | ![Sign Up Dark](assets/sign-up-dark.png)                     |
+| Sign In             | ![Sign In Light](assets/sign-in.png)                     | ![Sign In Dark](assets/sign-in-dark.png)                     |
+| Profile             | ![Profile Light](assets/profile.png)                     | ![Profile Dark](assets/profile-dark.png)                     |
+| Settings - General  | ![Settings General Light](assets/settings-general.png)   | ![Settings General Dark](assets/settings-general-dark.png)   |
+| Settings - Security | ![Settings Security Light](assets/settings-security.png) | ![Settings Security Dark](assets/settings-security-dark.png) |
 
 ---
 
@@ -126,7 +128,7 @@ pnpm dlx shadcn@latest init
 
 ### Adding components
 
-To add components to your app, run the following command at the root of your `web` app:
+To add components to your app, run the following command at the root directory:
 
 ```bash
 pnpm dlx shadcn@latest add button -c apps/web
