@@ -14,9 +14,7 @@
   "prettier": "@workspace/prettier-config",
   "dependencies": {
     "@react-email/components": "catalog:web",
-    "dotenv": "catalog:core",
     "react": "catalog:web",
-    "react-dom": "catalog:web",
     "resend": "catalog:web",
     "zod": "catalog:core"
   },

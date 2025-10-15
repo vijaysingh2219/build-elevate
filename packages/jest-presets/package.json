@@ -11,7 +11,6 @@
     "./node/jest-preset": "./node/jest-preset.js"
   },
   "dependencies": {
-    "jest": "catalog:dev",
-    "ts-jest": "catalog:dev"
+    "jest": "catalog:dev"
   }
 }

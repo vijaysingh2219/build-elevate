@@ -14,9 +14,7 @@
   "prettier": "@workspace/prettier-config",
   "dependencies": {
     "@upstash/ratelimit": "catalog:core",
-    "@upstash/redis": "catalog:core",
-    "dotenv": "catalog:core",
-    "zod": "catalog:core"
+    "@upstash/redis": "catalog:core"
   },
   "devDependencies": {
     "@types/node": "catalog:dev",

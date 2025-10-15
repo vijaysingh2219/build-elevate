@@ -15,7 +15,6 @@
     "test": "turbo test"
   },
   "devDependencies": {
-    "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "eslint": "catalog:eslint",
     "prettier": "catalog:prettier",

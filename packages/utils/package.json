@@ -29,7 +29,6 @@
   },
   "prettier": "@workspace/prettier-config",
   "dependencies": {
-    "bcryptjs": "catalog:server",
     "date-fns": "catalog:core",
     "zod": "catalog:core"
   },

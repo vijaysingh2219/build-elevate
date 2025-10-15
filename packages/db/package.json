@@ -22,7 +22,6 @@
     "@types/node": "catalog:dev",
     "@workspace/typescript-config": "workspace:*",
     "prisma": "catalog:core",
-    "tsx": "catalog:dev",
     "typescript": "catalog:dev"
   }
 }

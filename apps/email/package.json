@@ -8,8 +8,6 @@
     "dev": "email dev --port 3002 --dir ../../packages/email/src/templates"
   },
   "dependencies": {
-    "@workspace/email": "workspace:*",
-    "@react-email/components": "catalog:web",
     "@react-email/preview-server": "catalog:web",
     "react": "catalog:web",
     "react-email": "catalog:web"

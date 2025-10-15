@@ -15,7 +15,6 @@
   },
   "prettier": "@workspace/prettier-config",
   "dependencies": {
-    "@hookform/resolvers": "catalog:web",
     "@radix-ui/react-avatar": "catalog:web",
     "@radix-ui/react-dialog": "catalog:web",
     "@radix-ui/react-dropdown-menu": "catalog:web",
@@ -32,12 +31,10 @@
     "react-dom": "catalog:web",
     "react-hook-form": "catalog:web",
     "tailwind-merge": "catalog:web",
-    "tw-animate-css": "catalog:web",
-    "zod": "catalog:core"
+    "tw-animate-css": "catalog:web"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "catalog:web",
-    "@turbo/gen": "catalog:dev",
     "@types/node": "catalog:dev",
     "@types/react": "catalog:web",
     "@types/react-dom": "catalog:web",

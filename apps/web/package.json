@@ -15,20 +15,12 @@
   "prettier": "@workspace/prettier-config",
   "dependencies": {
     "@hookform/resolvers": "catalog:web",
-    "@radix-ui/react-avatar": "catalog:web",
-    "@radix-ui/react-dialog": "catalog:web",
-    "@radix-ui/react-dropdown-menu": "catalog:web",
-    "@radix-ui/react-label": "catalog:web",
-    "@radix-ui/react-separator": "catalog:web",
-    "@radix-ui/react-slot": "catalog:web",
-    "@radix-ui/react-tooltip": "catalog:web",
     "@tanstack/react-query": "catalog:web",
     "@types/qrcode": "catalog:web",
     "@workspace/auth": "workspace:*",
     "@workspace/db": "workspace:*",
     "@workspace/ui": "workspace:*",
     "@workspace/utils": "workspace:*",
-    "class-variance-authority": "catalog:web",
     "lucide-react": "catalog:web",
     "next": "catalog:web",
     "next-themes": "catalog:web",
@@ -36,8 +28,7 @@
     "react": "catalog:web",
     "react-dom": "catalog:web",
     "react-hook-form": "catalog:web",
-    "sonner": "catalog:web",
-    "zod": "catalog:core"
+    "sonner": "catalog:web"
   },
   "devDependencies": {
     "@types/node": "catalog:dev",
