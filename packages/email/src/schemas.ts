@@ -31,3 +31,8 @@ export const changeEmailSchema = z.object({
   name: z.string().min(1).max(100),
   verificationUrl: z.string().url(),
 });
+
+export const resetPasswordSchema = z.object({
+  name: z.string().min(1).max(100),
+  resetUrl: z.string().url(),
+});

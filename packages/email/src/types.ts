@@ -18,3 +18,8 @@ export interface ChangeEmailProps {
   name: string;
   verificationUrl: string;
 }
+
+export interface ResetPasswordProps {
+  name: string;
+  resetUrl: string;
+}

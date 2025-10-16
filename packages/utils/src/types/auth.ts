@@ -3,7 +3,9 @@ import {
   changePasswordSchema,
   deleteAccountSchema,
   emailSchema,
+  forgotPasswordSchema,
   passwordSchema,
+  resetPasswordSchema,
   setPasswordSchema,
   signInSchema,
   signUpSchema,
@@ -25,3 +27,7 @@ export type ChangePasswordFormValues = z.infer<typeof changePasswordSchema>;
 export type UpdateProfileFormValues = z.infer<typeof updateProfileSchema>;
 
 export type DeleteAccountFormValues = z.infer<typeof deleteAccountSchema>;
+
+export type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
+
+export type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;

@@ -196,7 +196,15 @@ export function CredentialsForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
               </FormControl>
               <FormDescription>
                 {mode === 'sign-in' ? (
-                  <>Enter the password for your account.</>
+                  <span className="flex items-center justify-between">
+                    <span>Enter the password for your account.</span>
+                    <Link
+                      href="/forgot-password"
+                      className="text-muted-foreground hover:text-foreground underline underline-offset-4"
+                    >
+                      Forgot password?
+                    </Link>
+                  </span>
                 ) : (
                   <>Choose a strong password with at least 8 characters.</>
                 )}
