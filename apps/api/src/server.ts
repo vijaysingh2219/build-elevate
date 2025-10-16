@@ -6,6 +6,7 @@ import morgan from 'morgan';
 import corsOptions from './config/corsOptions';
 import credentials from './middleware/credentials';
 import { errorHandler } from './middleware/error';
+import routes from './routes';
 
 const isProd = process.env.NODE_ENV === 'production';
 
@@ -44,6 +45,9 @@ export const createServer = (): Express => {
       timestamp,
     });
   });
+
+  // API Routes
+  app.use('/api', routes);
 
   app.use((req, res) => {
     res.status(404).json({ error: 'Route not found', path: req.originalUrl });

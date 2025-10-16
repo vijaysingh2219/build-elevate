@@ -16,6 +16,7 @@
     "preset": "@workspace/jest-presets/node"
   },
   "dependencies": {
+    "@workspace/auth": "workspace:*",
     "@workspace/utils": "workspace:*",
     "cors": "catalog:server",
     "dotenv": "catalog:core",

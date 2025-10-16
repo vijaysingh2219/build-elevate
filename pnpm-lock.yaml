@@ -262,6 +262,9 @@ importers:
 
   apps/api:
     dependencies:
+      '@workspace/auth':
+        specifier: workspace:*
+        version: link:../../packages/auth
       '@workspace/utils':
         specifier: workspace:*
         version: link:../../packages/utils

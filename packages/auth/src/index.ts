@@ -6,3 +6,6 @@ export * from './server';
 
 // Next handlers (for Next.js API routes)
 export * from './next-handlers';
+
+// Node.js helpers (for Express)
+export * from './node-handlers';
