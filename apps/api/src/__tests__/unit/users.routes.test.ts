@@ -45,7 +45,7 @@ jest.mock('@workspace/auth', () => ({
   fromNodeHeaders: jest.fn((headers) => headers),
 }));
 
-import { createServer } from '../server';
+import { createServer } from '../../server';
 
 describe('User Routes', () => {
   let app: Express;

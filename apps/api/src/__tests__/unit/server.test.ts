@@ -9,7 +9,7 @@ jest.mock('@workspace/auth', () => ({
 }));
 
 // Mock the auth middleware
-jest.mock('../middleware/auth', () => ({
+jest.mock('../../middleware/auth', () => ({
   requireAuth: jest.fn((req: Request, res: Response, next: NextFunction) => {
     // Mock authenticated user for testing
     Object.assign(req, {
@@ -25,7 +25,7 @@ jest.mock('../middleware/auth', () => ({
   }),
 }));
 
-import { createServer } from '../server';
+import { createServer } from '../../server';
 
 describe('API Server', () => {
   let app: ReturnType<typeof createServer>;
