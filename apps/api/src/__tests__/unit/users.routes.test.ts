@@ -45,6 +45,23 @@ jest.mock('@workspace/auth', () => ({
   fromNodeHeaders: jest.fn((headers) => headers),
 }));
 
+jest.mock('@workspace/rate-limit', () => ({
+  createRateLimiter: jest.fn(() => ({
+    limit: jest.fn(() =>
+      Promise.resolve({
+        success: true,
+        limit: 100,
+        remaining: 99,
+        reset: Date.now() + 60000,
+      }),
+    ),
+  })),
+  slidingWindow: jest.fn((requests: number, window: string) => ({
+    requests,
+    window,
+  })),
+}));
+
 import { createServer } from '../../server';
 
 describe('User Routes', () => {

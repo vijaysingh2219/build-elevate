@@ -8,6 +8,24 @@ jest.mock('@workspace/auth', () => ({
   auth: {},
 }));
 
+// Mock the rate limit package
+jest.mock('@workspace/rate-limit', () => ({
+  createRateLimiter: jest.fn(() => ({
+    limit: jest.fn(() =>
+      Promise.resolve({
+        success: true,
+        limit: 100,
+        remaining: 99,
+        reset: Date.now() + 60000,
+      }),
+    ),
+  })),
+  slidingWindow: jest.fn((requests: number, window: string) => ({
+    requests,
+    window,
+  })),
+}));
+
 // Mock the auth middleware
 jest.mock('../../middleware/auth', () => ({
   requireAuth: jest.fn((req: Request, res: Response, next: NextFunction) => {

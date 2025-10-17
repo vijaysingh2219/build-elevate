@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@workspace/auth": "workspace:*",
+    "@workspace/rate-limit": "workspace:*",
     "@workspace/utils": "workspace:*",
     "cors": "catalog:server",
     "dotenv": "catalog:core",

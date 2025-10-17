@@ -265,6 +265,9 @@ importers:
       '@workspace/auth':
         specifier: workspace:*
         version: link:../../packages/auth
+      '@workspace/rate-limit':
+        specifier: workspace:*
+        version: link:../../packages/rate-limit
       '@workspace/utils':
         specifier: workspace:*
         version: link:../../packages/utils
