@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { forgetPassword } from '@workspace/auth/client';
+import { requestPasswordReset } from '@workspace/auth/client';
 import { Button } from '@workspace/ui/components/button';
 import {
   Card,
@@ -43,7 +43,7 @@ export default function ForgotPasswordPage() {
 
   const forgotPasswordMutation = useMutation({
     mutationFn: async (values: ForgotPasswordFormValues) => {
-      const result = await forgetPassword({
+      const result = await requestPasswordReset({
         email: values.email,
         redirectTo: '/reset-password',
       });

@@ -111,7 +111,7 @@ export default function GeneralSettingsPage() {
   }
 
   return (
-    <section className="mx-auto max-w-xl space-y-6 px-4 py-10">
+    <section className="mx-auto max-w-3xl space-y-6 px-4 py-10">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">General Settings</h1>
         <p className="text-muted-foreground mt-2">

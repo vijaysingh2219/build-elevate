@@ -18,7 +18,7 @@ export const {
   changeEmail,
   updateUser,
   deleteUser,
-  forgetPassword,
+  requestPasswordReset,
   resetPassword,
   $Infer,
 } = authClient;
