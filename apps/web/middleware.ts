@@ -1,4 +1,5 @@
 import { auth } from '@workspace/auth';
+import { prisma } from '@workspace/db';
 import { NextRequest, NextResponse } from 'next/server';
 
 // Public routes that anyone can access
@@ -26,6 +27,25 @@ export async function middleware(req: NextRequest) {
   const { nextUrl } = req;
   const session = await auth.api.getSession({ headers: req.headers });
   const isLoggedIn = !!session?.user;
+
+  // Update session timestamp for authenticated users to keep it active
+  if (isLoggedIn && session?.session?.id) {
+    const lastUpdated = new Date(session.session.updatedAt);
+    const now = new Date();
+    const minutesSinceUpdate = (now.getTime() - lastUpdated.getTime()) / (1000 * 60);
+
+    // Only update if more than 5 minutes have passed
+    if (minutesSinceUpdate >= 5) {
+      prisma.session
+        .update({
+          where: { id: session.session.id },
+          data: { updatedAt: now },
+        })
+        .catch((error) => {
+          console.error('Failed to update session timestamp:', error);
+        });
+    }
+  }
 
   const { pathname, search } = req.nextUrl;
 

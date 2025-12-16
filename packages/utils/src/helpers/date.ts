@@ -1,1 +1,6 @@
-export { format as formatDate, formatDuration, intervalToDuration } from 'date-fns';
+export {
+  format as formatDate,
+  formatDistanceToNow,
+  formatDuration,
+  intervalToDuration,
+} from 'date-fns';

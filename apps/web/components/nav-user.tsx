@@ -16,7 +16,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@workspace/ui/components/sidebar';
-import { ChevronsUpDown, LogOut, Settings, Shield, User2 } from 'lucide-react';
+import { Activity, ChevronsUpDown, LogOut, Settings, Shield, User2 } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
@@ -51,6 +51,11 @@ export function NavUser() {
         label: 'Security',
         href: `/settings/security`,
         icon: Shield,
+      },
+      {
+        label: 'Activity',
+        href: `/settings/activity`,
+        icon: Activity,
       },
     ],
     [
