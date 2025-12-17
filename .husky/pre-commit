@@ -1,0 +1,5 @@
+pnpm run format
+pnpm run format:check
+pnpm check-types
+pnpm exec lint-staged
+pnpm exec turbo run check-types --filter=[HEAD^]...

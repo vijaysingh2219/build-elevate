@@ -58,6 +58,8 @@ catalogs:
 
   dev:
     typescript: ^5.9.2
+    husky: ^9.1.7
+    lint-staged: ^16.2.7
     esbuild: ^0.20.1
     esbuild-register: ^3.5.0
     "@types/node": ^20.19.9
