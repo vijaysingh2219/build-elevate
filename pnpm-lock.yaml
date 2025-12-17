@@ -439,6 +439,9 @@ importers:
 
   packages/auth:
     dependencies:
+      '@workspace/db':
+        specifier: workspace:*
+        version: link:../db
       '@workspace/email':
         specifier: workspace:*
         version: link:../email

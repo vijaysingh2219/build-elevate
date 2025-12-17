@@ -1,3 +1,4 @@
+import { prisma } from '@workspace/db';
 import {
   changeEmailSchema,
   getTemplate,
@@ -13,7 +14,6 @@ import {
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { twoFactor } from 'better-auth/plugins';
-import { prisma } from '../../db/src/client';
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
