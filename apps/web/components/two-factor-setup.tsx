@@ -35,9 +35,14 @@ import { toast } from 'sonner';
 interface TwoFactorSetupProps {
   isEnabled: boolean;
   onStatusChange?: (enabled: boolean) => void;
+  showStatus?: boolean;
 }
 
-export function TwoFactorSetup({ isEnabled, onStatusChange }: TwoFactorSetupProps) {
+export function TwoFactorSetup({
+  isEnabled,
+  onStatusChange,
+  showStatus = false,
+}: TwoFactorSetupProps) {
   const [showSetupDialog, setShowSetupDialog] = useState(false);
   const [showDisableDialog, setShowDisableDialog] = useState(false);
   const [qrCode, setQrCode] = useState<string>('');
@@ -184,12 +189,14 @@ export function TwoFactorSetup({ isEnabled, onStatusChange }: TwoFactorSetupProp
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="text-sm">
-            Status:{' '}
-            <span className={isEnabled ? 'font-medium text-green-600' : 'text-muted-foreground'}>
-              {isEnabled ? 'Enabled' : 'Disabled'}
-            </span>
-          </div>
+          {showStatus && (
+            <div className="text-sm">
+              Status:{' '}
+              <span className={isEnabled ? 'font-medium text-green-600' : 'text-muted-foreground'}>
+                {isEnabled ? 'Enabled' : 'Disabled'}
+              </span>
+            </div>
+          )}
 
           {/* Show warning if user doesn't have a password */}
           {!checkingPassword && hasPassword === false && !isEnabled && (

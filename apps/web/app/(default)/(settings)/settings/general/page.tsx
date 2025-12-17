@@ -25,7 +25,6 @@ import {
 import { Input } from '@workspace/ui/components/input';
 import { Skeleton } from '@workspace/ui/components/skeleton';
 import { Spinner } from '@workspace/ui/components/spinner';
-import { formatDate } from '@workspace/utils';
 import { updateProfileSchema } from '@workspace/utils/schemas';
 import { UpdateProfileFormValues } from '@workspace/utils/types';
 import { Mail, User } from 'lucide-react';
@@ -99,10 +98,10 @@ export default function GeneralSettingsPage() {
 
   if (isLoading) {
     return (
-      <section className="w-xl mx-auto max-w-3xl space-y-6 px-4 py-10">
-        <div>
-          <Skeleton className="mb-2 h-8 w-48" />
-          <Skeleton className="h-4 w-96" />
+      <section className="mx-auto max-w-3xl space-y-6 px-4 py-10">
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-4 w-64" />
         </div>
         <Skeleton className="h-64 w-full" />
         <Skeleton className="h-64 w-full" />
@@ -112,9 +111,9 @@ export default function GeneralSettingsPage() {
 
   return (
     <section className="mx-auto max-w-3xl space-y-6 px-4 py-10">
-      <div>
+      <div className="space-y-2">
         <h1 className="text-3xl font-bold tracking-tight">General Settings</h1>
-        <p className="text-muted-foreground mt-2">
+        <p className="text-muted-foreground">
           Manage your account information and personal details.
         </p>
       </div>
@@ -212,23 +211,6 @@ export default function GeneralSettingsPage() {
             </CardFooter>
           </form>
         </Form>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Account Information</CardTitle>
-          <CardDescription>Additional details about your account</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <p className="text-muted-foreground text-sm">Email Verified</p>
-            <p className="font-medium">{user.emailVerified ? 'Yes' : 'No'}</p>
-          </div>
-          <div>
-            <p className="text-muted-foreground text-sm">Account Created</p>
-            <p className="font-medium">{formatDate(user.createdAt, 'PPpp')}</p>
-          </div>
-        </CardContent>
       </Card>
     </section>
   );

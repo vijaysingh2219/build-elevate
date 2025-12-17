@@ -3,25 +3,51 @@ import { Skeleton } from '@workspace/ui/components/skeleton';
 
 export default function ProfileLoading() {
   return (
-    <section className="w-2xl mx-auto px-4 py-10">
+    <section className="mx-auto max-w-5xl space-y-6 px-4 py-10">
       <Card>
-        <CardHeader className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div className="flex items-center gap-4">
-            <Skeleton className="h-20 w-20 rounded-md" />
-            <div className="flex-1 space-y-2">
-              <Skeleton className="h-6 w-48" />
-              <Skeleton className="h-4 w-64" />
+        <CardHeader className="flex w-full flex-col items-start gap-4 sm:flex-row sm:items-center">
+          <Skeleton className="h-24 w-24 rounded-xl" />
+          <div className="min-w-0 flex-1 space-y-3">
+            <Skeleton className="h-7 w-48" />
+            <div className="flex flex-wrap items-center gap-2">
+              <Skeleton className="h-4 w-40" />
+              <Skeleton className="h-8 w-8 rounded-md" />
             </div>
           </div>
         </CardHeader>
 
-        <CardContent className="mt-4 grid grid-cols-1 gap-x-6 gap-y-4 text-sm sm:grid-cols-2">
-          {[...Array(4)].map((_, i) => (
-            <div key={i}>
-              <Skeleton className="mb-1 h-4 w-32" />
-              <Skeleton className="h-4 w-56" />
-            </div>
-          ))}
+        <CardContent className="grid gap-6 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-4 w-56" />
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-28" />
+            <Skeleton className="h-4 w-40" />
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-6 w-40" />
+          <Skeleton className="mt-2 h-4 w-64" />
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {[...Array(2)].map((_, i) => (
+              <div key={i} className="rounded-lg border p-4">
+                <div className="flex items-start gap-3">
+                  <Skeleton className="h-10 w-10 rounded-full" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-6 w-20 rounded-full" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </CardContent>
       </Card>
     </section>

@@ -168,7 +168,7 @@ export default function ActivityPage() {
                   <Skeleton className="h-4 w-16" />
                   <Skeleton className="h-4 w-20" />
                 </div>
-                <div className="grid grid-cols-2 gap-3 pt-3">
+                <div className="grid grid-cols-1 gap-3 pt-3 sm:grid-cols-2">
                   <Skeleton className="h-4 w-28" />
                   <Skeleton className="h-4 w-32" />
                   <Skeleton className="h-4 w-24" />
@@ -228,7 +228,7 @@ export default function ActivityPage() {
             recognize.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-4">
           {sessions.length === 0 ? (
             <p className="text-muted-foreground text-sm">No active sessions found.</p>
           ) : (
@@ -258,7 +258,7 @@ export default function ActivityPage() {
                           This Device
                         </span>
                       </div>
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                         {currentSession.ipAddress && (
                           <div className="flex items-start gap-2">
                             <MapPin className="text-muted-foreground mt-0.5 h-4 w-4 flex-shrink-0" />
@@ -311,6 +311,7 @@ export default function ActivityPage() {
                           <Button
                             variant="destructive"
                             size="sm"
+                            className="w-full sm:w-auto"
                             onClick={() => handleRevokeSession(session.token)}
                             disabled={
                               revokeSessionMutation.isPending && revokingToken === session.token
@@ -326,7 +327,7 @@ export default function ActivityPage() {
                             )}
                           </Button>
                         </div>
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                           {session.ipAddress && (
                             <div className="flex items-start gap-2">
                               <MapPin className="text-muted-foreground mt-0.5 h-4 w-4 flex-shrink-0" />
