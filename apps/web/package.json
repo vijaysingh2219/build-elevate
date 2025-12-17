@@ -8,8 +8,8 @@
     "check-types": "tsc --noEmit",
     "clean": "rm -rf .next .turbo node_modules",
     "dev": "next dev --turbopack",
-    "lint": "next lint",
-    "lint:fix": "next lint --fix",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix",
     "start": "next start"
   },
   "prettier": "@workspace/prettier-config",
@@ -37,6 +37,7 @@
     "@workspace/eslint-config": "workspace:^",
     "@workspace/prettier-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
+    "eslint": "catalog:eslint",
     "typescript": "catalog:dev"
   }
 }

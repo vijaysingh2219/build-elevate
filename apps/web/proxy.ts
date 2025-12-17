@@ -23,7 +23,7 @@ const AUTH_ROUTES = [
   '/goodbye',
 ];
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { nextUrl } = req;
   const session = await auth.api.getSession({ headers: req.headers });
   const isLoggedIn = !!session?.user;
@@ -70,5 +70,4 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: ['/((?!_next|favicon.ico|public|api).*)'],
-  runtime: 'nodejs',
 };

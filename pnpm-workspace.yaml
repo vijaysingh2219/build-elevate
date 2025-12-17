@@ -4,11 +4,11 @@ packages:
 
 catalogs:
   web:
-    react: ^19.1.1
-    "@types/react": ^19.1.9
-    react-dom: ^19.1.1
-    "@types/react-dom": ^19.1.7
-    next: ^15.5.9
+    react: ^19.2.3
+    "@types/react": ^19.2.7
+    react-dom: ^19.2.3
+    "@types/react-dom": ^19.2.3
+    next: ^16.0.10
     next-themes: ^0.4.6
     better-auth: ^1.4.7
     tailwindcss: ^4.1.11
