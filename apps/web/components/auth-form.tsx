@@ -37,9 +37,6 @@ export function AuthForm({ mode, className, ...props }: AuthFormProps) {
     }
   }, [isLoading, isAuthenticated, router]);
 
-  // Don't render anything while checking or redirecting
-  if (isLoading || isAuthenticated) return null;
-
   return (
     <div className={cn(className)}>
       <div
