@@ -24,6 +24,7 @@ import {
 import { Input } from '@workspace/ui/components/input';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@workspace/ui/components/input-otp';
 import { Label } from '@workspace/ui/components/label';
+import { Skeleton } from '@workspace/ui/components/skeleton';
 import { Spinner } from '@workspace/ui/components/spinner';
 import { AlertCircle, Shield, ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
@@ -422,5 +423,19 @@ export function TwoFactorSetup({
         </DialogContent>
       </Dialog>
     </>
+  );
+}
+
+export function TwoFactorSetupSkeleton() {
+  return (
+    <div className="bg-card space-y-6 rounded-lg border p-6">
+      <div className="flex items-center justify-between">
+        <div className="flex-1 space-y-1">
+          <Skeleton className="h-6 w-48" />
+          <Skeleton className="h-4 w-72" />
+        </div>
+      </div>
+      <Skeleton className="h-20 w-full" />
+    </div>
   );
 }

@@ -24,6 +24,7 @@ import {
   FormMessage,
 } from '@workspace/ui/components/form';
 import { Input } from '@workspace/ui/components/input';
+import { Skeleton } from '@workspace/ui/components/skeleton';
 import { Spinner } from '@workspace/ui/components/spinner';
 import { changePasswordSchema, setPasswordSchema } from '@workspace/utils/schemas';
 import { ChangePasswordFormValues, SetPasswordFormValues } from '@workspace/utils/types';
@@ -294,5 +295,33 @@ export function PasswordForm({ onSuccess }: PasswordFormProps) {
         </form>
       </Form>
     </Card>
+  );
+}
+
+export function PasswordFormSkeleton() {
+  return (
+    <div className="bg-card space-y-6 rounded-lg border p-6">
+      <div className="flex items-center justify-between">
+        <div className="flex-1 space-y-1">
+          <Skeleton className="h-6 w-48" />
+          <Skeleton className="h-4 w-64" />
+        </div>
+      </div>
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-10 w-full" />
+        </div>
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-10 w-full" />
+        </div>
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-28" />
+          <Skeleton className="h-10 w-full" />
+        </div>
+      </div>
+      <Skeleton className="h-10 w-24" />
+    </div>
   );
 }

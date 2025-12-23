@@ -1,10 +1,10 @@
 'use client';
 
 import { ConnectedAccounts, ConnectedAccountsSkeleton } from '@/components/connected-accounts';
-import { DeleteAccountForm } from '@/components/delete-account-form';
+import { DeleteAccountForm, DeleteAccountFormSkeleton } from '@/components/delete-account-form';
 import { ExtraSecurity, ExtraSecuritySkeleton } from '@/components/extra-security';
-import { PasswordForm } from '@/components/password-form';
-import { TwoFactorSetup } from '@/components/two-factor-setup';
+import { PasswordForm, PasswordFormSkeleton } from '@/components/password-form';
+import { TwoFactorSetup, TwoFactorSetupSkeleton } from '@/components/two-factor-setup';
 import { useRequiredAuthUser } from '@/hooks/use-auth-user';
 import { useHasPassword } from '@/hooks/use-has-password';
 import { Skeleton } from '@workspace/ui/components/skeleton';
@@ -23,58 +23,19 @@ export default function SecurityPage() {
         </div>
 
         {/* Password Form Card Skeleton */}
-        <div className="bg-card space-y-6 rounded-lg border p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex-1 space-y-1">
-              <Skeleton className="h-6 w-48" />
-              <Skeleton className="h-4 w-64" />
-            </div>
-          </div>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-20" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-28" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-          </div>
-          <Skeleton className="h-10 w-24" />
-        </div>
+        <PasswordFormSkeleton />
 
         {/* Connected Accounts Skeleton */}
         <ConnectedAccountsSkeleton />
 
         {/* Two Factor Setup Card Skeleton */}
-        <div className="bg-card space-y-6 rounded-lg border p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex-1 space-y-1">
-              <Skeleton className="h-6 w-48" />
-              <Skeleton className="h-4 w-72" />
-            </div>
-          </div>
-          <Skeleton className="h-20 w-full" />
-        </div>
+        <TwoFactorSetupSkeleton />
 
         {/* Extra Security Card Skeleton */}
         <ExtraSecuritySkeleton />
 
         {/* Delete Account Card Skeleton */}
-        <div className="border-destructive/50 bg-destructive/5 space-y-6 rounded-lg border p-6">
-          <div className="flex items-center gap-4">
-            <div className="flex-1 space-y-1">
-              <Skeleton className="h-6 w-48" />
-              <Skeleton className="h-4 w-80" />
-            </div>
-          </div>
-          <Skeleton className="h-20 w-full" />
-          <Skeleton className="h-10 w-32" />
-        </div>
+        <DeleteAccountFormSkeleton />
       </section>
     );
   }
