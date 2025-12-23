@@ -12,6 +12,7 @@ export const {
   signUp,
   useSession,
   getSession,
+  revokeSession,
   sendVerificationEmail,
   listAccounts,
   linkSocial,

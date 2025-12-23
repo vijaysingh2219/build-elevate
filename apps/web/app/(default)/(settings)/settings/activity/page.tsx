@@ -3,7 +3,7 @@
 import { useRequiredAuthUser } from '@/hooks/use-auth-user';
 import { parseUserAgent } from '@/lib/user-agent';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type { Session } from '@workspace/auth';
+import { revokeSession, type Session } from '@workspace/auth';
 import { Badge } from '@workspace/ui/components/badge';
 import { Button } from '@workspace/ui/components/button';
 import {
@@ -39,15 +39,6 @@ async function fetchSessions(): Promise<SessionsResponse> {
   return response.json();
 }
 
-async function revokeSession(token: string): Promise<void> {
-  const response = await fetch(`/api/sessions/${token}`, {
-    method: 'DELETE',
-  });
-  if (!response.ok) {
-    throw new Error('Failed to revoke session');
-  }
-}
-
 export default function ActivityPage() {
   const { user, isLoading: userLoading } = useRequiredAuthUser();
   const queryClient = useQueryClient();
@@ -64,7 +55,7 @@ export default function ActivityPage() {
   });
 
   const revokeSessionMutation = useMutation({
-    mutationFn: revokeSession,
+    mutationFn: async (token: string) => await revokeSession({ token }),
     onMutate: (token: string) => {
       setRevokingToken(token);
     },
