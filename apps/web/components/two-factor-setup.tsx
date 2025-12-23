@@ -175,7 +175,7 @@ export function TwoFactorSetup({
 
   return (
     <>
-      <Card>
+      <Card id="two-factor-authentication" className="scroll-mt-6">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             {isEnabled ? (

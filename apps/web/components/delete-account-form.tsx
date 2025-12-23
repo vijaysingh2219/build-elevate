@@ -102,7 +102,7 @@ export function DeleteAccountForm() {
 
   return (
     <>
-      <Card className="border-destructive">
+      <Card id="delete-account" className="border-destructive scroll-mt-6">
         <CardHeader>
           <CardTitle className="text-destructive flex items-center gap-2">
             <Trash2 className="h-5 w-5" />

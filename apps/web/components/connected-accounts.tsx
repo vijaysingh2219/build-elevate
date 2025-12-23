@@ -88,7 +88,7 @@ export function ConnectedAccounts() {
   };
 
   return (
-    <Card>
+    <Card id="connected-accounts" className="scroll-mt-6">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Link2 className="h-5 w-5" />

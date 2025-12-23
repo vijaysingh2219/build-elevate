@@ -58,7 +58,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Profile Card */}
-      <Card>
+      <Card id="profile-info" className="scroll-mt-6">
         <CardHeader className="">
           <div className="flex w-full flex-col items-start gap-6 sm:flex-row sm:items-center">
             <Avatar className="border-border h-24 w-24 rounded-xl border-2 shadow-md">
@@ -131,7 +131,7 @@ export default function ProfilePage() {
       </Card>
 
       {/* Security Overview Card */}
-      <Card>
+      <Card id="security-overview" className="scroll-mt-6">
         <CardHeader>
           <div className="flex items-center gap-2">
             <Shield className="h-5 w-5" />

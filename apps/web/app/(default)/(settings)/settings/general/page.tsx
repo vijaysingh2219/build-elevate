@@ -136,7 +136,7 @@ export default function GeneralSettingsPage() {
         </p>
       </div>
 
-      <Card>
+      <Card id="profile-information" className="scroll-mt-6">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <User className="h-5 w-5" />

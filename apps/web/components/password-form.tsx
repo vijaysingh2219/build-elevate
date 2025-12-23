@@ -118,7 +118,7 @@ export function PasswordForm({ onSuccess }: PasswordFormProps) {
   }
 
   return (
-    <Card id="set-password" className="scroll-mt-6">
+    <Card id={isChangeMode ? 'change-password' : 'set-password'} className="scroll-mt-6">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Lock className="h-5 w-5" />

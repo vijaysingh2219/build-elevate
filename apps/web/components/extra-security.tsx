@@ -46,7 +46,7 @@ export function ExtraSecurity() {
 
   return (
     <>
-      <Card>
+      <Card id="extra-security" className="scroll-mt-6">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Shield className="h-5 w-5" />
