@@ -1,13 +1,11 @@
-import { auth } from '@workspace/auth/server';
+import { requireAuth } from '@/lib/auth-helpers';
 import { prisma } from '@workspace/db';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest) {
   try {
-    const session = await auth.api.getSession({ headers: req.headers });
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const { error, session } = await requireAuth(req);
+    if (error) return error;
 
     const sessions = await prisma.session.findMany({
       where: {

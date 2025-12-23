@@ -1,3 +1,4 @@
+import { requireAuth } from '@/lib/auth-helpers';
 import { auth } from '@workspace/auth';
 import { prisma } from '@workspace/db';
 import { passwordSchema } from '@workspace/utils';
@@ -5,10 +6,8 @@ import { NextResponse } from 'next/server';
 
 export async function GET(req: Request) {
   try {
-    const session = await auth.api.getSession({ headers: req.headers });
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const { error, session } = await requireAuth(req);
+    if (error) return error;
 
     // Check if user has a password in their account
     const account = await prisma.account.findFirst({
@@ -32,15 +31,13 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const session = await auth.api.getSession({ headers: req.headers });
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const { error, session } = await requireAuth(req);
+    if (error) return error;
 
     const { newPassword } = await req.json();
 
-    const { success, error } = passwordSchema.safeParse(newPassword);
-    if (error || !success) {
+    const { success, error: validationError } = passwordSchema.safeParse(newPassword);
+    if (validationError || !success) {
       return NextResponse.json(
         { error: 'Password must be 8-100 characters long' },
         { status: 400 },
