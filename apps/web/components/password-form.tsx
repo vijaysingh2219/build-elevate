@@ -13,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@workspace/ui/components/card';
+import { Checkbox } from '@workspace/ui/components/checkbox';
 import {
   Form,
   FormControl,
@@ -49,6 +50,7 @@ export function PasswordForm({ onSuccess }: PasswordFormProps) {
       currentPassword: '',
       password: '',
       confirmPassword: '',
+      revokeAllOtherSessions: false,
     },
   });
 
@@ -81,6 +83,7 @@ export function PasswordForm({ onSuccess }: PasswordFormProps) {
       const result = await changePassword({
         currentPassword: values.currentPassword,
         newPassword: values.password,
+        revokeOtherSessions: values.revokeAllOtherSessions || false,
       });
       return result;
     },
@@ -252,6 +255,27 @@ export function PasswordForm({ onSuccess }: PasswordFormProps) {
                 </FormItem>
               )}
             />
+
+            {isChangeMode && (
+              <FormField
+                control={form.control}
+                name="revokeAllOtherSessions"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                    <FormControl>
+                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel className="cursor-pointer">Revoke all other sessions</FormLabel>
+                      <FormDescription>
+                        Sign out all other devices and browsers after changing your password. You
+                        will remain signed in on this device.
+                      </FormDescription>
+                    </div>
+                  </FormItem>
+                )}
+              />
+            )}
           </CardContent>
           <CardFooter className="mt-4">
             <Button type="submit" disabled={setPasswordMutation.isPending} className="w-full">

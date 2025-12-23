@@ -16,6 +16,7 @@
   "prettier": "@workspace/prettier-config",
   "dependencies": {
     "@radix-ui/react-avatar": "catalog:web",
+    "@radix-ui/react-checkbox": "catalog:web",
     "@radix-ui/react-dialog": "catalog:web",
     "@radix-ui/react-dropdown-menu": "catalog:web",
     "@radix-ui/react-label": "catalog:web",

@@ -48,6 +48,7 @@ export const changePasswordSchema = z
     currentPassword: passwordSchema,
     password: passwordSchema,
     confirmPassword: passwordSchema,
+    revokeAllOtherSessions: z.boolean().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
