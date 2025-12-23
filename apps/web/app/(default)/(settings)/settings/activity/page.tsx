@@ -1,6 +1,7 @@
 'use client';
 
 import { useRequiredAuthUser } from '@/hooks/use-auth-user';
+import { parseUserAgent } from '@/lib/user-agent';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { Session } from '@workspace/auth';
 import { Badge } from '@workspace/ui/components/badge';
@@ -45,61 +46,6 @@ async function revokeSession(token: string): Promise<void> {
   if (!response.ok) {
     throw new Error('Failed to revoke session');
   }
-}
-
-function parseUserAgent(userAgent: string | null | undefined): {
-  browser: string;
-  os: string;
-  device: string;
-} {
-  if (!userAgent) {
-    return { browser: 'Unknown Browser', os: 'Unknown OS', device: 'Unknown' };
-  }
-
-  let browser = 'Unknown Browser';
-  let os = 'Unknown OS';
-  let device = 'PC';
-
-  // Parse browser (specific to general)
-  if (userAgent.includes('Edg/')) {
-    browser = 'Edge';
-  } else if (userAgent.includes('Brave')) {
-    browser = 'Brave';
-  } else if (userAgent.includes('OPR/')) {
-    browser = 'Opera';
-  } else if (userAgent.includes('Firefox')) {
-    browser = 'Firefox';
-  } else if (userAgent.includes('Chrome')) {
-    browser = 'Chrome';
-  } else if (userAgent.includes('Safari')) {
-    browser = 'Safari';
-  }
-
-  // Parse OS (more specific patterns first)
-  if (userAgent.includes('Windows NT')) {
-    os = 'Windows';
-  } else if (userAgent.includes('Mac OS X')) {
-    os = 'macOS';
-  } else if (userAgent.includes('Android')) {
-    os = 'Android';
-    device = 'Mobile';
-  } else if (
-    userAgent.includes('iPhone') ||
-    userAgent.includes('iPad') ||
-    userAgent.includes('iOS')
-  ) {
-    os = 'iOS';
-    device = 'Mobile';
-  } else if (userAgent.includes('Linux')) {
-    os = 'Linux';
-  }
-
-  // Additional mobile detection
-  if (userAgent.includes('Mobile') && device === 'PC') {
-    device = 'Mobile';
-  }
-
-  return { browser, os, device };
 }
 
 export default function ActivityPage() {
@@ -210,6 +156,8 @@ export default function ActivityPage() {
   const currentSession = sessions.find((s) => s.id === currentSessionId);
   const otherSessions = sessions.filter((s) => s.id !== currentSessionId);
 
+  const currentSessionUserAgent = parseUserAgent(currentSession?.userAgent || '');
+
   return (
     <section className="mx-auto max-w-3xl space-y-6 px-4 py-10">
       <div>
@@ -242,17 +190,17 @@ export default function ActivityPage() {
                     <div className="flex-1 space-y-3">
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <div className="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-1.5 dark:bg-green-900/30">
-                          {parseUserAgent(currentSession.userAgent).device === 'Mobile' ? (
+                          {currentSessionUserAgent.device === 'Mobile' ? (
                             <Smartphone className="h-4 w-4 text-green-600 dark:text-green-400" />
                           ) : (
                             <Monitor className="h-4 w-4 text-green-600 dark:text-green-400" />
                           )}
                           <span className="font-semibold text-gray-900 dark:text-gray-100">
-                            {parseUserAgent(currentSession.userAgent).browser}
+                            {currentSessionUserAgent.browser}
                           </span>
                           <span className="text-gray-400">•</span>
                           <span className="text-sm text-gray-600 dark:text-gray-300">
-                            {parseUserAgent(currentSession.userAgent).os}
+                            {currentSessionUserAgent.os}
                           </span>
                         </div>
                         <span className="inline-flex items-center gap-1 rounded-full bg-green-600 px-3 py-1 text-xs font-semibold text-white dark:bg-green-700">
