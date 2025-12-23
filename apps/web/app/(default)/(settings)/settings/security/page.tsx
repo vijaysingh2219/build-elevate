@@ -2,6 +2,7 @@
 
 import { ConnectedAccounts, ConnectedAccountsSkeleton } from '@/components/connected-accounts';
 import { DeleteAccountForm } from '@/components/delete-account-form';
+import { ExtraSecurity, ExtraSecuritySkeleton } from '@/components/extra-security';
 import { PasswordForm } from '@/components/password-form';
 import { TwoFactorSetup } from '@/components/two-factor-setup';
 import { useRequiredAuthUser } from '@/hooks/use-auth-user';
@@ -60,6 +61,9 @@ export default function SecurityPage() {
           <Skeleton className="h-20 w-full" />
         </div>
 
+        {/* Extra Security Card Skeleton */}
+        <ExtraSecuritySkeleton />
+
         {/* Delete Account Card Skeleton */}
         <div className="border-destructive/50 bg-destructive/5 space-y-6 rounded-lg border p-6">
           <div className="flex items-center gap-4">
@@ -90,6 +94,8 @@ export default function SecurityPage() {
       <ConnectedAccounts />
 
       <TwoFactorSetup isEnabled={user.twoFactorEnabled ?? false} showStatus={true} />
+
+      <ExtraSecurity />
 
       {/* Danger Zone - Delete Account */}
       <DeleteAccountForm />
