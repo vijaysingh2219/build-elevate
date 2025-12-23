@@ -55,6 +55,12 @@ export const config = {
   description: siteConfig.description,
   baseUrl: process.env.NEXT_PUBLIC_BASE_URL ?? 'https://turborepo.org',
   domain: process.env.NEXT_PUBLIC_DOMAIN ?? 'turborepo.org',
+  providers: [
+    {
+      id: 'google',
+      name: 'Google',
+    },
+  ],
   nav: [
     {
       title: 'Dashboard',

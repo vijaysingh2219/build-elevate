@@ -122,6 +122,13 @@ export const auth = betterAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     },
   },
+  account: {
+    accountLinking: {
+      enabled: true,
+      trustedProviders: ['google'],
+      updateUserInfoOnLink: true,
+    },
+  },
   plugins: [
     twoFactor({
       issuer: 'BuildElevate',

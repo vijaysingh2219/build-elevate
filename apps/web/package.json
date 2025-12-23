@@ -28,7 +28,8 @@
     "react": "catalog:web",
     "react-dom": "catalog:web",
     "react-hook-form": "catalog:web",
-    "sonner": "catalog:web"
+    "sonner": "catalog:web",
+    "zod": "catalog:core"
   },
   "devDependencies": {
     "@types/node": "catalog:dev",

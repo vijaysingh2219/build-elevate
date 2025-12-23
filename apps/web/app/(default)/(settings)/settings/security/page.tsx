@@ -1,5 +1,6 @@
 'use client';
 
+import { ConnectedAccounts, ConnectedAccountsSkeleton } from '@/components/connected-accounts';
 import { DeleteAccountForm } from '@/components/delete-account-form';
 import { PasswordForm } from '@/components/password-form';
 import { TwoFactorSetup } from '@/components/two-factor-setup';
@@ -45,6 +46,9 @@ export default function SecurityPage() {
           <Skeleton className="h-10 w-24" />
         </div>
 
+        {/* Connected Accounts Skeleton */}
+        <ConnectedAccountsSkeleton />
+
         {/* Two Factor Setup Card Skeleton */}
         <div className="bg-card space-y-6 rounded-lg border p-6">
           <div className="flex items-center justify-between">
@@ -82,6 +86,8 @@ export default function SecurityPage() {
 
       {/* Password management - shows Set Password or Change Password based on user's current state */}
       <PasswordForm onSuccess={() => refetchPasswordStatus()} />
+
+      <ConnectedAccounts />
 
       <TwoFactorSetup isEnabled={user.twoFactorEnabled ?? false} showStatus={true} />
 
