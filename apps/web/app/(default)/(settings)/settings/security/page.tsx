@@ -1,10 +1,16 @@
 'use client';
 
-import { ConnectedAccounts, ConnectedAccountsSkeleton } from '@/components/connected-accounts';
-import { DeleteAccountForm, DeleteAccountFormSkeleton } from '@/components/delete-account-form';
-import { ExtraSecurity, ExtraSecuritySkeleton } from '@/components/extra-security';
-import { PasswordForm, PasswordFormSkeleton } from '@/components/password-form';
-import { TwoFactorSetup, TwoFactorSetupSkeleton } from '@/components/two-factor-setup';
+import { TwoFactorSetup, TwoFactorSetupSkeleton } from '@/components/auth/two-factor-setup';
+import {
+  ConnectedAccounts,
+  ConnectedAccountsSkeleton,
+} from '@/components/security/connected-accounts';
+import {
+  DeleteAccountForm,
+  DeleteAccountFormSkeleton,
+} from '@/components/security/delete-account-form';
+import { ExtraSecurity, ExtraSecuritySkeleton } from '@/components/security/extra-security';
+import { PasswordForm, PasswordFormSkeleton } from '@/components/security/password-form';
 import { useRequiredAuthUser } from '@/hooks/use-auth-user';
 import { useHasPassword } from '@/hooks/use-has-password';
 import { Skeleton } from '@workspace/ui/components/skeleton';

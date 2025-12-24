@@ -1,4 +1,4 @@
-import { AuthForm } from '@/components/auth-form';
+import { AuthForm } from '@/components/auth/auth-form';
 import { Suspense } from 'react';
 
 export default function SignInPage() {

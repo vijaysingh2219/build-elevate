@@ -1,8 +1,8 @@
 'use client';
 
-import { CredentialsForm } from '@/components/credentials-form';
+import { CredentialsForm } from '@/components/auth/credentials-form';
 import Google from '@/components/icons/google';
-import Logo from '@/components/logo';
+import Logo from '@/components/ui/logo';
 import { config } from '@/config/site';
 import { useAuthUser } from '@/hooks/use-auth-user';
 import { useIsMobile } from '@/hooks/use-mobile';

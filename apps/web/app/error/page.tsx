@@ -1,6 +1,6 @@
 'use client';
 
-import Logo from '@/components/logo';
+import Logo from '@/components/ui/logo';
 import { Button } from '@workspace/ui/components/button';
 import { ArrowLeftIcon, HomeIcon } from 'lucide-react';
 import Link from 'next/link';

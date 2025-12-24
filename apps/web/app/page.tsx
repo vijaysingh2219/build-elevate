@@ -1,6 +1,6 @@
 'use client';
 
-import Logo from '@/components/logo';
+import Logo from '@/components/ui/logo';
 import { Button } from '@workspace/ui/components/button';
 import Link from 'next/link';
 

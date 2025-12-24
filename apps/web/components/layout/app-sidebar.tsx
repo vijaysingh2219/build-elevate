@@ -1,8 +1,8 @@
 'use client';
 
-import Logo from '@/components/logo';
-import { NavUser } from '@/components/nav-user';
-import ThemeSwitcher from '@/components/theme-switcher';
+import { NavUser } from '@/components/layout/nav-user';
+import Logo from '@/components/ui/logo';
+import ThemeSwitcher from '@/components/ui/theme-switcher';
 import { config } from '@/config/site';
 import { useAuthUser } from '@/hooks/use-auth-user';
 import { Button } from '@workspace/ui/components/button';

@@ -1,6 +1,6 @@
 'use client';
 
-import { AppSidebar } from '@/components/app-sidebar';
+import { AppSidebar } from '@/components/layout/app-sidebar';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SidebarProvider } from '@workspace/ui/components/sidebar';
 import { TooltipProvider } from '@workspace/ui/components/tooltip';

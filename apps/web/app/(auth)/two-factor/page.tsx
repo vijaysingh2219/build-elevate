@@ -1,4 +1,4 @@
-import { TwoFactorVerification } from '@/components/two-factor-verification';
+import { TwoFactorVerification } from '@/components/auth/two-factor-verification';
 import { Skeleton } from '@workspace/ui/components/skeleton';
 import { Suspense } from 'react';
 

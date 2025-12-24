@@ -1,6 +1,6 @@
 'use client';
 
-import Logo from '@/components/logo';
+import Logo from '@/components/ui/logo';
 import { SidebarTrigger, useSidebar } from '@workspace/ui/components/sidebar';
 import { cn } from '@workspace/ui/lib/utils';
 import Link from 'next/link';
