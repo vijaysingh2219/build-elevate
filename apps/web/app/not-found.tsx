@@ -1,7 +1,14 @@
 import Logo from '@/components/ui/logo';
+import { generatePageMetadata, pageMetadata } from '@/config/metadata';
 import { Button } from '@workspace/ui/components/button';
 import { ArrowLeftIcon, Home } from 'lucide-react';
 import Link from 'next/link';
+
+export const metadata = generatePageMetadata(
+  pageMetadata.notFound.title,
+  pageMetadata.notFound.description,
+  { noindex: true },
+);
 
 export default function NotFound() {
   return (

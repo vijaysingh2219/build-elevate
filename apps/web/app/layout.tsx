@@ -2,12 +2,16 @@ import { Geist, Geist_Mono } from 'next/font/google';
 
 import { Providers } from '@/components/auth/providers';
 import Header from '@/components/layout/header';
+import { generatePageMetadata, pageMetadata } from '@/config/metadata';
 import { siteConfig } from '@/config/site';
 import { viewportConfig } from '@/config/viewport';
 import '@workspace/ui/globals.css';
 import { Metadata, Viewport } from 'next';
 
-export const metadata: Metadata = siteConfig;
+export const metadata: Metadata = {
+  ...siteConfig,
+  ...generatePageMetadata(pageMetadata.home.title, pageMetadata.home.description),
+};
 
 export const viewport: Viewport = viewportConfig;
 

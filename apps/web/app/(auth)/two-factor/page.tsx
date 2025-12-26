@@ -1,6 +1,13 @@
 import { TwoFactorVerification } from '@/components/auth/two-factor-verification';
+import { generatePageMetadata, pageMetadata } from '@/config/metadata';
 import { Skeleton } from '@workspace/ui/components/skeleton';
 import { Suspense } from 'react';
+
+export const metadata = generatePageMetadata(
+  pageMetadata.auth.twoFactor.title,
+  pageMetadata.auth.twoFactor.description,
+  { noindex: true },
+);
 
 export default function TwoFactorPage() {
   return (
