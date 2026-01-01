@@ -20,6 +20,7 @@ This template is for creating a monorepo with
 - [Jest](https://jestjs.io/) for testing
 - [GitHub Actions](https://github.com/features/actions) for CI/CD
 - [pnpm](https://pnpm.io/) as the package manager
+- [T3 OSS Env](https://env.t3.gg/) for type-safe environment variable validation
 
 ---
 

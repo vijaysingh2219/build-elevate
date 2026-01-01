@@ -145,6 +145,7 @@ jobs:
         run: pnpm test
         env:
           DATABASE_URL: "postgresql://user:pass@localhost:5432/test"
+          SKIP_ENV_VALIDATION: "true"
 
   build:
     name: Build
@@ -188,6 +189,7 @@ jobs:
         run: pnpm build
         env:
           DATABASE_URL: "postgresql://user:pass@localhost:5432/test"
+          SKIP_ENV_VALIDATION: "true"
 
   format-check:
     name: Format Check

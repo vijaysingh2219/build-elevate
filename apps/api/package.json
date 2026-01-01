@@ -16,6 +16,7 @@
     "preset": "@workspace/jest-presets/node"
   },
   "dependencies": {
+    "@t3-oss/env-core": "catalog:core",
     "@workspace/auth": "workspace:*",
     "@workspace/rate-limit": "workspace:*",
     "@workspace/utils": "workspace:*",
@@ -23,7 +24,8 @@
     "dotenv": "catalog:core",
     "express": "catalog:server",
     "helmet": "catalog:server",
-    "morgan": "catalog:server"
+    "morgan": "catalog:server",
+    "zod": "catalog:core"
   },
   "devDependencies": {
     "@jest/globals": "catalog:dev",

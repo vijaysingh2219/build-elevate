@@ -7,6 +7,7 @@ import { siteConfig } from '@/config/site';
 import { viewportConfig } from '@/config/viewport';
 import '@workspace/ui/globals.css';
 import { Metadata, Viewport } from 'next';
+import '../env';
 
 export const metadata: Metadata = {
   ...siteConfig,

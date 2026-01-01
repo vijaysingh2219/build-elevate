@@ -1,7 +1,8 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+import type { NextConfig } from 'next';
+
+const nextConfig: NextConfig = {
   transpilePackages: ['@workspace/ui', '@workspace/auth', '@workspace/email'],
-  output: 'standalone'
+  output: 'standalone',
 };
 
 export default nextConfig;

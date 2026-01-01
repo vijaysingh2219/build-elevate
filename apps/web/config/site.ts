@@ -1,5 +1,6 @@
 import { Home } from 'lucide-react';
 import { Metadata } from 'next';
+import { env } from '../env';
 
 export const siteConfig: Metadata = {
   title: 'build-elevate',
@@ -27,7 +28,7 @@ export const siteConfig: Metadata = {
   openGraph: {
     title: 'build-elevate',
     description: 'A starter template for building applications with Turborepo.',
-    url: process.env.NEXT_PUBLIC_BASE_URL ?? 'https://turborepo.org',
+    url: env.NEXT_PUBLIC_BASE_URL,
     siteName: 'build-elevate',
     images: [
       {
@@ -53,8 +54,8 @@ export const siteConfig: Metadata = {
 export const config = {
   name: 'build-elevate',
   description: siteConfig.description,
-  baseUrl: process.env.NEXT_PUBLIC_BASE_URL ?? 'https://turborepo.org',
-  domain: process.env.NEXT_PUBLIC_DOMAIN ?? 'turborepo.org',
+  baseUrl: env.NEXT_PUBLIC_BASE_URL,
+  domain: env.NEXT_PUBLIC_DOMAIN,
   providers: [
     {
       id: 'google',

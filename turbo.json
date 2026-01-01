@@ -6,7 +6,23 @@
       "dependsOn": ["db:generate", "^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**", "generated/**/*"],
-      "env": ["DATABASE_URL"]
+      "env": [
+        "DATABASE_URL",
+        "GOOGLE_CLIENT_ID",
+        "GOOGLE_CLIENT_SECRET",
+        "BETTER_AUTH_URL",
+        "BETTER_AUTH_SECRET",
+        "NEXT_PUBLIC_BASE_URL",
+        "NEXT_PUBLIC_DOMAIN",
+        "RESEND_TOKEN",
+        "RESEND_EMAIL_FROM",
+        "UPSTASH_REDIS_REST_URL",
+        "UPSTASH_REDIS_REST_TOKEN",
+        "NODE_ENV",
+        "PORT",
+        "ALLOWED_ORIGINS",
+        "SKIP_ENV_VALIDATION"
+      ]
     },
     "check-types": {
       "dependsOn": ["^build"]
@@ -31,7 +47,23 @@
     },
     "lint": {
       "dependsOn": ["^build"],
-      "env": ["GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "BETTER_AUTH_SECRET", "NEXT_PUBLIC_BASE_URL", "NODE_ENV", "PORT", "ALLOWED_ORIGINS", "RESEND_TOKEN", "RESEND_EMAIL_FROM", "UPSTASH_REDIS_REST_URL", "UPSTASH_REDIS_REST_TOKEN"]
+      "env": [
+        "GOOGLE_CLIENT_ID",
+        "GOOGLE_CLIENT_SECRET",
+        "BETTER_AUTH_URL",
+        "BETTER_AUTH_SECRET",
+        "NEXT_PUBLIC_BASE_URL",
+        "NEXT_PUBLIC_DOMAIN",
+        "NODE_ENV",
+        "PORT",
+        "ALLOWED_ORIGINS",
+        "RESEND_TOKEN",
+        "RESEND_EMAIL_FROM",
+        "UPSTASH_REDIS_REST_URL",
+        "UPSTASH_REDIS_REST_TOKEN",
+        "DATABASE_URL",
+        "SKIP_ENV_VALIDATION"
+      ]
     },
     "start": {
       "cache": false

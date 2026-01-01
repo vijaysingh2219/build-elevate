@@ -4,11 +4,12 @@ import express, { type Express, json, urlencoded } from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import corsOptions from './config/corsOptions';
+import { env } from './env';
 import credentials from './middleware/credentials';
 import { errorHandler } from './middleware/error';
 import routes from './routes';
 
-const isProd = process.env.NODE_ENV === 'production';
+const isProd = env.NODE_ENV === 'production';
 
 export const createServer = (): Express => {
   const app = express();

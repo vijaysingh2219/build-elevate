@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { env } from '../env';
 
 export const generatePageMetadata = (
   title: string,
@@ -8,7 +9,7 @@ export const generatePageMetadata = (
     noindex?: boolean;
   },
 ): Metadata => {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://build-elevate.vercel.app';
+  const baseUrl = env.NEXT_PUBLIC_BASE_URL;
   const ogImage = options?.ogImage || '/og-image.png';
   const formattedTitle = `${title} | build-elevate`;
 
