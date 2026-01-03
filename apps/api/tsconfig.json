@@ -6,12 +6,16 @@
     "baseUrl": ".",
     "jsx": "react-jsx",
     "paths": {
-      "@workspace/utils/*": ["../../packages/utils/src/*"]
+      "@workspace/utils/*": ["../../packages/utils/src/*"],
+      "@workspace/rate-limit/*": ["../../packages/rate-limit/src/*"]
     }
   },
   "references": [
     {
       "path": "../../packages/utils"
+    },
+    {
+      "path": "../../packages/rate-limit"
     }
   ],
   "include": ["src"],

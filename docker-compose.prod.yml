@@ -6,6 +6,7 @@ services:
       dockerfile: ./apps/web/Dockerfile.prod
     env_file:
       - ./apps/web/.env.production
+      - ./packages/db/.env.production
     ports:
       - 3000:3000
     networks:
@@ -20,7 +21,8 @@ services:
       context: .
       dockerfile: ./apps/api/Dockerfile.prod
     env_file:
-      - ./apps/api/.env.local
+      - ./apps/api/.env.production
+      - ./packages/db/.env.production
     ports:
       - 4000:4000
     networks:
@@ -29,7 +31,7 @@ services:
       - postgres
 
   postgres:
-    image: postgres
+    image: postgres:16-alpine
     container_name: build-elevate-postgres
     environment:
       POSTGRES_DB: build-elevate-app
