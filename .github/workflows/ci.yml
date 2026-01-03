@@ -141,6 +141,11 @@ jobs:
       - name: Generate Prisma client
         run: pnpm --filter @workspace/db db:generate
 
+      - name: Build packages
+        run: pnpm --filter "@workspace/*" build
+        env:
+          DATABASE_URL: "postgresql://user:pass@localhost:5432/test"
+
       - name: Run tests
         run: pnpm test
         env:
