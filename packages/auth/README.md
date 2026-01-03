@@ -1,54 +1,74 @@
 # @workspace/auth
 
-A comprehensive authentication package built on top of [Better Auth](https://www.better-auth.com/) for the build-elevate template. This package provides a complete authentication solution with support for email/password authentication and Google OAuth, seamlessly integrated with PostgreSQL and Prisma.
+This package provides authentication features for the monorepo, including:
 
----
+- Email and password authentication
+- Google OAuth integration
+- Two-factor authentication (2FA)
+- Email verification and password reset flows
+- Session management powered by [Better Auth](https://www.better-auth.com/)
+
+## Usage
+
+Import and use authentication utilities in your apps:
+
+```ts
+// Client-side (React components)
+import { signIn, signOut, useSession } from '@workspace/auth';
+
+// Server-side (API routes, server components)
+import { auth } from '@workspace/auth';
+```
 
 ## Features
 
-- 🔐 **Email & Password Authentication** - Secure credential-based authentication
-- ✉️ **Email Verification** - Required email verification for new accounts
-- 🌐 **Google OAuth Integration** - One-click social login
-- 🔐 **Two-Factor Authentication (2FA)** - Additional security layer for user accounts
-- 🗄️ **PostgreSQL Database** - Persistent session storage via Prisma
-- ⚡ **Better Auth Integration** - Modern, type-safe authentication library
-- 🎯 **TypeScript Support** - Full type safety throughout
-- 🔄 **Next.js Integration** - Ready-to-use API handlers and middleware
+- **Email/Password Auth**: Secure credential-based authentication with email verification
+- **OAuth Providers**: Google sign-in integration
+- **Two-Factor Auth**: Additional security layer with TOTP support
+- **Rate Limiting**: Built-in protection against abuse
+- **Email Integration**: Automated verification and password reset emails
+- **Type-Safe**: Full TypeScript support with Better Auth
 
----
+## Setup
 
-## Installation
+1. Configure required environment variables:
+   - `GOOGLE_CLIENT_ID`: Google OAuth client ID
+   - `GOOGLE_CLIENT_SECRET`: Google OAuth client secret
+   - `NEXT_PUBLIC_BASE_URL`: Your application's base URL
+   - `DATABASE_URL`: PostgreSQL connection string (from @workspace/db)
+   - Email configuration (from @workspace/email)
 
-This package is part of the workspace and is automatically available to other packages:
+2. The auth package automatically integrates with:
+   - `@workspace/db` for database storage
+   - `@workspace/email` for sending verification emails
+   - `@workspace/rate-limit` for request rate limiting
 
-```json
-{
-  "dependencies": {
-    "@workspace/auth": "workspace:*"
-  }
+## Client-Side API
+
+```ts
+import { signIn, signOut, signUp, useSession, twoFactor } from '@workspace/auth';
+
+// Sign in
+await signIn.email({ email, password });
+await signIn.social({ provider: 'google' });
+
+// Get session in React components
+const { data: session } = useSession();
+
+// Sign out
+await signOut();
+```
+
+## Server-Side API
+
+```ts
+import { auth } from '@workspace/auth';
+
+// Get session in API routes or server components
+const session = await auth.api.getSession({ headers: request.headers });
+
+// Protect API routes
+if (!session) {
+  return new Response('Unauthorized', { status: 401 });
 }
 ```
-
----
-
-## Environment Variables
-
-The following environment variables are required in [apps/web/.env](../../apps/web/.env.example):
-
-```bash
-# Required for Google OAuth
-GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=your-google-client-secret
-
-# Base URL for your application (used by auth client)
-NEXT_PUBLIC_BASE_URL=http://localhost:3000
-
-# Database connection (inherited from @workspace/db)
-DATABASE_URL=postgresql://username:password@localhost:5432/database
-
-# Email configuration (inherited from @workspace/email)
-RESEND_TOKEN=your-resend-api-token
-RESEND_EMAIL_FROM=noreply@yourdomain.com
-```
-
----
