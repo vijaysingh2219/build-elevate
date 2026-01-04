@@ -1,150 +1,172 @@
 # build-elevate
 
-This template is for creating a monorepo with
+A modern full-stack monorepo starter with Next.js, Express, and Better Auth
 
-- [Turborepo](https://turborepo.com/) for monorepo management
-- [Next.js](https://nextjs.org/) (with Turbopack) for the web application
-- [Express](https://expressjs.com/) for the API server
-- [TypeScript](https://www.typescriptlang.org/) for type safety
-- [Docker](https://www.docker.com/) for containerization
-- [Prisma](https://www.prisma.io/) as the ORM for database access
-- [PostgreSQL](https://www.postgresql.org/) as the database
-- [shadcn/ui](https://ui.shadcn.com/) for UI components
-- [Tailwind CSS](https://tailwindcss.com/) for styling
-- [Better Auth](https://www.better-auth.com/) for authentication
-- [React Email](https://react.email/) for email templates
-- [Resend](https://resend.com/) for sending emails
-- [Tanstack Query](https://tanstack.com/query/latest) for data fetching and state management
-- [ESLint](https://eslint.org/) for linting
-- [Prettier](https://prettier.io/) for code formatting
-- [Jest](https://jestjs.io/) for testing
-- [GitHub Actions](https://github.com/features/actions) for CI/CD
-- [pnpm](https://pnpm.io/) as the package manager
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org/)
+[![pnpm](https://img.shields.io/badge/pnpm-10.4.1-orange)](https://pnpm.io/)
 
----
+## Overview
 
-## 🖼 Screenshots
+[build-elevate](https://github.com/vijaysingh2219/build-elevate) is a full-stack monorepo starter that gets you from idea to production faster. Built with [Turborepo](https://turborepo.org/), it combines a Next.js frontend, Express backend, and shared packages into one cohesive development experience.
 
-| Page                | Light Theme                                              | Dark Theme                                                   |
-| ------------------- | -------------------------------------------------------- | ------------------------------------------------------------ |
-| Home                | ![Home Light](assets/home.png)                           | ![Home Dark](assets/home-dark.png)                           |
-| Sign Up             | ![Sign Up Light](assets/sign-up.png)                     | ![Sign Up Dark](assets/sign-up-dark.png)                     |
-| Sign In             | ![Sign In Light](assets/sign-in.png)                     | ![Sign In Dark](assets/sign-in-dark.png)                     |
-| Profile             | ![Profile Light](assets/profile.png)                     | ![Profile Dark](assets/profile-dark.png)                     |
-| Settings - General  | ![Settings General Light](assets/settings-general.png)   | ![Settings General Dark](assets/settings-general-dark.png)   |
-| Settings - Security | ![Settings Security Light](assets/settings-security.png) | ![Settings Security Dark](assets/settings-security-dark.png) |
-| Settings - Activity | ![Settings Activity Light](assets/settings-activity.png) | ![Settings Activity Dark](assets/settings-activity-dark.png) |
+Perfect for SaaS applications, web platforms, or any project that needs authentication, database integration, and a professional UI out of the box.
 
----
+### Why build-elevate?
 
-## Project Structure
+- **Ready to Ship** — Pre-configured authentication, database, email, and UI components
+- **Developer Experience** — Hot reload, type safety, and monorepo benefits from day one
+- **Modular Design** — Shared packages make code reuse effortless across frontend and backend
+- **Security First** — Better Auth integration with session management and OAuth providers
+- **Production Ready** — Docker setup, CI/CD workflows, and deployment best practices included
 
-This monorepo is structured into the following applications and packages:
+## Features
 
 ### Applications
 
-- `apps/web`: Next.js web application.
-- `apps/api`: Express API server.
+- **apps/web** — Next.js 16 app with Turbopack, authentication, and modern UI
+- **apps/api** — Express server with RESTful API endpoints and health monitoring
+- **apps/email** — React Email templates with hot reload preview
+- **apps/studio** — Prisma Studio for database management
 
-### Packages
+### Shared Packages
 
-- `packages/eslint-config`: Centralized ESLint config.
-- `packages/jest-presets`: Shared Jest configuration for Node.js and React.
-- `packages/prettier-config`: Shared Prettier formatting rules.
-- `packages/typescript-config`: Base TypeScript configuration.
-- `packages/auth`: Authentication package using Better Auth.
-- `packages/db`: Shared Prisma-based database access layer.
-- `packages/email`: Email features with React Email & Resend.
-- `packages/ui`: Reusable UI components built with `shadcn/ui`.
-- `packages/utils`: Common utilities and shared TypeScript types.
+| Package                   | Description                                         |
+| ------------------------- | --------------------------------------------------- |
+| **@workspace/auth**       | Better Auth setup with session management and OAuth |
+| **@workspace/db**         | Prisma schema and database client for PostgreSQL    |
+| **@workspace/ui**         | shadcn/ui components with Tailwind CSS              |
+| **@workspace/email**      | React Email templates and Resend integration        |
+| **@workspace/utils**      | Shared utilities and TypeScript types               |
+| **@workspace/rate-limit** | API rate limiting utilities                         |
 
----
+### Configuration Packages
+
+- **eslint-config** — Unified linting rules for all workspaces
+- **prettier-config** — Consistent code formatting
+- **typescript-config** — Shared TypeScript compiler options
+- **jest-presets** — Testing configuration for Node and React
+
+### Built With
+
+[Turborepo](https://turborepo.com/) · [Next.js 16](https://nextjs.org/) · [Express](https://expressjs.com/) · [TypeScript](https://www.typescriptlang.org/) · [Docker](https://www.docker.com/) · [Prisma](https://www.prisma.io/) · [PostgreSQL](https://www.postgresql.org/) · [shadcn/ui](https://ui.shadcn.com/) · [Tailwind CSS](https://tailwindcss.com/) · [Better Auth](https://www.better-auth.com/) · [React Email](https://react.email/) · [Resend](https://resend.com/) · [Tanstack Query](https://tanstack.com/query/latest) · [ESLint](https://eslint.org/) · [Prettier](https://prettier.io/) · [Jest](https://jestjs.io/) · [GitHub Actions](https://github.com/features/actions) · [pnpm](https://pnpm.io/)
 
 ## Getting Started
 
-### Setting up `apps/web`
+### Requirements
 
-To set up and run the web application (`apps/web`), follow the instructions in [apps/web/README.md](apps/web/README.md).
+Make sure you have these installed:
 
-### Setting up `apps/api`
+- **Node.js** 20 or higher
+- **pnpm** 10+ (recommended)
+- **PostgreSQL** database
+- **Git**
 
-To set up and run the API server (`apps/api`), follow the instructions in [apps/api/README.md](apps/api/README.md).
+### Quick Start
 
----
+1. **Clone the repository**
 
-## Docker Setup
+   ```bash
+   git clone https://github.com/vijaysingh2219/build-elevate.git
+   cd build-elevate
+   ```
 
-This project includes mutiple Dockerfile and a production `docker-compose` setup for the apps.
+2. **Install dependencies**
 
-### 1. Production
+   ```bash
+   pnpm install
+   ```
 
-To build and run the production container:
+3. **Configure environment variables**
+
+   Copy `.env.example` files in these directories and fill in your values:
+   - `apps/web/.env.local`
+   - `apps/api/.env`
+   - `packages/db/.env`
+
+4. **Initialize the database**
+
+   ```bash
+   cd packages/db
+   pnpm db:migrate
+   cd ../..
+   ```
+
+5. **Start development servers**
+
+   ```bash
+   pnpm dev
+   ```
+
+**You're ready!** Open:
+
+- Frontend: [http://localhost:3000](http://localhost:3000)
+- API: [http://localhost:4000](http://localhost:4000)
+
+## Structure
+
+```plaintext
+build-elevate/
+├── apps/
+│   ├── web/             # Next.js frontend (localhost:3000)
+│   ├── api/             # Express backend (localhost:4000)
+│   ├── email/           # Email preview server
+│   └── studio/          # Database UI
+├── packages/
+│   ├── auth/            # Authentication logic
+│   ├── db/              # Prisma schema & client
+│   ├── ui/              # React components
+│   ├── email/           # Email templates
+│   ├── utils/           # Shared helpers
+│   └── rate-limit/      # API protection
+└── turbo.json           # Turborepo pipeline config
+```
+
+Packages are shared across apps for consistency and maintainability.
+
+## Available Scripts
+
+| Command            | Description                                |
+| ------------------ | ------------------------------------------ |
+| `pnpm dev`         | Start development servers for all apps     |
+| `pnpm build`       | Build all apps and packages                |
+| `pnpm start`       | Start production servers                   |
+| `pnpm lint`        | Lint all workspaces                        |
+| `pnpm format`      | Format code with Prettier                  |
+| `pnpm check-types` | Type-check all workspaces                  |
+| `pnpm test`        | Run tests across all workspaces            |
+| `pnpm clean`       | Clear Turborepo cache                      |
+| `pnpm docker:prod` | Build and run production Docker containers |
+
+## Docker Deployment
+
+Production-ready Docker setup with docker-compose:
 
 ```bash
 pnpm docker:prod
 ```
 
-This will:
+This spins up:
 
-- Build the Docker image using `docker-compose.prod.yml`
-- Start the web container on `localhost:3000`
-- Start the API container on `localhost:4000`
-- Start the PostgreSQL database container on `localhost:5432`
+- **Web app** → `localhost:3000`
+- **API server** → `localhost:4000`
+- **PostgreSQL** → `localhost:5432`
 
-Make sure you have `.env.production` in `apps/web`, `apps/api`, `packages/db`.
+Features:
 
-#### Notes
+- Multi-stage builds for minimal image size
+- Non-root user execution for security
+- Turbo pruning for optimized workspace dependencies
 
-- The Dockerfile uses a **multi-stage build** for minimal image size.
-- The containers runs as a **non-root user** (`nextjs`, `expressjs`) for security.
-- The Docker build context includes the whole monorepo, and Turbo prunes the workspace to include only the necessary dependencies, ensuring PNPM and workspaces are resolved correctly.
+## Documentation
 
----
+For detailed documentation, see:
 
-## Root-Level Scripts
+- [Web App Documentation](apps/web/README.md) - Next.js application
+- [API Documentation](apps/api/README.md) - Express server
+- [UI Components Guide](packages/ui/README.md) - shadcn/ui components
+- [Screenshots](SCREENSHOTS.md) - Visual overview of the UI
 
-The following scripts are available at the root of the monorepo:
+## License
 
-| Script             | Description                                                       |
-| ------------------ | ----------------------------------------------------------------- |
-| `pnpm build`       | Runs `turbo build` to build all apps and packages.                |
-| `pnpm clean`       | Clears the Turborepo cache and outputs.                           |
-| `pnpm dev`         | Runs `turbo dev` to start development servers concurrently.       |
-| `pnpm docker:prod` | Builds production Docker images and runs containers for all apps. |
-| `pnpm lint`        | Lints all workspaces using the shared ESLint configuration.       |
-| `pnpm format`      | Formats code using Prettier across the monorepo.                  |
-| `pnpm check-types` | Checks TypeScript types across all workspaces.                    |
-| `pnpm start`       | Starts the production servers for all apps.                       |
-| `pnpm test`        | Runs tests across all workspaces using Jest.                      |
-
----
-
-## UI Components (shadcn/ui)
-
-### Usage
-
-```bash
-pnpm dlx shadcn@latest init
-```
-
-### Adding components
-
-To add components to your app, run the following command at the root directory:
-
-```bash
-pnpm dlx shadcn@latest add button -c apps/web
-```
-
-This will place the ui components in the `packages/ui/src/components` directory.
-
-### Tailwind
-
-Your `tailwind.config.ts` and `globals.css` are already set up to use the components from the `ui` package.
-
-### Using components
-
-To use the components in your app, import them from the `ui` package.
-
-```tsx
-import { Button } from "@workspace/ui/components/button";
-```
+MIT License. See the [LICENSE](LICENSE) file for details.
