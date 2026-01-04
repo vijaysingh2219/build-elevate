@@ -2,22 +2,8 @@
   "extends": "@workspace/typescript-config/base.json",
   "compilerOptions": {
     "rootDir": "./src",
-    "outDir": "./dist",
-    "baseUrl": ".",
-    "jsx": "react-jsx",
-    "paths": {
-      "@workspace/utils/*": ["../../packages/utils/src/*"],
-      "@workspace/rate-limit/*": ["../../packages/rate-limit/src/*"]
-    }
+    "outDir": "./dist"
   },
-  "references": [
-    {
-      "path": "../../packages/utils"
-    },
-    {
-      "path": "../../packages/rate-limit"
-    }
-  ],
   "include": ["src"],
   "exclude": ["node_modules", "dist"]
 }
