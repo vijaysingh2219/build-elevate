@@ -6,7 +6,6 @@ services:
       dockerfile: ./apps/web/Dockerfile.prod
     env_file:
       - ./apps/web/.env.production
-      - ./packages/db/.env.production
     ports:
       - 3000:3000
     networks:
@@ -22,7 +21,6 @@ services:
       dockerfile: ./apps/api/Dockerfile.prod
     env_file:
       - ./apps/api/.env.production
-      - ./packages/db/.env.production
     ports:
       - 4000:4000
     networks:
