@@ -1,6 +1,6 @@
 {
   "name": "@workspace/email",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "private": true,
   "exports": {
     ".": "./dist/index.js"
