@@ -3,7 +3,7 @@
 import { useRequiredAuthUser } from '@/hooks/use-auth-user';
 import { parseUserAgent } from '@/lib/user-agent';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { revokeSession, type Session } from '@workspace/auth';
+import { revokeSession, type Session } from '@workspace/auth/client';
 import { Badge } from '@workspace/ui/components/badge';
 import { Button } from '@workspace/ui/components/button';
 import {

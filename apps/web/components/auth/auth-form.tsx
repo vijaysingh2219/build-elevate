@@ -6,7 +6,7 @@ import Logo from '@/components/ui/logo';
 import { config } from '@/config/site';
 import { useAuthUser } from '@/hooks/use-auth-user';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { signIn } from '@workspace/auth';
+import { signIn } from '@workspace/auth/client';
 import { Button } from '@workspace/ui/components/button';
 import {
   Card,

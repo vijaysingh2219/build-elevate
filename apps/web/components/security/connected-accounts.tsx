@@ -3,7 +3,7 @@
 import { config } from '@/config/site';
 import { providerIcons } from '@/lib/provider-icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { linkSocial, listAccounts, signIn, unlinkAccount } from '@workspace/auth';
+import { linkSocial, listAccounts, signIn, unlinkAccount } from '@workspace/auth/client';
 import { Badge } from '@workspace/ui/components/badge';
 import { Button } from '@workspace/ui/components/button';
 import {

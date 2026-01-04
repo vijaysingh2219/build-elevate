@@ -27,3 +27,6 @@ export const {
   resetPassword,
   $Infer,
 } = authClient;
+
+// Export the inferred session type for use in client components
+export type Session = typeof authClient.$Infer.Session;

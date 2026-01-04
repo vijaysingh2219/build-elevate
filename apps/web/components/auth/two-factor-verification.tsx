@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation } from '@tanstack/react-query';
-import { twoFactor } from '@workspace/auth';
+import { twoFactor } from '@workspace/auth/client';
 import { Button } from '@workspace/ui/components/button';
 import {
   Card,

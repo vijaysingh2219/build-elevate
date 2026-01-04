@@ -2,7 +2,7 @@
 
 import { useHasPassword } from '@/hooks/use-has-password';
 import { useMutation } from '@tanstack/react-query';
-import { twoFactor } from '@workspace/auth';
+import { twoFactor } from '@workspace/auth/client';
 import { Alert, AlertDescription, AlertTitle } from '@workspace/ui/components/alert';
 import { Button } from '@workspace/ui/components/button';
 import {

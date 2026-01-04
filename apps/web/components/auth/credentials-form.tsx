@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { sendVerificationEmail, signIn, signUp } from '@workspace/auth';
+import { sendVerificationEmail, signIn, signUp } from '@workspace/auth/client';
 import { Button } from '@workspace/ui/components/button';
 import {
   Form,
