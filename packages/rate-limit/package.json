@@ -16,8 +16,10 @@
   },
   "prettier": "@workspace/prettier-config",
   "dependencies": {
+    "@t3-oss/env-nextjs": "catalog:core",
     "@upstash/ratelimit": "catalog:core",
-    "@upstash/redis": "catalog:core"
+    "@upstash/redis": "catalog:core",
+    "zod": "catalog:core"
   },
   "devDependencies": {
     "@types/node": "catalog:dev",

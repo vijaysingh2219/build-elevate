@@ -50,6 +50,7 @@ catalogs:
   core:
     turbo: ^2.5.5
     zod: ^3.25.76
+    "@t3-oss/env-nextjs": ^0.11.1
     dotenv: ^17.2.1
     prisma: ^6.16.1
     "@prisma/client": ^6.16.1

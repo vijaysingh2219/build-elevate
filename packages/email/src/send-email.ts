@@ -1,5 +1,6 @@
 import { Resend } from 'resend';
 import { loadEmailConfig } from './config';
+import { keys } from './keys';
 import { resendEmailSchema } from './schemas';
 import { EmailContent } from './types';
 
@@ -57,7 +58,7 @@ export const sendEmail = async (email: EmailContent) => {
   }
 
   // Use provided from address, config default, or environment variable
-  const fromAddress = from || config.defaultFromAddress || process.env.RESEND_EMAIL_FROM;
+  const fromAddress = from || config.defaultFromAddress || keys().RESEND_EMAIL_FROM;
   if (!fromAddress) {
     throw new Error(
       'Email "from" address is required. Either:\n' +

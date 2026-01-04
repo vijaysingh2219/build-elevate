@@ -1,13 +1,15 @@
+import { keys } from './keys';
+
 export interface EmailServiceConfig {
   resendToken: string;
-  defaultFromAddress?: string;
+  defaultFromAddress: string;
   isDevelopment: boolean;
 }
 
-export function loadEmailConfig(): EmailServiceConfig {
-  const resendToken = process.env.RESEND_TOKEN;
-  const defaultFromAddress = process.env.RESEND_EMAIL_FROM;
-  const isDevelopment = process.env.NODE_ENV === 'development';
+export const loadEmailConfig = (): EmailServiceConfig => {
+  const resendToken = keys().RESEND_TOKEN;
+  const defaultFromAddress = keys().RESEND_EMAIL_FROM;
+  const isDevelopment = keys().NODE_ENV === 'development';
 
   if (!resendToken) {
     throw new Error(
@@ -18,7 +20,7 @@ export function loadEmailConfig(): EmailServiceConfig {
 
   return {
     resendToken,
-    defaultFromAddress,
+    defaultFromAddress: defaultFromAddress || '',
     isDevelopment,
   };
-}
+};
