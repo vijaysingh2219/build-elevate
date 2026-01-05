@@ -1,0 +1,42 @@
+# Source files
+scripts/
+*.ts
+!dist/**/*.d.ts
+
+# Config files
+tsup.config.ts
+tsconfig.json
+turbo.json
+eslint.config.js
+
+# Development
+node_modules/
+.turbo/
+coverage/
+.env*
+!.env.example
+
+# Git
+.git/
+.github/
+
+# Build outputs
+apps/*/dist/
+apps/*/.next/
+packages/*/dist/
+
+# Tests
+**/__tests__/
+**/*.test.ts
+**/*.spec.ts
+
+# Documentation
+README.md
+docs/
+assets/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

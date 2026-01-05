@@ -1,9 +1,44 @@
 {
   "name": "build-elevate",
-  "version": "1.0.0",
-  "private": true,
+  "version": "1.0.2",
+  "description": "Production-grade full-stack starter with Next.js, Express, and Better Auth - Get from idea to production faster",
+  "type": "module",
+  "author": "Vijay Singh",
+  "license": "MIT",
+  "homepage": "https://github.com/vijaysingh2219/build-elevate#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vijaysingh2219/build-elevate.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vijaysingh2219/build-elevate/issues"
+  },
+  "keywords": [
+    "starter",
+    "boilerplate",
+    "nextjs",
+    "express",
+    "monorepo",
+    "turborepo",
+    "typescript",
+    "prisma",
+    "better-auth",
+    "shadcn-ui",
+    "fullstack",
+    "template",
+    "scaffold",
+    "cli"
+  ],
+  "bin": {
+    "build-elevate": "./dist/index.js"
+  },
+  "files": [
+    "dist/index.js"
+  ],
   "scripts": {
     "build": "turbo build",
+    "build:cli": "tsup",
+    "prepublish": "pnpm build:cli",
     "clean": "turbo clean",
     "dev": "turbo dev",
     "docker:prod": "docker-compose -f docker-compose.prod.yml up --build",
@@ -15,7 +50,14 @@
     "test": "turbo test",
     "prepare": "husky"
   },
+  "dependencies": {
+    "@clack/prompts": "catalog:cli",
+    "commander": "catalog:cli",
+    "degit": "catalog:cli"
+  },
   "devDependencies": {
+    "@types/node": "catalog:dev",
+    "@types/degit": "catalog:cli",
     "@workspace/typescript-config": "workspace:*",
     "eslint": "catalog:eslint",
     "husky": "catalog:dev",
@@ -24,6 +66,7 @@
     "prettier-plugin-organize-imports": "catalog:prettier",
     "prettier-plugin-packagejson": "catalog:prettier",
     "prettier-plugin-tailwindcss": "catalog:prettier",
+    "tsup": "catalog:cli",
     "turbo": "catalog:core",
     "typescript": "catalog:dev"
   },
