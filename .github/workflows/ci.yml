@@ -5,10 +5,18 @@ on:
     branches:
       - main
       - dev
+    paths-ignore:
+      - "**/*.md"
+      - "SCREENSHOTS.md"
+      - "LICENSE"
   pull_request:
     branches:
       - main
       - dev
+    paths-ignore:
+      - "**/*.md"
+      - "SCREENSHOTS.md"
+      - "LICENSE"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
