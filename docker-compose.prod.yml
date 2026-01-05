@@ -11,8 +11,13 @@ services:
     networks:
       - app_network
     depends_on:
-      - postgres
-      - api # Optional: If your web app communicates with the API
+      postgres:
+        condition: service_healthy
+      api:
+        condition: service_started
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
 
   api:
     container_name: build-elevate-api
@@ -26,7 +31,17 @@ services:
     networks:
       - app_network
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    security_opt:
+      - no-new-privileges:true
 
   postgres:
     image: postgres:16-alpine
