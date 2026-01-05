@@ -60,31 +60,23 @@ Make sure you have these installed:
 - **Node.js** 20 or higher
 - **pnpm** 10+ (recommended)
 - **PostgreSQL** database
-- **Git**
 
 ### Quick Start
 
-1. **Clone the repository**
+1. **Create a new project**
 
    ```bash
-   git clone https://github.com/vijaysingh2219/build-elevate.git
-   cd build-elevate
+   pnpm dlx build-elevate@latest init
    ```
 
-2. **Install dependencies**
+2. **Configure environment variables**
 
-   ```bash
-   pnpm install
-   ```
-
-3. **Configure environment variables**
-
-   Copy `.env.example` files in these directories and fill in your values:
+   Configure files in these directories and fill in your values:
    - `apps/web/.env.local`
    - `apps/api/.env`
    - `packages/db/.env`
 
-4. **Initialize the database**
+3. **Initialize the database**
 
    ```bash
    cd packages/db
@@ -92,7 +84,7 @@ Make sure you have these installed:
    cd ../..
    ```
 
-5. **Start development servers**
+4. **Start development servers**
 
    ```bash
    pnpm dev
