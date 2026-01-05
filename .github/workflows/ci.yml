@@ -5,18 +5,30 @@ on:
     branches:
       - main
       - dev
-    paths-ignore:
-      - "**/*.md"
-      - "SCREENSHOTS.md"
-      - "LICENSE"
+    paths:
+      - "apps/**"
+      - "packages/**"
+      - "*.config.*"
+      - "**/eslint.config.js"
+      - "package.json"
+      - "pnpm-*.yaml"
+      - "tsconfig*.json"
+      - "turbo.json"
+      - ".github/workflows/**"
   pull_request:
     branches:
       - main
       - dev
-    paths-ignore:
-      - "**/*.md"
-      - "SCREENSHOTS.md"
-      - "LICENSE"
+    paths:
+      - "apps/**"
+      - "packages/**"
+      - "*.config.*"
+      - "**/eslint.config.js"
+      - "package.json"
+      - "pnpm-*.yaml"
+      - "tsconfig*.json"
+      - "turbo.json"
+      - ".github/workflows/**"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
