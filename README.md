@@ -3,8 +3,8 @@
 A modern full-stack monorepo starter with Next.js, Express, and Better Auth
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Node](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org/)
-[![pnpm](https://img.shields.io/badge/pnpm-10.4.1-orange)](https://pnpm.io/)
+[![downloads](https://img.shields.io/npm/dy/build-elevate)](https://www.npmjs.com/package/build-elevate)
+[![npm](https://img.shields.io/npm/v/build-elevate)](https://www.npmjs.com/package/build-elevate)
 
 ## Overview
 

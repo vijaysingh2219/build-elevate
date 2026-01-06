@@ -1,6 +1,6 @@
 # GitHub Workflows
 
-This directory contains GitHub Actions workflows for the build-elevate monorepo project. Each workflow serves a specific purpose in the CI/CD pipeline.
+This directory contains GitHub Actions workflows for the monorepo project. Each workflow serves a specific purpose in the CI/CD pipeline.
 
 ## Workflows Overview
 

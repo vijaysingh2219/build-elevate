@@ -1,6 +1,6 @@
 # Express API Server
 
-This is the API server for the build-elevate Template. It is built with Express and provides a simple RESTful API.
+This is the API server managed in a Turborepo monorepo setup. It is built with Express and provides a simple RESTful API.
 
 ## Setup
 
