@@ -94,6 +94,35 @@ const removeDockerFiles = async () => {
   }
 };
 
+const updateDockerComposeForTemplate = async (template: string) => {
+  const dockerComposePath = "docker-compose.prod.yml";
+
+  try {
+    const content = await readFile(dockerComposePath, "utf8");
+
+    if (template === "web") {
+      // Remove API service and its Dockerfile
+      let updated = content.replace(/\n  api:[\s\S]*?(?=\n  \w+:|$)/, "");
+      // Remove API dependency from web service
+      updated = updated.replace(
+        /\n      api:\n        condition: service_started/,
+        "",
+      );
+      await writeFile(dockerComposePath, updated);
+      await rm("apps/api/Dockerfile.prod", { force: true });
+    } else if (template === "api") {
+      // Remove web service and its Dockerfile
+      let updated = content.replace(/\n  web:[\s\S]*?(?=\n  \w+:|$)/, "");
+      await writeFile(dockerComposePath, updated);
+      await rm("apps/web/Dockerfile.prod", { force: true });
+    }
+  } catch (error) {
+    log.warn(
+      `Failed to update docker-compose.prod.yml: ${error instanceof Error ? error.message : String(error)}`,
+    );
+  }
+};
+
 const removeAppsByTemplate = async (template: string) => {
   const errors: string[] = [];
 
@@ -106,6 +135,7 @@ const removeAppsByTemplate = async (template: string) => {
       // Remove web and email apps
       await rm("apps/web", { recursive: true, force: true });
       await rm("apps/email", { recursive: true, force: true });
+      await rm("packages/ui", { recursive: true, force: true });
     }
     // For 'fullstack', keep everything
   } catch (error) {
@@ -188,22 +218,73 @@ const buildWorkspacePackages = async () => {
   await exec("pnpm build --filter '@workspace/*'", execSyncOpts);
 };
 
+const cleanupPackageJson = async () => {
+  const packageJsonPath = "package.json";
+  const content = await readFile(packageJsonPath, "utf8");
+  const packageJson = JSON.parse(content);
+
+  // Remove CLI-specific fields
+  delete packageJson.bin;
+  delete packageJson.files;
+  delete packageJson.homepage;
+  delete packageJson.repository;
+  delete packageJson.keywords;
+  delete packageJson.bugs;
+
+  // Remove CLI-specific scripts
+  if (packageJson.scripts) {
+    delete packageJson.scripts["build:cli"];
+    delete packageJson.scripts.prepublish;
+  }
+
+  // Remove all dependencies
+  delete packageJson.dependencies;
+
+  // Remove CLI-specific devDependencies
+  if (packageJson.devDependencies) {
+    delete packageJson.devDependencies["@types/degit"];
+    delete packageJson.devDependencies.tsup;
+  }
+
+  await writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2) + "\n");
+};
+
+const updateLicense = async (projectName: string) => {
+  const licensePath = "LICENSE";
+  const currentYear = new Date().getFullYear();
+
+  const content = await readFile(licensePath, "utf8");
+
+  // Replace the copyright line with new project name and current year
+  const updated = content.replace(
+    /Copyright \(c\) \d{4} .+/,
+    `Copyright (c) ${currentYear} ${projectName}`,
+  );
+
+  await writeFile(licensePath, updated);
+};
+
 const updatePnpmCatalog = async (template: string) => {
   const workspacePath = "pnpm-workspace.yaml";
   const workspaceFile = await readFile(workspacePath, "utf8");
 
   let updatedContent = workspaceFile;
 
+  updatedContent = updatedContent.replace(
+    /\n  cli:[\s\S]*?(?=\n  \w+:|$)/s,
+    "",
+  );
+
   if (template === "api") {
     // Remove web catalog section
     updatedContent = updatedContent.replace(
-      /\n  web:[\s\S]*?(?=\n  \w+:|$)/,
+      /\n  web:[\s\S]*?(?=\n  \w+:|$)/s,
       "",
     );
   } else if (template === "web") {
     // Remove server catalog section
     updatedContent = updatedContent.replace(
-      /\n  server:[\s\S]*?(?=\n  \w+:|$)/,
+      /\n  server:[\s\S]*?(?=\n  \w+:|$)/s,
       "",
     );
   }
@@ -470,11 +551,17 @@ export const initialize = async (options: {
     await replaceProjectNameInAll(name);
     if (options.verbose) log.info("✓ Replaced project name in all files");
 
-    if (template !== "fullstack") {
-      s.message("Updating pnpm catalog...");
-      await updatePnpmCatalog(template);
-      if (options.verbose) log.info("✓ Updated pnpm catalog");
-    }
+    s.message("Cleaning up package.json...");
+    await cleanupPackageJson();
+    if (options.verbose) log.info("✓ Cleaned up package.json");
+
+    s.message("Updating LICENSE...");
+    await updateLicense(name);
+    if (options.verbose) log.info("✓ Updated LICENSE");
+
+    s.message("Updating pnpm catalog...");
+    await updatePnpmCatalog(template);
+    if (options.verbose) log.info("✓ Updated pnpm catalog");
 
     s.message("Setting up environment variable files...");
     await setupEnvironmentVariables(includeDocker);
@@ -500,6 +587,11 @@ export const initialize = async (options: {
       s.message("Removing Docker files...");
       await removeDockerFiles();
       if (options.verbose) log.info("✓ Removed Docker files");
+    } else if (template !== "fullstack") {
+      s.message("Updating Docker configuration for template...");
+      await updateDockerComposeForTemplate(template);
+      if (options.verbose)
+        log.info(`✓ Updated Docker configuration for ${template} template`);
     }
 
     s.message("Installing dependencies...");
