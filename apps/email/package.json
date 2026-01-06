@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@react-email/preview-server": "catalog:web",
-    "react": "catalog:web",
+    "react": "catalog:core",
     "react-email": "catalog:web"
   },
   "devDependencies": {

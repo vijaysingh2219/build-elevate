@@ -28,8 +28,8 @@
     "input-otp": "catalog:web",
     "lucide-react": "catalog:web",
     "next-themes": "catalog:web",
-    "react": "catalog:web",
-    "react-dom": "catalog:web",
+    "react": "catalog:core",
+    "react-dom": "catalog:core",
     "react-hook-form": "catalog:web",
     "tailwind-merge": "catalog:web",
     "tw-animate-css": "catalog:web"
@@ -37,8 +37,8 @@
   "devDependencies": {
     "@tailwindcss/postcss": "catalog:web",
     "@types/node": "catalog:dev",
-    "@types/react": "catalog:web",
-    "@types/react-dom": "catalog:web",
+    "@types/react": "catalog:core",
+    "@types/react-dom": "catalog:core",
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "tailwindcss": "catalog:web",

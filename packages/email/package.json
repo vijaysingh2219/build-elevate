@@ -16,10 +16,10 @@
   },
   "prettier": "@workspace/prettier-config",
   "dependencies": {
-    "@react-email/components": "catalog:web",
+    "@react-email/components": "catalog:core",
     "@t3-oss/env-nextjs": "catalog:core",
-    "react": "catalog:web",
-    "resend": "catalog:web",
+    "react": "catalog:core",
+    "resend": "catalog:core",
     "zod": "catalog:core"
   },
   "devDependencies": {
@@ -27,8 +27,8 @@
     "@workspace/eslint-config": "workspace:^",
     "@workspace/prettier-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
-    "@types/react": "catalog:web",
-    "@types/react-dom": "catalog:web",
+    "@types/react": "catalog:core",
+    "@types/react-dom": "catalog:core",
     "typescript": "catalog:dev"
   }
 }
