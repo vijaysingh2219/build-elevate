@@ -22,7 +22,7 @@
     "@workspace/db": "workspace:*",
     "@workspace/email": "workspace:*",
     "@workspace/rate-limit": "workspace:*",
-    "better-auth": "catalog:web",
+    "better-auth": "catalog:core",
     "zod": "catalog:core"
   },
   "devDependencies": {
