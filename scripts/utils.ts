@@ -223,3 +223,40 @@ export const templateDescriptions: Record<string, string> = {
 export const getDescription = (template: string): string => {
   return templateDescriptions[template] || "";
 };
+
+// Environment variables required by each template
+export const envsByTemplate: Record<string, string[]> = {
+  fullstack: [
+    "GOOGLE_CLIENT_ID",
+    "GOOGLE_CLIENT_SECRET",
+    "NEXT_PUBLIC_BASE_URL",
+    "NODE_ENV",
+    "PORT",
+    "ALLOWED_ORIGINS",
+    "RESEND_TOKEN",
+    "RESEND_EMAIL_FROM",
+    "UPSTASH_REDIS_REST_URL",
+    "UPSTASH_REDIS_REST_TOKEN",
+  ],
+  web: [
+    "GOOGLE_CLIENT_ID",
+    "GOOGLE_CLIENT_SECRET",
+    "NEXT_PUBLIC_BASE_URL",
+    "NODE_ENV",
+    "RESEND_TOKEN",
+    "RESEND_EMAIL_FROM",
+    "UPSTASH_REDIS_REST_URL",
+    "UPSTASH_REDIS_REST_TOKEN",
+  ],
+  api: [
+    "GOOGLE_CLIENT_ID",
+    "GOOGLE_CLIENT_SECRET",
+    "NODE_ENV",
+    "PORT",
+    "ALLOWED_ORIGINS",
+    "RESEND_TOKEN",
+    "RESEND_EMAIL_FROM",
+    "UPSTASH_REDIS_REST_URL",
+    "UPSTASH_REDIS_REST_TOKEN",
+  ],
+};

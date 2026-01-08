@@ -27,6 +27,10 @@ import {
   getDescription,
 } from "./utils.js";
 import { createProjectReadme } from "./readme.js";
+import {
+  removeAuthClientArtifactsForApi,
+  updateTurboLintEnv,
+} from "./update.js";
 
 const cloneBuildElevate = async (name: string) => {
   const emitter = degit(url, {
@@ -936,8 +940,14 @@ export const initialize = async (options: {
     if (template !== "fullstack") {
       s.message(`Configuring ${template} project...`);
       await removeAppsByTemplate(template);
+      // Remove client.ts from auth for API-only template
+      await removeAuthClientArtifactsForApi(template);
       if (options.verbose) log.info(`✓ Configured ${template} template`);
     }
+
+    s.message("Configuring turbo.json lint env for template...");
+    await updateTurboLintEnv(template);
+    if (options.verbose) log.info("✓ Updated turbo.json lint env");
 
     s.message("Replacing project name...");
     await replaceProjectNameInAll(name);
