@@ -1,9 +1,11 @@
 import { readFile, writeFile } from "node:fs/promises";
+import { templateDescriptions } from "./utils.js";
 
 export const createProjectReadme = async (
   projectName: string,
   template: string,
   includeDocker: boolean,
+  packageManager: "pnpm" | "npm" | "bun" = "pnpm",
 ) => {
   const readmePath = "README.md";
   let content = "";
@@ -13,20 +15,17 @@ export const createProjectReadme = async (
     content = "";
   }
 
-  const templateDescriptions: Record<string, string> = {
-    fullstack:
-      "\nFull-stack application with Next.js frontend, Express backend, and PostgreSQL database",
-    web: "\nFrontend application with Next.js, authentication, and modern UI",
-    api: "\nBackend API with Express, PostgreSQL, and authentication",
-  };
+  const scriptPrefix =
+    packageManager === "pnpm" ? packageManager : `${packageManager} run`;
 
   content = content.replace(/^# .*/m, `# ${projectName}\n`);
   content = content.replace(
     /^(> .*)?\n*(A modern full-stack monorepo starter[\s\S]*?)(?=\n##|\n#|$)/m,
-    `${templateDescriptions[template]}\n\nBuilt with [build-elevate](https://github.com/vijaysingh2219/build-elevate) - A production-grade full-stack starter.`,
+    `\n${templateDescriptions[template]}\n\nBuilt with [build-elevate](https://github.com/vijaysingh2219/build-elevate) - A production-grade full-stack starter.`,
   );
 
-  const gettingStarted = `## Getting Started\n\n### Prerequisites\n\n- Node.js 20+\n- pnpm 10+\n- PostgreSQL database\n\n### Setup\n\n1. Install dependencies:\n\n    \u0060\u0060\u0060bash\n    pnpm install\n    \u0060\u0060\u0060\n\n2. Configure environment variables:\n   - Copy \`.env.example\` files to \`.env.local\` or \`.env\` in respective packages\n   - Update database connection strings and API keys\n\n3. Generate Prisma client and run migrations:\n\n    \u0060\u0060\u0060bash\n    cd packages/db\n    pnpm db:generate\n    pnpm db:migrate\n    cd ../..\n    \u0060\u0060\u0060\n\n4. Start development server:\n\n    \u0060\u0060\u0060bash\n    pnpm dev\n    \u0060\u0060\u0060\n`;
+  const installCmd = `${packageManager} install`;
+  const gettingStarted = `## Getting Started\n\n### Prerequisites\n\n- Node.js 20+\n- ${packageManager}\n- PostgreSQL database\n\n### Setup\n\n1. Install dependencies:\n\n    \u0060\u0060\u0060bash\n    ${installCmd}\n    \u0060\u0060\u0060\n\n2. Configure environment variables:\n   - Copy \`.env.example\` files to \`.env.local\` or \`.env\` in respective packages\n   - Update database connection strings and API keys\n\n3. Generate Prisma client and run migrations:\n\n    \u0060\u0060\u0060bash\n    cd packages/db\n    ${scriptPrefix} db:generate\n    ${scriptPrefix} db:migrate\n    cd ../..\n    \u0060\u0060\u0060\n\n4. Start development server:\n\n    \u0060\u0060\u0060bash\n    ${scriptPrefix} dev\n    \u0060\u0060\u0060\n`;
   if (/## Getting Started/.test(content)) {
     content = content.replace(
       /## Getting Started[\s\S]*?(?=\n## |\n# |$)/,
@@ -36,7 +35,7 @@ export const createProjectReadme = async (
     content += `\n${gettingStarted}`;
   }
 
-  const scriptsSection = `## Available Scripts\n\n- \`pnpm dev\` - Start development servers\n- \`pnpm build\` - Build all packages\n- \`pnpm lint\` - Run ESLint\n- \`pnpm format\` - Format code with Prettier\n- \`pnpm test\` - Run tests\n\n### Database Commands (run from packages/db)\n\n- \`pnpm db:generate\` - Generate Prisma client\n- \`pnpm db:migrate\` - Run database migrations\n`;
+  const scriptsSection = `## Available Scripts\n\n- \`${scriptPrefix} dev\` - Start development servers\n- \`${scriptPrefix} build\` - Build all packages\n- \`${scriptPrefix} lint\` - Run ESLint\n- \`${scriptPrefix} format\` - Format code with Prettier\n- \`${scriptPrefix} test\` - Run tests\n\n### Database Commands (run from packages/db)\n\n- \`${scriptPrefix} db:generate\` - Generate Prisma client\n- \`${scriptPrefix} db:migrate\` - Run database migrations\n`;
   if (/## Available Scripts/.test(content)) {
     content = content.replace(
       /## Available Scripts[\s\S]*?(?=\n## |\n# |$)/,
@@ -144,6 +143,49 @@ export const createProjectReadme = async (
     );
   } else {
     content += `\n${docsSection}`;
+  }
+
+  // Add or remove Docker Deployment section based on includeDocker
+  if (includeDocker) {
+    const dockerCmd = `${scriptPrefix} docker:prod`;
+    let dockerSpins = "This spins up:\n\n";
+    if (template !== "api") {
+      dockerSpins += "- **Web app** → `localhost:3000`\n";
+    }
+    if (template !== "web") {
+      dockerSpins += "- **API server** → `localhost:4000`\n";
+    }
+    dockerSpins += "- **PostgreSQL** → `localhost:5432`";
+
+    const dockerSection = `## Docker Deployment
+
+Production-ready Docker setup with docker-compose:
+
+\`\`\`bash
+${dockerCmd}
+\`\`\`
+
+${dockerSpins}
+
+Features:
+
+- Multi-stage builds for minimal image size
+- Non-root user execution for security
+- Turbo pruning for optimized workspace dependencies\n`;
+    if (/##\s*Docker Deployment/.test(content)) {
+      content = content.replace(
+        /##\s*Docker Deployment[\s\S]*?(?=\n##\s|\n#\s|$)/,
+        dockerSection,
+      );
+    } else {
+      content += `\n\n${dockerSection}`;
+    }
+  } else {
+    // Remove Docker Deployment section if present
+    content = content.replace(
+      /\n?##\s*Docker Deployment[\s\S]*?(?=\n##\s|\n#\s|$)/,
+      "",
+    );
   }
 
   await writeFile(readmePath, content);

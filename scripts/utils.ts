@@ -1,4 +1,8 @@
-import { type ExecSyncOptions, exec as execRaw } from "node:child_process";
+import {
+  type ExecSyncOptions,
+  type ExecOptions,
+  exec as execRaw,
+} from "node:child_process";
 import { randomBytes } from "node:crypto";
 import { access, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -7,6 +11,7 @@ import { promisify } from "node:util";
 export const url = "vijaysingh2219/build-elevate";
 
 export const execSyncOpts: ExecSyncOptions = { stdio: "ignore" };
+export const execOpts = { stdio: "ignore" as const };
 
 export const internalContentDirs = ["scripts", "dist", "assets"];
 
@@ -24,7 +29,7 @@ export const allInternalContent = [
 
 export const exec = promisify(execRaw);
 
-export const supportedPackageManagers = ["npm", "yarn", "bun", "pnpm"];
+export const supportedPackageManagers = ["npm", "bun", "pnpm"];
 
 export const validateProjectName = (name: string): string | undefined => {
   if (!name || name.trim().length === 0) {
@@ -204,4 +209,17 @@ export const updateAuthSecretInEnvFile = async (filePath: string) => {
   } catch (error) {
     // Skip if file doesn't exist
   }
+};
+
+// Descriptions for each template
+export const templateDescriptions: Record<string, string> = {
+  fullstack:
+    "Full-stack application with Next.js frontend, Express backend, authentication and PostgreSQL database",
+  web: "Frontend application with Next.js, authentication, and modern UI",
+  api: "Backend API with Express, PostgreSQL, and authentication",
+};
+
+// Get description for a given template
+export const getDescription = (template: string): string => {
+  return templateDescriptions[template] || "";
 };

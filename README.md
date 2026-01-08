@@ -58,7 +58,7 @@ Perfect for SaaS applications, web platforms, or any project that needs authenti
 Make sure you have these installed:
 
 - **Node.js** 20 or higher
-- **pnpm** 10+ (recommended)
+- **Package manager:** pnpm (recommended), npm, or bun
 - **PostgreSQL** database
 
 ### Quick Start

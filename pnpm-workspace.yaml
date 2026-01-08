@@ -103,4 +103,5 @@ catalogs:
     commander: ^12.1.0
     degit: ^2.8.4
     "@types/degit": ^2.8.3
+    yaml: ^2.8.1
     tsup: ^8.0.1

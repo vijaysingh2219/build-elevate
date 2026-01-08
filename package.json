@@ -53,7 +53,8 @@
   "dependencies": {
     "@clack/prompts": "catalog:cli",
     "commander": "catalog:cli",
-    "degit": "catalog:cli"
+    "degit": "catalog:cli",
+    "yaml": "catalog:cli"
   },
   "devDependencies": {
     "@types/node": "catalog:dev",

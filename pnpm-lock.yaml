@@ -21,6 +21,9 @@ catalogs:
     tsup:
       specifier: ^8.0.1
       version: 8.5.1
+    yaml:
+      specifier: ^2.8.1
+      version: 2.8.1
   core:
     '@prisma/adapter-pg':
       specifier: ^7.2.0
@@ -284,6 +287,9 @@ importers:
       degit:
         specifier: catalog:cli
         version: 2.8.4
+      yaml:
+        specifier: catalog:cli
+        version: 2.8.1
     devDependencies:
       '@types/degit':
         specifier: catalog:cli

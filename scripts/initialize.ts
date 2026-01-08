@@ -1,5 +1,7 @@
-import { copyFile, readFile, rm, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import { copyFile, readFile, readdir, rm, writeFile } from "node:fs/promises";
+import yaml from "yaml";
+import { join, resolve } from "node:path";
+import { cwd } from "node:process";
 import degit from "degit";
 import {
   cancel,
@@ -22,7 +24,9 @@ import {
   updateAuthSecretInEnvFile,
   url,
   validateProjectName,
+  getDescription,
 } from "./utils.js";
+import { createProjectReadme } from "./readme.js";
 
 const cloneBuildElevate = async (name: string) => {
   const emitter = degit(url, {
@@ -145,8 +149,386 @@ const removeAppsByTemplate = async (template: string) => {
   }
 };
 
-const installDependencies = async () => {
-  await exec("pnpm install", execSyncOpts);
+const getPackageManager = async (provided?: string, yes?: boolean) => {
+  if (provided) return provided;
+  if (yes) return "pnpm";
+  const pm = await select({
+    message: "Which package manager would you like to use?",
+    options: [
+      { value: "npm", label: "npm" },
+      { value: "pnpm", label: "pnpm" },
+      { value: "bun", label: "bun" },
+    ],
+    initialValue: "pnpm",
+  });
+  if (isCancel(pm)) {
+    cancel("Operation cancelled.");
+    process.exit(0);
+  }
+  return pm as string;
+};
+
+const findAllPackageJsons = async (dir: string): Promise<string[]> => {
+  let results: string[] = [];
+  const list = await readdir(dir, { withFileTypes: true });
+  for (const file of list) {
+    const filePath = join(dir, file.name);
+    if (file.isDirectory()) {
+      if (
+        file.name === "node_modules" ||
+        file.name === ".turbo" ||
+        file.name === ".next" ||
+        file.name === "dist" ||
+        file.name === "build"
+      ) {
+        continue;
+      }
+      results = results.concat(await findAllPackageJsons(filePath));
+    } else if (file.name === "package.json") {
+      results.push(filePath);
+    }
+  }
+  return results;
+};
+
+const replaceCatalogVersions = async () => {
+  const workspacePath = "pnpm-workspace.yaml";
+  const workspaceContent = await readFile(workspacePath, "utf8");
+  const workspace = yaml.parse(workspaceContent) as {
+    catalogs?: Record<string, Record<string, string>>;
+  };
+
+  if (!workspace.catalogs) {
+    log.warn("No catalogs found in pnpm-workspace.yaml");
+    return;
+  }
+
+  const catalogLookups: Record<string, Record<string, string>> = {};
+  for (const [catalogName, packages] of Object.entries(workspace.catalogs)) {
+    catalogLookups[catalogName] = packages;
+  }
+
+  const packageJsonFiles = await findAllPackageJsons(".");
+
+  const rootPackageJson = resolve(cwd(), "package.json");
+  const allFiles = new Set<string>();
+
+  for (const file of packageJsonFiles) {
+    allFiles.add(resolve(file));
+  }
+
+  allFiles.add(rootPackageJson);
+
+  const normalizedFiles = Array.from(allFiles);
+
+  for (const filePath of normalizedFiles) {
+    const content = await readFile(filePath, "utf8");
+    let packageJson: any;
+    try {
+      packageJson = JSON.parse(content);
+    } catch (error) {
+      log.warn(
+        `Failed to parse ${filePath}: ${error instanceof Error ? error.message : String(error)}`,
+      );
+      continue;
+    }
+
+    let fileChanged = false;
+    const dependencyFields = [
+      "dependencies",
+      "devDependencies",
+      "peerDependencies",
+      "optionalDependencies",
+    ] as const;
+
+    for (const field of dependencyFields) {
+      if (!packageJson[field] || typeof packageJson[field] !== "object") {
+        continue;
+      }
+
+      for (const [packageName, version] of Object.entries(packageJson[field])) {
+        if (typeof version === "string" && version.startsWith("workspace:")) {
+          continue;
+        }
+
+        if (typeof version === "string" && version.startsWith("catalog:")) {
+          const catalogName = version.replace("catalog:", "");
+          const catalog = catalogLookups[catalogName];
+
+          if (!catalog) {
+            log.warn(
+              `Catalog "${catalogName}" not found for package "${packageName}" in ${filePath}`,
+            );
+            continue;
+          }
+
+          const catalogVersion = catalog[packageName];
+          if (!catalogVersion) {
+            log.warn(
+              `Package "${packageName}" not found in catalog "${catalogName}" (${filePath})`,
+            );
+            continue;
+          }
+
+          packageJson[field][packageName] = catalogVersion;
+          fileChanged = true;
+        }
+      }
+    }
+
+    if (fileChanged) {
+      try {
+        const updatedContent = JSON.stringify(packageJson, null, 2) + "\n";
+        await writeFile(filePath, updatedContent);
+      } catch (error) {
+        log.warn(
+          `Failed to write ${filePath}: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      }
+    }
+  }
+};
+
+const replaceWorkspaceProtocols = async (packageManager: string) => {
+  if (packageManager === "pnpm" || packageManager === "bun") {
+    return;
+  }
+
+  const packageJsonFiles = await findAllPackageJsons(".");
+
+  const rootPackageJson = resolve(cwd(), "package.json");
+  const allFiles = new Set<string>();
+
+  for (const file of packageJsonFiles) {
+    allFiles.add(resolve(file));
+  }
+
+  allFiles.add(rootPackageJson);
+
+  const normalizedFiles = Array.from(allFiles);
+
+  for (const filePath of normalizedFiles) {
+    const content = await readFile(filePath, "utf8");
+    let packageJson: any;
+    try {
+      packageJson = JSON.parse(content);
+    } catch (error) {
+      log.warn(
+        `Failed to parse ${filePath}: ${error instanceof Error ? error.message : String(error)}`,
+      );
+      continue;
+    }
+
+    let fileChanged = false;
+    const dependencyFields = [
+      "dependencies",
+      "devDependencies",
+      "peerDependencies",
+      "optionalDependencies",
+    ] as const;
+
+    for (const field of dependencyFields) {
+      if (!packageJson[field] || typeof packageJson[field] !== "object") {
+        continue;
+      }
+
+      for (const [packageName, version] of Object.entries(packageJson[field])) {
+        if (typeof version === "string" && version.startsWith("workspace:")) {
+          packageJson[field][packageName] = "*";
+          fileChanged = true;
+        }
+      }
+    }
+
+    if (fileChanged) {
+      try {
+        const updatedContent = JSON.stringify(packageJson, null, 2) + "\n";
+        await writeFile(filePath, updatedContent);
+      } catch (error) {
+        log.warn(
+          `Failed to write ${filePath}: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      }
+    }
+  }
+};
+
+const addWorkspacesField = async () => {
+  const workspacePath = "pnpm-workspace.yaml";
+  let workspacePackages: string[] = [];
+
+  try {
+    const workspaceContent = await readFile(workspacePath, "utf8");
+    const workspace = yaml.parse(workspaceContent) as {
+      packages?: string[];
+    };
+    if (workspace.packages) {
+      workspacePackages = workspace.packages;
+    }
+  } catch (error) {
+    log.warn(
+      `Failed to read ${workspacePath}: ${error instanceof Error ? error.message : String(error)}`,
+    );
+    workspacePackages = ["apps/*", "packages/*"];
+  }
+
+  const packageJsonPath = "package.json";
+  const content = await readFile(packageJsonPath, "utf8");
+  const packageJson = JSON.parse(content);
+
+  packageJson.workspaces = workspacePackages;
+
+  await writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2) + "\n");
+};
+
+const updateDockerfilesForPackageManager = async (packageManager: string) => {
+  const dockerfiles = ["apps/api/Dockerfile.prod", "apps/web/Dockerfile.prod"];
+
+  // Helper to replace pnpm commands with npm or bun
+  const replaceCommands = (content: string, pm: string) => {
+    if (pm === "pnpm") return content;
+    let updated = content;
+    // Regex to match the pnpm install block with flexible whitespace
+    const pnpmBlock =
+      /# ✅ Install pnpm and manually configure PNPM_HOME\s*\nENV PNPM_HOME="[^"]*"\s*\nENV PATH="[^"]*"\s*\nRUN npm install -g pnpm\s*\\\s*\n\s*&&\s*pnpm config set global-bin-dir "\$PNPM_HOME"\s*\\\s*\n\s*&&\s*pnpm add -g turbo\s*\n?/g;
+    // Regex to match the pnpm cache mount with flexible whitespace
+    const cacheMount =
+      /--mount=type=cache,id=pnpm,target=\/root\/\.local\/share\/pnpm\/store\s*\\\s*\n\s*/g;
+    // Regex for the install command
+    const installRegex = /pnpm install --frozen-lockfile --ignore-scripts/g;
+    // Regex for the db:generate command
+    const generateRegex = /pnpm --filter @workspace\/db db:generate/g;
+    // Regex for the turbo build command
+    const buildRegex = /pnpm turbo build/g;
+
+    if (pm === "npm") {
+      // Replace pnpm install block with npm version
+      updated = updated.replace(
+        pnpmBlock,
+        "# ✅ Install turbo globally\nRUN npm install -g turbo\n",
+      );
+      // Remove pnpm cache mount
+      updated = updated.replace(cacheMount, "");
+      // Replace install command
+      updated = updated.replace(installRegex, "npm install --ignore-scripts");
+      // Replace db:generate command
+      updated = updated.replace(
+        generateRegex,
+        "cd packages/db && npm run db:generate",
+      );
+      // Replace turbo build command
+      updated = updated.replace(buildRegex, "turbo build");
+    } else if (pm === "bun") {
+      // Replace pnpm install block with bun version
+      updated = updated.replace(
+        pnpmBlock,
+        '# ✅ Install bun and add to PATH\nENV PATH="/root/.bun/bin:$PATH"\nRUN apk add --no-cache curl bash \\\n  && curl -fsSL https://bun.sh/install | bash \\\n  && /root/.bun/bin/bun install -g turbo\n\n',
+      );
+      // Remove pnpm cache mount
+      updated = updated.replace(cacheMount, "");
+      // Replace install command
+      updated = updated.replace(installRegex, "bun install");
+      // Replace db:generate command
+      updated = updated.replace(
+        generateRegex,
+        "cd packages/db && bun run db:generate",
+      );
+      // Replace turbo build command
+      updated = updated.replace(buildRegex, "turbo build");
+    }
+    return updated;
+  };
+  for (const dockerfile of dockerfiles) {
+    try {
+      const content = await readFile(dockerfile, "utf8");
+      const updated = replaceCommands(content, packageManager);
+      if (updated !== content) {
+        await writeFile(dockerfile, updated);
+      }
+    } catch (error) {
+      // Ignore if file doesn't exist (template may have removed it)
+    }
+  }
+};
+
+const configurePackageManager = async (packageManager: string) => {
+  const packageJsonPath = "package.json";
+
+  if (packageManager !== "pnpm") {
+    await replaceCatalogVersions();
+    await replaceWorkspaceProtocols(packageManager);
+    if (packageManager === "npm" || packageManager === "bun") {
+      await addWorkspacesField();
+    }
+  }
+
+  let packageJson;
+  try {
+    const content = await readFile(packageJsonPath, "utf8");
+    packageJson = JSON.parse(content);
+  } catch {
+    packageJson = undefined;
+  }
+
+  // Update Dockerfiles for selected package manager
+  await updateDockerfilesForPackageManager(packageManager);
+
+  if (packageManager === "bun") {
+    if (packageJson) {
+      packageJson.packageManager = "bun@1.3.5";
+      // Add @tailwindcss/postcss to dependencies if not present
+      if (!packageJson.dependencies) packageJson.dependencies = {};
+      if (!packageJson.dependencies["@tailwindcss/postcss"]) {
+        packageJson.dependencies["@tailwindcss/postcss"] = "^4.1.18";
+      }
+      await writeFile(
+        packageJsonPath,
+        JSON.stringify(packageJson, null, 2) + "\n",
+      );
+    }
+    try {
+      await rm("pnpm-lock.yaml", { force: true });
+    } catch {}
+  } else if (packageManager === "npm") {
+    if (packageJson) {
+      packageJson.packageManager = "npm@11.7.0";
+      await writeFile(
+        packageJsonPath,
+        JSON.stringify(packageJson, null, 2) + "\n",
+      );
+    }
+    try {
+      await rm("pnpm-lock.yaml", { force: true });
+    } catch {}
+    try {
+      await rm("pnpm-workspace.yaml", { force: true });
+    } catch {}
+  }
+
+  if (packageJson && packageManager !== "pnpm") {
+    const pmCmd = packageManager;
+    for (const key of Object.keys(packageJson.scripts || {})) {
+      if (typeof packageJson.scripts[key] === "string") {
+        packageJson.scripts[key] = packageJson.scripts[key]
+          .replace(/pnpm /g, pmCmd + " ")
+          .replace(/pnpm\./g, pmCmd + ".");
+      }
+    }
+    await writeFile(
+      packageJsonPath,
+      JSON.stringify(packageJson, null, 2) + "\n",
+    );
+  }
+};
+
+const installDependencies = async (packageManager: string) => {
+  if (packageManager === "pnpm") {
+    await exec("pnpm install");
+  } else if (packageManager === "bun") {
+    await exec("bun install");
+  } else {
+    await exec("npm install");
+  }
 };
 
 const initializeGit = async (remoteUrl?: string) => {
@@ -179,9 +561,6 @@ const setupEnvironmentVariables = async (includeDocker: boolean) => {
       await updateAuthSecretInEnvFile(join(source, target));
     } catch (error) {
       // Skip if source app doesn't exist (based on template choice)
-      log.warn(
-        `Skipped env file for ${source}: ${error instanceof Error ? error.message : String(error)}`,
-      );
     }
   });
 
@@ -204,9 +583,6 @@ const setupEnvironmentVariables = async (includeDocker: boolean) => {
         await updateAuthSecretInEnvFile(join(source, target));
       } catch (error) {
         // Skip if source app doesn't exist (based on template choice)
-        log.warn(
-          `Skipped production env file for ${source}: ${error instanceof Error ? error.message : String(error)}`,
-        );
       }
     });
 
@@ -214,11 +590,11 @@ const setupEnvironmentVariables = async (includeDocker: boolean) => {
   }
 };
 
-const buildWorkspacePackages = async () => {
-  await exec("pnpm build --filter '@workspace/*'", execSyncOpts);
+const buildWorkspacePackages = async (selectedManager: string) => {
+  await exec(`${selectedManager} run build`, execSyncOpts);
 };
 
-const cleanupPackageJson = async () => {
+const cleanupPackageJson = async (template: string) => {
   const packageJsonPath = "package.json";
   const content = await readFile(packageJsonPath, "utf8");
   const packageJson = JSON.parse(content);
@@ -230,6 +606,7 @@ const cleanupPackageJson = async () => {
   delete packageJson.repository;
   delete packageJson.keywords;
   delete packageJson.bugs;
+  delete packageJson.author;
 
   // Remove CLI-specific scripts
   if (packageJson.scripts) {
@@ -245,6 +622,9 @@ const cleanupPackageJson = async () => {
     delete packageJson.devDependencies["@types/degit"];
     delete packageJson.devDependencies.tsup;
   }
+
+  packageJson.description = getDescription(template);
+  packageJson.version = "1.0.0";
 
   await writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2) + "\n");
 };
@@ -492,6 +872,7 @@ export const initialize = async (options: {
   skipStudio?: boolean;
   yes?: boolean;
   verbose?: boolean;
+  packageManager?: string;
 }) => {
   try {
     intro("Let's start a Build Elevate project!");
@@ -501,6 +882,11 @@ export const initialize = async (options: {
     const template =
       options.template ||
       (options.yes ? "fullstack" : await getProjectTemplate());
+    const packageManager = await getPackageManager(
+      options.packageManager,
+      options.yes,
+    );
+
     const includeDocker = options.skipDocker
       ? false
       : options.skipDocker === undefined
@@ -547,12 +933,18 @@ export const initialize = async (options: {
     process.chdir(projectDir);
     if (options.verbose) log.info(`✓ Changed directory to ${projectDir}`);
 
+    if (template !== "fullstack") {
+      s.message(`Configuring ${template} project...`);
+      await removeAppsByTemplate(template);
+      if (options.verbose) log.info(`✓ Configured ${template} template`);
+    }
+
     s.message("Replacing project name...");
     await replaceProjectNameInAll(name);
     if (options.verbose) log.info("✓ Replaced project name in all files");
 
     s.message("Cleaning up package.json...");
-    await cleanupPackageJson();
+    await cleanupPackageJson(template);
     if (options.verbose) log.info("✓ Cleaned up package.json");
 
     s.message("Updating LICENSE...");
@@ -563,6 +955,10 @@ export const initialize = async (options: {
     await updatePnpmCatalog(template);
     if (options.verbose) log.info("✓ Updated pnpm catalog");
 
+    s.message(`Configuring for ${packageManager}...`);
+    await configurePackageManager(packageManager);
+    if (options.verbose) log.info("✓ Configured package manager");
+
     s.message("Setting up environment variable files...");
     await setupEnvironmentVariables(includeDocker);
     if (options.verbose) log.info("✓ Environment files created");
@@ -570,12 +966,6 @@ export const initialize = async (options: {
     s.message("Deleting internal content...");
     await deleteInternalContent();
     if (options.verbose) log.info("✓ Deleted internal content");
-
-    if (template !== "fullstack") {
-      s.message(`Configuring ${template} project...`);
-      await removeAppsByTemplate(template);
-      if (options.verbose) log.info(`✓ Configured ${template} template`);
-    }
 
     if (!includeStudio) {
       s.message("Removing Prisma Studio app...");
@@ -595,12 +985,24 @@ export const initialize = async (options: {
     }
 
     s.message("Installing dependencies...");
-    await installDependencies();
+    await installDependencies(packageManager);
     if (options.verbose) log.info("✓ Installed dependencies");
 
-    s.message("Building workspace packages...");
-    await buildWorkspacePackages();
-    if (options.verbose) log.info("✓ Built workspace packages");
+    // Build workspace packages
+    try {
+      await buildWorkspacePackages(packageManager);
+    } catch {
+      // ignore build errors - (expected)
+    }
+
+    // Update README.md with project details
+    s.message("Creating project README...");
+    await createProjectReadme(
+      name,
+      template,
+      includeDocker,
+      packageManager as "npm" | "pnpm" | "bun",
+    );
 
     if (!options.disableGit) {
       s.message("Initializing Git repository...");
@@ -614,9 +1016,10 @@ export const initialize = async (options: {
     }
 
     s.stop("Project initialized successfully!");
-
+    const devCommand =
+      packageManager === "pnpm" ? "pnpm dev" : packageManager + " run dev";
     outro(
-      `🎉 Your Build Elevate project is ready!\n\nNext steps:\n  cd ${name}\n  Update .env files with your database and API keys\n  pnpm build\n  pnpm dev`,
+      `🎉 Your Build Elevate project is ready!\n\nNext steps:\n  cd ${name}\n  Update .env files with your database and API keys\n  ${devCommand}`,
     );
   } catch (error) {
     const message =
