@@ -19,19 +19,22 @@ program
   .version(packageJson.version);
 
 program
-  .command("init")
-  .description("Create a new Build Elevate project")
-  .option("--name <name>", "Project name")
+  .command("init [project-name]")
+  .description("Create a new project")
+  .option("-t, --template <type>", "Project type: fullstack, web, or api")
   .option(
-    "--template <type>",
-    "Project type: fullstack, web, or api (default: fullstack)",
+    "-p, --package-manager <manager>",
+    "Package manager: pnpm, npm, or bun",
   )
-  .option("--disable-git", "Skip Git repository initialization")
-  .option("--git-remote <url>", "Set Git remote origin URL")
-  .option("--skip-docker", "Exclude Docker configuration")
-  .option("--skip-studio", "Exclude Prisma Studio app")
-  .option("-y, --yes", "Skip all prompts and use default values")
-  .option("--verbose", "Show detailed output during initialization")
+  .option("--no-git", "Skip Git repository initialization")
+  .option("--skip-install", "Skip dependency installation")
+  .option("-y, --yes", "Skip prompts and use defaults")
+  .option("-v, --verbose", "Show detailed output")
   .action(initialize);
+
+// Show help if no command provided
+if (!process.argv.slice(2).length) {
+  program.outputHelp();
+}
 
 program.parse(process.argv);

@@ -535,7 +535,7 @@ const installDependencies = async (packageManager: string) => {
   }
 };
 
-const initializeGit = async (remoteUrl?: string) => {
+const initializeGit = async () => {
   await exec("git init", execSyncOpts);
   await exec("git branch -M main", execSyncOpts);
   await exec("git add .", execSyncOpts);
@@ -543,10 +543,6 @@ const initializeGit = async (remoteUrl?: string) => {
     'git commit --no-verify -m "✨ Initial commit from Build Elevate"',
     execSyncOpts,
   );
-
-  if (remoteUrl) {
-    await exec(`git remote add origin ${remoteUrl}`, execSyncOpts);
-  }
 };
 
 const setupEnvironmentVariables = async (includeDocker: boolean) => {
@@ -774,61 +770,6 @@ const getStudioChoice = async () => {
   return value as boolean;
 };
 
-const getGitRemote = async () => {
-  const useRemote = await select({
-    message: "Set up Git remote origin?",
-    options: [
-      {
-        value: true,
-        label: "Yes",
-        hint: "Add remote repository URL",
-      },
-      { value: false, label: "No", hint: "Skip for now" },
-    ],
-    initialValue: false,
-  });
-
-  if (isCancel(useRemote)) {
-    cancel("Operation cancelled.");
-    process.exit(0);
-  }
-
-  if (!useRemote) {
-    return undefined;
-  }
-
-  const remoteUrl = await text({
-    message: "Enter your Git remote URL:",
-    placeholder: "https://github.com/username/repo.git",
-    validate(value: string) {
-      if (value.length === 0) {
-        return "Please enter a remote URL.";
-      }
-      // Validate HTTPS/HTTP URLs
-      if (value.startsWith("http://") || value.startsWith("https://")) {
-        if (!value.match(/^https?:\/\/[a-z0-9.-]+\.[a-z]{2,}\//i)) {
-          return "Invalid URL format. Example: https://github.com/username/repo.git";
-        }
-      }
-      // Validate SSH URLs
-      else if (value.startsWith("git@")) {
-        if (!value.match(/^git@[a-z0-9.-]+\.[a-z]{2,}:/i)) {
-          return "Invalid SSH format. Example: git@github.com:username/repo.git";
-        }
-      } else {
-        return "Remote URL must start with https://, http://, or git@";
-      }
-    },
-  });
-
-  if (isCancel(remoteUrl)) {
-    cancel("Operation cancelled.");
-    process.exit(0);
-  }
-
-  return remoteUrl.toString();
-};
-
 const validatePrerequisites = async (
   name: string,
   projectDir: string,
@@ -867,60 +808,69 @@ const validatePrerequisites = async (
   }
 };
 
-export const initialize = async (options: {
-  name?: string;
-  template?: string;
-  disableGit?: boolean;
-  gitRemote?: string;
-  skipDocker?: boolean;
-  skipStudio?: boolean;
-  yes?: boolean;
-  verbose?: boolean;
-  packageManager?: string;
-}) => {
+export const initialize = async (
+  projectName?: string,
+  options: {
+    template?: string;
+    git?: boolean;
+    skipInstall?: boolean;
+    yes?: boolean;
+    verbose?: boolean;
+    packageManager?: string;
+  } = {},
+) => {
   try {
     intro("Let's start a Build Elevate project!");
 
+    // Validate template if provided
+    if (
+      options.template &&
+      !["fullstack", "web", "api"].includes(options.template)
+    ) {
+      log.error(
+        `Invalid template: ${options.template}. Choose from: fullstack, web, api`,
+      );
+      process.exit(1);
+    }
+
+    // Validate package manager if provided
+    if (
+      options.packageManager &&
+      !["pnpm", "npm", "bun"].includes(options.packageManager)
+    ) {
+      log.error(
+        `Invalid package manager: ${options.packageManager}. Choose from: pnpm, npm, bun`,
+      );
+      process.exit(1);
+    }
+
     const cwd = process.cwd();
-    const name = options.name || (options.yes ? "my-app" : await getName());
+
+    // Handle project name - use positional argument or prompt
+    const name = projectName || (options.yes ? "my-app" : await getName());
+
     const template =
       options.template ||
       (options.yes ? "fullstack" : await getProjectTemplate());
+
     const packageManager = await getPackageManager(
       options.packageManager,
       options.yes,
     );
 
-    const includeDocker = options.skipDocker
-      ? false
-      : options.skipDocker === undefined
-        ? options.yes
-          ? true
-          : await getDockerChoice()
-        : true;
-    const includeStudio = options.skipStudio
-      ? false
-      : options.skipStudio === undefined
-        ? options.yes
-          ? true
-          : await getStudioChoice()
-        : true;
-    const gitRemote = options.gitRemote
-      ? options.gitRemote
-      : !options.disableGit && !options.yes
-        ? await getGitRemote()
-        : undefined;
+    // Handle --no-git flag
+    const shouldInitGit = options.git !== false;
 
-    if (!["fullstack", "web", "api"].includes(template)) {
-      throw new Error("Invalid project template");
-    }
+    const includeDocker = options.yes ? true : await getDockerChoice();
+
+    const includeStudio = options.yes ? true : await getStudioChoice();
 
     const s = spinner();
     const projectDir = join(cwd, name);
 
     // Validate prerequisites before starting
     s.start("Validating prerequisites...");
-    await validatePrerequisites(name, projectDir, options.disableGit || false);
+    await validatePrerequisites(name, projectDir, !shouldInitGit);
     s.stop("✓ Prerequisites validated");
 
     s.start("Cloning Build Elevate...");
@@ -994,15 +944,18 @@ export const initialize = async (options: {
         log.info(`✓ Updated Docker configuration for ${template} template`);
     }
 
-    s.message("Installing dependencies...");
-    await installDependencies(packageManager);
-    if (options.verbose) log.info("✓ Installed dependencies");
+    // Handle --skip-install flag
+    if (!options.skipInstall) {
+      s.message("Installing dependencies...");
+      await installDependencies(packageManager);
+      if (options.verbose) log.info("✓ Installed dependencies");
 
-    // Build workspace packages
-    try {
-      await buildWorkspacePackages(packageManager);
-    } catch {
-      // ignore build errors - (expected)
+      // Build workspace packages
+      try {
+        await buildWorkspacePackages(packageManager);
+      } catch {}
+    } else {
+      if (options.verbose) log.info("⊘ Skipped dependency installation");
     }
 
     // Update README.md with project details
@@ -1014,22 +967,25 @@ export const initialize = async (options: {
       packageManager as "npm" | "pnpm" | "bun",
     );
 
-    if (!options.disableGit) {
+    if (shouldInitGit) {
       s.message("Initializing Git repository...");
-      await initializeGit(gitRemote);
+      await initializeGit();
       if (options.verbose) {
         log.info("✓ Initialized Git repository");
-        if (gitRemote) {
-          log.info(`✓ Added remote origin: ${gitRemote}`);
-        }
       }
     }
 
     s.stop("Project initialized successfully!");
+
+    // Adjust next steps based on skipInstall flag
+    const cdCommand = `cd ${name}`;
+    const installCommand = options.skipInstall
+      ? `\n  ${packageManager === "pnpm" ? "pnpm" : packageManager} install`
+      : "";
     const devCommand =
       packageManager === "pnpm" ? "pnpm dev" : packageManager + " run dev";
     outro(
-      `🎉 Your Build Elevate project is ready!\n\nNext steps:\n  cd ${name}\n  Update .env files with your database and API keys\n  ${devCommand}`,
+      `🎉 Your Build Elevate project is ready!\n\nNext steps:\n  ${cdCommand}${installCommand}\n  Update .env files with your database and API keys\n  ${devCommand}`,
     );
   } catch (error) {
     const message =
