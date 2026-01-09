@@ -32,3 +32,6 @@ packages/db/generated
 
 # React Email
 .react-email
+
+# Docs
+.source/
