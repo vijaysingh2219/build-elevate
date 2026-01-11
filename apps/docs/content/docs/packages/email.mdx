@@ -1,0 +1,53 @@
+---
+title: Email
+description: Email features including templates and sending via Resend.
+---
+
+## Overview
+
+`@workspace/email` provides email features for the monorepo, including:
+
+- Transactional email templates built with [React Email](https://react.email/)
+- Email sending via [Resend](https://resend.com/)
+- Shared configuration, schemas, and types
+
+## Usage
+
+Import and use email utilities in your apps:
+
+```ts
+import { sendEmail, getTemplate } from "@workspace/email";
+
+// Send an email
+await sendEmail({
+  to: "user@example.com",
+  subject: "Welcome!",
+  react: getTemplate("verify-email").render({
+    name: "User",
+    email: "user@example.com",
+    verificationUrl: "https://example.com/verify",
+  }),
+});
+```
+
+## Features
+
+- **Predefined Templates**: Verification, password reset, change email
+- **Type-safe Schemas**: Zod-validated email content
+- **Simple API**: `sendEmail` for sending, `getTemplate` for rendering
+- **React Components**: Modular, customizable email UIs
+
+## Setup
+
+1. Configure Resend API keys in your environment variables (`RESEND_API_KEY`, `RESEND_EMAIL_FROM`).
+2. Customize templates in `packages/email/src/templates/` as needed.
+
+## Templates
+
+The following templates are included:
+
+- **Verification Email**: For account confirmation
+- **Change Email**: For email address changes
+- **Reset Password**: For password recovery
+
+Templates use shared React components for consistent design. See `packages/email/src/templates/` and `packages/email/src/components/` for details.

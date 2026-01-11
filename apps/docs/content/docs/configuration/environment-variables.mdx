@@ -1,0 +1,129 @@
+---
+title: Environment Variables
+description: Managing environment variables for different applications and packages in the monorepo.
+---
+
+## Overview
+
+Each app and package may have its own `.env` file for environment-specific configuration. These files are not committed to version control and should be created from the provided `.env.example` files.
+
+## Setup
+
+1. Copy the relevant `.env.example` file to `.env`, `.env.local`, or `.env.production` in each app/package.
+
+```bash tab="macOS/Linux"
+find . -name ".env.example" -execdir sh -c 'cp .env.example .env' \;
+```
+
+```powershell tab="Windows"
+Get-ChildItem -Recurse -Filter .env.example | ForEach-Object {
+	Copy-Item $_.FullName ($_.DirectoryName + "\.env") -Force
+}
+```
+
+2. Fill in the required values in each `.env` file as described below.
+
+## Quick Start
+
+To run locally with basic functionality, configure these **required** variables:
+
+1.  **Database**
+
+```
+DATABASE_URL=postgres://postgres:password@localhost:5432/app
+```
+
+<Callout type="info">
+  For local development, we recommend [Supabase](https://supabase.com/) for a
+  managed PostgreSQL database. Set up a free project and get the connection
+  string.
+</Callout>
+
+2.  **Authentication**
+
+Add to `apps/web/.env.local` and `apps/api/.env`:
+
+- `GOOGLE_CLIENT_ID=your-google-client-id`
+- `GOOGLE_CLIENT_SECRET=your-google-client-secret`
+- `NEXT_PUBLIC_BASE_URL=http://localhost:3000`
+
+<Callout type="info">
+  Set up OAuth credentials in the [Google Cloud
+  Console](https://console.cloud.google.com/apis/credentials). Use
+  `http://localhost:3000/api/auth/callback/google` as the redirect URI.
+</Callout>
+
+3.  **Email Service (Resend)**
+
+Add to `apps/web/.env.local`, `apps/api/.env.local` and `packages/email/.env.local`:
+
+- `RESEND_TOKEN=your-resend-token`
+- `RESEND_EMAIL_FROM=your@email.com`
+
+<Callout type="info">
+  Sign up at [Resend](https://resend.com/) to get an `API token` and set up a
+  verified sender email.
+</Callout>
+
+4.  **Rate Limiting**
+
+Add to `apps/api/.env.local` and `packages/rate-limit/.env.local`:
+
+    - `UPSTASH_REDIS_REST_URL=your-upstash-url`
+    - `UPSTASH_REDIS_REST_TOKEN=your-upstash-token`
+
+<Callout type="info">
+  Use [Upstash](https://upstash.com/) for a managed Redis instance. Set up a
+  free database and get the `REST_URL` and `TOKEN`.
+</Callout>
+
+## Environment Variable Files
+
+build-elevate uses the following `.env` files:
+
+| File                       | Description                                  |
+| -------------------------- | -------------------------------------------- |
+| `apps/web/.env.local`      | Web Application Variables                    |
+| `apps/api/.env.local`      | API Server Variables                         |
+| `packages/db/.env`         | Database connection and Prisma config        |
+| `packages/email/.env`      | React Email templates and Resend integration |
+| `packages/rate-limit/.env` | Upstash Redis config                         |
+
+## Adding New Variables
+
+To add new environment variables:
+
+1. Define the variable in the appropriate `.env` file.
+2. Add validation to the server or client object in the package's `keys.ts` file.
+
+Example `packages/package-name/keys.ts`:
+
+```ts
+import { createEnv } from "@t3-oss/env-nextjs";
+import { z } from "zod";
+export const keys = createEnv({
+  server: {
+    NEW_SECRET: z.string().min(1),
+  },
+  client: {
+    NEXT_PUBLIC_NEW_VALUE: z.string().optional(),
+  },
+  runtimeEnv: {
+    NEW_SECRET: process.env.NEW_SECRET,
+    NEXT_PUBLIC_NEW_VALUE: process.env.NEXT_PUBLIC_NEW_VALUE,
+  },
+});
+```
+
+## Deployment
+
+When deploying to production:
+
+1. Ensure all required environment variables are set in your hosting platform (e.g., Vercel, Heroku, etc.). Refer to their documentation for setting environment variables.
+
+2. Update URL variables (`NEXT_PUBLIC_APP_URL`, etc.) to production values as needed.
+
+<Callout type="info">
+  Variables prefixed with `VERCEL_` are automatically available in Vercel
+  deployments, such as `VERCEL_PRODUCTION_URL`.
+</Callout>

@@ -1,0 +1,37 @@
+---
+title: Design System
+description: Shared UI component library built with shadcn/ui for reusable, themeable React components.
+---
+
+## Overview
+
+`@workspace/ui` is a shared UI component library built with [shadcn/ui](https://ui.shadcn.com/), providing reusable, themeable React components for all apps in the monorepo.
+
+## Usage
+
+To use a component in your app:
+
+```tsx
+import { Button } from "@workspace/ui/components/button";
+```
+
+## Adding Components
+
+To add new components from shadcn/ui:
+
+```bash
+pnpm dlx shadcn@latest add button -c apps/web
+```
+
+This will place the component in `packages/ui/src/components/`.
+
+## Tailwind Setup
+
+Tailwind CSS is preconfigured. Use `globals.css` and `tailwind.config.ts` from the UI package for consistent styling.
+
+## Features
+
+- **Reusable Components**: Button, Alert, Card, Dialog, Tooltip, and more
+- **Themeable**: Built-in support for dark mode and custom themes
+- **Type-Safe**: Full TypeScript support
+- **Utility Functions**: Includes helpers like `cn()` for class merging

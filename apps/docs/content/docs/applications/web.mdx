@@ -1,0 +1,54 @@
+---
+title: Web
+description: Documentation for the Web application in the monorepo.
+---
+
+## Frontend Application
+
+- Built with Next.js 16 and TypeScript.
+- Located in `apps/web`.
+- Uses shared UI, authentication, and utility packages from the monorepo.
+- Features a modern, responsive UI built with shadcn/ui and Tailwind CSS.
+- Integrates authentication via Better Auth and supports Google OAuth.
+- Connects to a PostgreSQL database via Prisma and the shared db package.
+
+### Features
+
+- **Design System:** The app is built using the [shadcn/ui](https://ui.shadcn.com/) design system with Tailwind CSS for styling.
+- **Authentication:** Session management, Google OAuth, and two-factor support via [Better Auth](https://www.better-auth.com/).
+- **SEO**: Server-side rendering and meta tags for better search engine visibility.
+
+### Setup
+
+1. Install dependencies:
+   ```npm
+   npm install
+   ```
+2. Copy and configure environment variables:
+   ```sh
+   cp .env.example .env.local
+   # Edit .env.local as needed
+   ```
+3. Set up the database (see [database](../packages/db) for details):
+
+   ```npm
+   cd ../../packages/db
+   npm run db:generate
+   npm run db:migrate
+   ```
+
+4. Run the app:
+   ```npm
+   npm run dev
+   ```
+   <Callout type="info">
+     The web application runs on port 3000 (http://localhost:3000) by default.
+   </Callout>
+
+### Example Pages
+
+- **Home**: Welcome and project overview
+- **Dashboard**: User dashboard (requires authentication)
+- **Auth**: Sign-in, sign-up, two-factor flows, and [more](../packages/auth)
+- **Profile**: User profile management
+- **Settings**: Application settings and preferences

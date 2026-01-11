@@ -1,0 +1,6 @@
+{
+  "title": "Configuration",
+  "icon": "MyIcon",
+  "pages": ["environment-variables", "formatting", "docker"],
+  "defaultOpen": true
+}

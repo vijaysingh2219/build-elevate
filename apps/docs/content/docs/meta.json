@@ -1,0 +1,4 @@
+{
+  "pages": ["index", "getting-started", "configuration", "applications", "packages", "deployment", "troubleshooting"],
+  "defaultOpen": true
+}

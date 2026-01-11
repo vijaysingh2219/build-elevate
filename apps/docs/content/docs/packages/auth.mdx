@@ -1,0 +1,79 @@
+---
+title: Authentication
+description: We use Better Auth to handle authentication and session management.
+---
+
+## Overview
+
+`@workspace/auth` provides authentication for the monorepo, including:
+
+- Email/password authentication with verification
+- Google OAuth integration
+- Two-factor authentication (2FA)
+- Session management (Better Auth)
+- Email verification and password reset flows
+- Rate limiting for sensitive actions
+
+Integrates with:
+
+- `@workspace/db` for database storage
+- `@workspace/email` for transactional emails
+- `@workspace/rate-limit` for abuse protection
+
+## Usage
+
+### Client Side (React)
+
+```ts
+import {
+  signIn,
+  signOut,
+  signUp,
+  useSession,
+  twoFactor,
+} from "@workspace/auth";
+
+// Sign in
+await signIn.email({ email, password });
+await signIn.social({ provider: "google" });
+
+// Get session in React components
+const { data: session } = useSession();
+
+// Sign out
+await signOut();
+```
+
+### Server Side (API/Server Components)
+
+```ts
+import { auth } from "@workspace/auth";
+
+// Get session in API routes or server components
+const session = await auth.api.getSession({ headers: request.headers });
+
+// Protect API routes
+if (!session) {
+  return new Response("Unauthorized", { status: 401 });
+}
+```
+
+## Features
+
+- **Email/Password Auth**: Secure credential-based login
+- **OAuth**: Google sign-in
+- **2FA**: TOTP-based two-factor authentication
+- **Email Flows**: Verification, password reset, change email
+- **Rate Limiting**: Prevents abuse of sensitive endpoints
+- **Type-Safe**: Full TypeScript support
+
+## Setup
+
+Set these environment variables:
+
+- `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` (for OAuth)
+- `NEXT_PUBLIC_BASE_URL` (frontend URL)
+- `DATABASE_URL` (Postgres, from @workspace/db)
+- Email config (see @workspace/email)
+
+See the source in `packages/auth/src/` for advanced usage and extension.

@@ -1,13 +1,98 @@
 ---
-title: Hello World
-description: Your first document
+title: Introduction
+description: Production-grade Turborepo monorepo starter with Next.js, Express, Better-Auth, and shadcn/ui
 ---
 
-Welcome to the docs! You can start writing documents in `/content/docs`.
+import { HomeIcon, Zap, Code2, Shield, Layers } from "lucide-react";
 
-## What is Next?
+# Overview
+
+A modern full-stack monorepo starter designed to accelerate your journey from concept to production. Build robust SaaS platforms, web apps, and more with best practices baked in.
+
+<Callout type="success" title="Perfect For">
+  SaaS products, web platforms, or any project that demands seamless
+  authentication, integrated database support, and a polished, ready-to-use UI.
+</Callout>
+
+## Why build-elevate?
 
 <Cards>
-  <Card title="Learn more about Next.js" href="https://nextjs.org/docs" />
-  <Card title="Learn more about Fumadocs" href="https://fumadocs.dev" />
+  <Card icon={<Zap />} title="Ready to Ship">
+    Authentication, database, email, and UI components are pre-configured so you
+    can focus on building features from day one.
+  </Card>
+  <Card icon={<Code2 />} title="Developer Experience">
+    Enjoy instant hot reloads, full type safety, and the productivity boost of a
+    monorepo. Turbocharged builds with Turborepo.
+  </Card>
+  <Card icon={<Layers />} title="Modular Design">
+    Share code effortlessly between frontend and backend with modular packages
+    for maximum reusability.
+  </Card>
+  <Card icon={<Shield />} title="Production Ready">
+    Built-in Docker support, CI/CD workflows, and deployment best practices
+    ensure you’re ready for scale from day one.
+  </Card>
 </Cards>
+
+## Quick Start
+
+Get started with build-elevate in under 5 minutes:
+
+```npm
+pnpm dlx build-elevate@latest init my-project
+```
+
+<Callout type="info">
+  Follow the [Getting Started](/docs/getting-started/installation) guide for
+  detailed setup instructions.
+</Callout>
+
+## Tech Stack
+
+<Cards>
+  <Card href="https://turborepo.org" title="Turborepo">
+    High-performance monorepo build system
+  </Card>
+  <Card href="https://nextjs.org" title="Next.js 16">
+    React framework with App Router and Turbopack
+  </Card>
+  <Card href="https://expressjs.com" title="Express">
+    Fast, unopinionated web framework for Node.js
+  </Card>
+  <Card href="https://www.better-auth.com" title="Better Auth">
+    Modern authentication library with session management
+  </Card>
+  <Card href="https://www.prisma.io" title="Prisma">
+    Next-generation ORM for Node.js and TypeScript
+  </Card>
+  <Card href="https://ui.shadcn.com" title="shadcn/ui">
+    Beautifully designed components built with Radix UI
+  </Card>
+</Cards>
+
+## Community & Support
+
+<Cards>
+  <Card
+    href="https://github.com/vijaysingh2219/build-elevate/issues"
+    title="Issues"
+  >
+    Found a bug? Let us know
+  </Card>
+  <Card
+    href="https://github.com/vijaysingh2219/build-elevate/discussions"
+    title="Discussions"
+  >
+    Ask questions and share ideas
+  </Card>
+</Cards>
+
+<Callout type="idea" title="Need Help?">
+  If you're stuck or have questions, check out our [Troubleshooting
+  Guide](/docs/troubleshooting) or open a discussion on GitHub.
+</Callout>
+
+## License
+
+[build-elevate](https://github.com/vijaysingh2219/build-elevate) is open source software [licensed as MIT](https://github.com/vijaysingh2219/build-elevate/blob/main/LICENSE).

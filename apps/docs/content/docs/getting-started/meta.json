@@ -1,0 +1,6 @@
+{
+  "title": "Getting Started",
+  "icon": "MyIcon",
+  "pages": ["installation", "first-steps", "structure"],
+  "defaultOpen": true
+}

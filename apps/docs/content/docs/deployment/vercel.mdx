@@ -1,0 +1,43 @@
+---
+title: Deploying to Vercel
+description: A step-by-step guide to deploying the monorepo applications to Vercel.
+---
+
+## Deployment
+
+This guide covers deploying the monorepo to [Vercel](https://vercel.com/), a popular platform for hosting Next.js applications.
+
+## Prerequisites
+
+- A Vercel account
+- Access to the monorepo
+
+## Steps to Deploy
+
+1. **Import the Repository**
+   - Log in to your Vercel account.
+   - Click on "New Project" and select "Import Git Repository".
+   - Connect your Git provider and select the monorepo.
+
+2. **Configure Project Settings**
+   - For each application (e.g., `web`), create a separate Vercel project.
+   - Set the root directory for each project:
+     - For the Web app, set the root to `apps/web`.
+   - Configure the build and output settings
+
+3. **Set Environment Variables**
+   - In the Vercel dashboard, navigate to the "Settings" tab of your project
+   - Add the necessary environment variables as defined in `.env` files (see [more](../configuration/environment-variables)).
+
+4. **Deploy the Application**
+   - Once everything is configured, click "Deploy".
+   - Vercel will build and deploy your application. You can monitor the deployment process in the dashboard.
+
+5. **Post-Deployment**
+   - After deployment, verify that the application is running correctly by visiting the provided Vercel URL.
+
+## Additional Tips
+
+- Use Vercel's preview deployments for testing changes before going live.
+- Monitor performance and logs through the Vercel dashboard.
+- Set up custom domains in the Vercel settings for production use.

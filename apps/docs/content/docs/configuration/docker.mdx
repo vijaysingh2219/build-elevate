@@ -1,0 +1,89 @@
+---
+title: Docker
+description: Docker setup and best practices for deploying the monorepo applications.
+---
+
+## Overview
+
+The monorepo is production-ready with a robust Docker setup for all core services:
+
+- **Multi-stage Dockerfiles** for each app (web, api) for minimal, secure images
+- **docker-compose.prod.yml** for orchestrating web, API, and PostgreSQL
+- Non-root user execution and health checks for security and reliability
+
+## Usage
+
+To build and run the full stack in production mode:
+
+```bash
+pnpm docker:prod
+```
+
+This will start:
+
+- Web app at [http://localhost:3000](http://localhost:3000)
+- API server at [http://localhost:4000](http://localhost:4000)
+- PostgreSQL at [localhost:5432](localhost:5432)
+
+## Key Files
+
+- **docker-compose.prod.yml**: Orchestrates all services, sets up networks, volumes, and health checks
+- **apps/web/Dockerfile.prod**: Multi-stage build for Next.js frontend
+- **apps/api/Dockerfile.prod**: Multi-stage build for Express backend
+
+## Best Practices
+
+- Use `.env.production` files in each app for environment variables
+- Images are built with Turbo pruning for optimal size and speed
+- All containers run as non-root users for security
+- Health checks ensure services are ready before dependent apps start
+
+## Example: docker-compose.prod.yml
+
+```yaml
+services:
+	web:
+		build:
+			context: .
+			dockerfile: ./apps/web/Dockerfile.prod
+		ports:
+			- 3000:3000
+		depends_on:
+			postgres:
+				condition: service_healthy
+			api:
+				condition: service_started
+	api:
+		build:
+			context: .
+			dockerfile: ./apps/api/Dockerfile.prod
+		ports:
+			- 4000:4000
+		depends_on:
+			postgres:
+				condition: service_healthy
+	postgres:
+		image: postgres:16-alpine
+		environment:
+			POSTGRES_DB: build-elevate-app
+			POSTGRES_USER: postgres
+			POSTGRES_PASSWORD: password
+		ports:
+			- 5432:5432
+		volumes:
+			- build-elevate-app_postgres_data:/var/lib/postgresql/data
+		healthcheck:
+			test: ["CMD-SHELL", "pg_isready -U postgres"]
+			interval: 10s
+			timeout: 5s
+			retries: 5
+volumes:
+	build-elevate-app_postgres_data:
+networks:
+	app_network:
+		driver: bridge
+```
+
+## Conclusion
+
+This Docker configuration provides a solid foundation for deploying the monorepo applications in production. By following best practices and utilizing multi-stage builds, the setup ensures security, performance, and maintainability.

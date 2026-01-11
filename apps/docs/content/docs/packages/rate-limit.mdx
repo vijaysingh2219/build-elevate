@@ -1,0 +1,59 @@
+---
+title: Rate Limiting
+description: Rate limiting utilities and predefined limiters for authentication flows.
+---
+
+## Overview
+
+`@workspace/rate-limit` provides rate limiting for the monorepo, including:
+
+- Powered by [Upstash Redis](https://upstash.com/)
+- Pre-configured rate limiters for authentication flows
+- Customizable rate limiting strategies
+- Shared configuration and types
+
+## Usage
+
+Import and use rate limiting utilities in your apps:
+
+```ts
+import {
+  createRateLimiter,
+  verifyEmailRateLimiter,
+} from "@workspace/rate-limit";
+
+// Use a predefined limiter
+const { success, limit, remaining, reset } =
+  await verifyEmailRateLimiter.limit(userId);
+if (!success) throw new Error("Rate limit exceeded");
+
+// Create a custom limiter
+const customLimiter = createRateLimiter({
+  prefix: "my-action",
+  limiter: Ratelimit.slidingWindow(5, "10 m"),
+});
+```
+
+## Features
+
+- **Predefined Rate Limiters**: For common auth operations
+- **Custom Limiter Creation**: Flexible config for any use case
+- **Sliding Window Algorithm**: Accurate, fair rate limiting
+- **Type-Safe APIs**: Full TypeScript support
+
+## Setup
+
+1. Configure Upstash Redis credentials in your environment variables:
+   - `UPSTASH_REDIS_REST_URL`
+   - `UPSTASH_REDIS_REST_TOKEN`
+2. Use predefined limiters or create your own as needed.
+
+## Predefined Rate Limiters
+
+The package includes rate limiters for common authentication flows:
+
+- **verifyEmailRateLimiter**: 3 requests per hour
+- **changeEmailRateLimiter**: 2 requests per 24 hours
+- **resetPasswordRateLimiter**: 3 requests per hour
+
+See the source in `packages/rate-limit/src/` for advanced usage and extension.

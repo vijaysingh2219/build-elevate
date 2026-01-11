@@ -1,0 +1,37 @@
+---
+title: Email
+---
+
+## Email Development App
+
+- Located in `apps/email`.
+- Used for developing and previewing email templates built with React Email.
+- Templates are sourced from `packages/email/src/templates`.
+
+### Features
+
+- **Live Preview:** Instantly view and test email templates in your browser.
+- **React Email Integration:** Build templates using React components.
+- **Previews for Common Flows:** Includes templates for email verification, password reset, and email change.
+
+### Usage
+
+1. **To preview the emails templates, simply run the email app**
+
+   ```sh
+   pnpm dev --filter email
+   ```
+
+   <Callout type="info">
+     The email preview application runs on port 3002 (http://localhost:3002) by
+     default.
+   </Callout>
+
+2. **Edit templates:**
+   Modify or add templates in `packages/email/src/templates/`.
+
+### Example Templates
+
+- `change-email.tsx`: Change email confirmation
+- `email-verification.tsx`: Email verification
+- `reset-password.tsx`: Password reset

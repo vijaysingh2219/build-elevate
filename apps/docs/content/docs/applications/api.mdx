@@ -1,0 +1,67 @@
+---
+title: API
+description: Documentation for the API application in the monorepo.
+---
+
+## Overview
+
+The API application serves as the backend for the monorepo, providing RESTful endpoints and handling authentication and data management.
+
+## Features
+
+- **RESTful API**: Built with Express.js to handle HTTP requests and responses.
+- **Security**: Implements Helmet for security headers and CORS for cross-origin resource sharing.
+- **Logging**: Uses Morgan for HTTP request logging.
+- **User authentication**: Handled via Better Auth, with session management and user data retrieval.
+- **Rate limiting**: The API uses Upstash Redis for rate limiting to protect against abuse and ensure fair usage.
+
+## Configuration
+
+The API server is located in `apps/api`. Below are the main configuration aspects:
+
+### Environment Variables
+
+Environment variables are managed via `.env` files. See `.env.example` in `apps/api` for all options.
+
+<Callout type="info">
+  See the [environment variables guide](../configuration/environment-variables)
+  for details and best practices.
+</Callout>
+
+### CORS & Allowed Origins
+
+Allowed origins are set via the `ALLOWED_ORIGINS` env variable as a comma-separated list. For example:
+
+```
+ALLOWED_ORIGINS=http://localhost:3000,https://your-production-domain.com
+```
+
+See `src/config/allowedOrigins.ts` and `src/config/corsOptions.ts` for implementation. CORS is enforced using these settings.
+
+### Middleware
+
+- **Helmet**: Security headers
+- **Morgan**: HTTP request logging
+- **Body Parsers**: JSON and URL-encoded
+- **Credentials**: Sets `Access-Control-Allow-Credentials` for allowed origins
+- **CORS**: Restricts origins based on config
+- **Error Handling**: Centralized error handler
+- **Rate Limiting**: Global and user-specific rate limits using Redis (see [rate limiting](../packages/rate-limit) for details)
+
+### Authentication
+
+Authentication is handled via Better Auth. Middleware attaches the session and user to each request. See `src/middleware/auth.ts` and type extensions in `src/types/express.d.ts`.
+
+### API Endpoints
+
+- `GET /api/health`: Health check
+- `GET /api/users/session`: Get current user session (requires authentication)
+
+### Docker
+
+Production builds use `Dockerfile.prod`. The build process uses TurboRepo for efficient builds and installs only production dependencies in the final image. See `apps/api/Dockerfile.prod` for details.
+
+<Callout type="info">
+  See the [Docker configuration guide](../configuration/docker) for detailed
+  setup instructions.
+</Callout>

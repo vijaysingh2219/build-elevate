@@ -1,0 +1,104 @@
+---
+title: Structure
+description: Understanding the build-elevate monorepo architecture and file organization
+---
+
+import { FolderTree, Package, Layers, Code2 } from "lucide-react";
+
+Understanding how the project is organized will help you navigate the codebase and know where to add your features.
+
+## Monorepo Architecture
+
+We use **Turborepo** to manage multiple applications and packages in a single repository. This architecture provides:
+
+- **Code Sharing**: Shared packages used across multiple apps
+- **Fast Builds**: Intelligent caching and parallel execution
+- **Type Safety**: Shared TypeScript configurations
+- **Unified Tooling**: Consistent linting, formatting, and testing
+
+<Callout type="info">
+  Think of it as multiple projects (web app, API, packages) living together,
+  sharing code, and building faster together.
+</Callout>
+
+## Root Directory
+
+```
+build-elevate/
+├── apps/                    # Applications (user-facing)
+├── packages/                # Shared packages (internal libraries)
+├── .github/                 # GitHub Actions workflows
+├── .husky/                  # Git hooks
+├── node_modules/            # Dependencies
+├── package.json             # Root package configuration
+├── pnpm-workspace.yaml      # pnpm workspace configuration
+├── turbo.json               # Turborepo pipeline configuration
+├── tsconfig.json            # Root TypeScript configuration
+├── eslint.config.js         # ESLint configuration
+└── README.md                # Project documentation
+```
+
+### Key Root Files
+
+| File                  | Purpose                                         |
+| --------------------- | ----------------------------------------------- |
+| `package.json`        | Root scripts and workspace dependencies         |
+| `turbo.json`          | Build pipeline, caching, and task dependencies  |
+| `pnpm-workspace.yaml` | Defines which folders are part of the workspace |
+| `tsconfig.json`       | Base TypeScript configuration for all packages  |
+| `eslint.config.js`    | Shared ESLint rules for all workspaces          |
+
+## Applications (`apps/`)
+
+Applications are the user-facing parts of your project. Each app can be deployed independently.
+
+```
+apps/
+├── web/                     # Next.js frontend application
+├── api/                     # Express backend server
+├── email/                   # Email template development
+└── studio/                  # Prisma Studio wrapper
+```
+
+<Callout type="info">
+  Find more details about each application in the
+  [Applications](../applications) section.
+</Callout>
+
+## Packages (`packages/`)
+
+Packages are internal libraries shared across applications. They provide reusable code and maintain consistency.
+
+```
+packages/
+├── auth/                   # Authentication logic
+├── db/                     # Database schema and client
+├── ui/                     # React component library
+├── email/                  # Email templates and utilities
+├── utils/                  # Shared utilities
+├── rate-limit/             # Rate limiting utilities
+├── eslint-config/          # Shared ESLint configuration
+├── prettier-config/        # Shared Prettier configuration
+├── typescript-config/      # Shared TypeScript configs
+└── jest-presets/           # Testing configuration
+```
+
+<Callout type="info">
+  Find more details about each package in the [Packages](../packages) section.
+</Callout>
+
+## Build Output
+
+When you run `pnpm build`, output files go to:
+
+```
+apps/web/.next/             # Next.js build output
+apps/api/dist/              # Express build output
+packages/*/dist/            # Package build outputs
+node_modules/.cache/turbo/  # Turborepo cache
+```
+
+<Callout type="info">
+  Turborepo caches build outputs to speed up subsequent builds. Run `pnpm clean`
+  to clear all caches.
+</Callout>

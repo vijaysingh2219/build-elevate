@@ -1,0 +1,80 @@
+---
+title: Database
+description: Database access and schema management using Prisma and PostgreSQL.
+---
+
+## Overview
+
+`@workspace/db` provides database access and schema management for the monorepo, including:
+
+- Type-safe database client powered by [Prisma](https://www.prisma.io/)
+- PostgreSQL schema and models
+- Shared configuration and migrations
+- Utilities for safe and efficient queries
+
+## Usage
+
+Import and use the Prisma client in your apps:
+
+```ts
+import { prisma } from "@workspace/db";
+
+// Query users
+const users = await prisma.user.findMany({
+  where: { emailVerified: true },
+  include: { sessions: true },
+});
+
+// Create a new user
+const newUser = await prisma.user.create({
+  data: {
+    email: "user@example.com",
+    name: "John Doe",
+  },
+});
+```
+
+## Features
+
+- **Prisma Client**: Type-safe, auto-complete database access
+- **Database Models**: User, Session, Account, TwoFactor, Verification
+- **Migration Management**: Version-controlled schema changes
+- **Singleton Pattern**: Optimized client instantiation for dev/prod
+
+## Setup
+
+1. Set the `DATABASE_URL` environment variable (PostgreSQL connection string).
+2. Run migrations to set up your schema.
+
+## Available Scripts
+
+- `db:generate`: Generate Prisma Client from schema
+- `db:migrate`: Create/apply new migrations
+- `db:deploy`: Deploy migrations to production
+- `db:reset`: Reset database and apply all migrations (dev only)
+
+## Database Schema
+
+The package includes these models:
+
+- **User**: User accounts with email verification and 2FA
+- **Session**: User sessions with IP/user agent tracking
+- **Account**: OAuth provider accounts
+- **TwoFactor**: 2FA settings
+- **Verification**: Email verification tokens
+
+See the full schema in `packages/db/prisma/schema.prisma`.
+
+## Migrations
+
+To create a new migration after modifying the schema:
+
+```bash
+pnpm db:migrate
+```
+
+To apply migrations in production:
+
+```bash
+pnpm db:deploy
+```

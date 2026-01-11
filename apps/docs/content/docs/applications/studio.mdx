@@ -1,0 +1,32 @@
+---
+title: Studio
+description: Documentation for the Studio application in the monorepo.
+---
+
+## Overview
+
+- Located in `apps/studio`.
+- Provides a UI for browsing and editing your PostgreSQL database using Prisma.
+- Connects to the database defined in `packages/db/prisma.config.ts` and `.env` (`DATABASE_URL`).
+
+### Features
+
+- **Visual Database Explorer:** Browse, edit, and manage your data with a web UI.
+- **Model Support:** Supports all models defined in your Prisma schema (User, Session, Account, TwoFactor, Verification).
+- **Safe Editing:** Edit records, add new entries, and delete data with safety checks.
+
+### Usage
+
+1. Ensure your database is running and `DATABASE_URL` is set in your environment.
+2. Start Prisma Studio:
+
+   ```sh
+   pnpm dev --filter studio
+   ```
+
+   <Callout type="info">
+     The Studio application runs on port 5555 (http://localhost:5555) by
+     default.
+   </Callout>
+
+3. Browse and edit your data visually.

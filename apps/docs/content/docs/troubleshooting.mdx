@@ -1,0 +1,88 @@
+---
+title: Troubleshooting
+description: Common issues and their solutions for the monorepo.
+---
+
+# Guide
+
+This page will be updated as common issues are reported by users.
+
+If you encounter a problem, please check our [GitHub Issues](https://github.com/vijaysingh2219/build-elevate/issues) or open a new discussion. We will add solutions for frequently reported problems here to help the community.
+
+> **Note:** If you see the same error as others, let us know! The more reports we get, the faster we can improve this guide.
+
+## Command Not Found
+
+If you get a "command not found" error:
+
+```bash
+# For pnpm users, try:
+npm install -g pnpm
+pnpm dlx build-elevate@latest init
+
+# For npm users:
+npx build-elevate@latest init
+
+# For bun users:
+bunx build-elevate@latest init
+```
+
+## Installation Fails
+
+If the installation fails:
+
+1. **Check your Node.js version**
+
+```bash
+   node --version  # Must be v20 or higher
+```
+
+2. **Clear package manager cache**
+
+```bash tab="pnpm"
+   pnpm store prune
+```
+
+```bash tab="npm"
+   npm cache clean --force
+```
+
+3. **Try with verbose logging**
+
+```bash
+   pnpm dlx build-elevate@latest init --verbose
+```
+
+## Port Already in Use
+
+If you see an error like "Port 3000 is already in use":
+
+```bash tab="Linux/Mac"
+# Find what's using the port
+lsof -i :3000
+
+# Kill the process
+kill -9 <PID>
+
+# Or use a different port
+PORT=3001 pnpm dev --filter=web
+```
+
+```bash tab="Windows"
+# Find what's using the port
+netstat -ano | findstr :3000
+
+# Kill the process
+taskkill /PID <PID> /F
+
+# Or use a different port
+set PORT=3001 && pnpm dev --filter=web
+```
+
+## Authentication Not Working
+
+If you can't sign in:
+
+1. **Verify `BETTER_AUTH_SECRET` is the same** in `apps/api/.env.local` and `apps/web/.env.local`
+2. **Check `ALLOWED_ORIGINS`** in `apps/api/.env.local` matches your web app URL
+3. **Clear cookies** and try again
