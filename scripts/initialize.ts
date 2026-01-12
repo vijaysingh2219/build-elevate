@@ -155,16 +155,61 @@ const removeAppsByTemplate = async (template: string) => {
 
 const getPackageManager = async (provided?: string, yes?: boolean) => {
   if (provided) return provided;
-  if (yes) return "pnpm";
+
+  const availablePMs = await Promise.all([
+    isCommandAvailable("npm").then((available) => ({
+      value: "npm" as const,
+      available,
+    })),
+    isCommandAvailable("pnpm").then((available) => ({
+      value: "pnpm" as const,
+      available,
+    })),
+    isCommandAvailable("bun").then((available) => ({
+      value: "bun" as const,
+      available,
+    })),
+  ]);
+
+  const installedPMs = availablePMs.filter((pm) => pm.available);
+
+  if (installedPMs.length === 0) {
+    throw new Error(
+      "No package manager found. Please install npm, pnpm, or bun.",
+    );
+  }
+
+  // Show detection results
+  const statusLines = availablePMs.map(
+    (pm) =>
+      `  ${pm.available ? "✓" : "✗"} ${pm.value}: ${pm.available ? "Installed" : "Not found"}`,
+  );
+  log.info(`Detected package managers:\n${statusLines.join("\n")}`);
+
+  if (yes) {
+    const preference = ["pnpm", "bun", "npm"] as const;
+    for (const preferred of preference) {
+      const found = installedPMs.find((pm) => pm.value === preferred);
+      if (found) {
+        return found.value;
+      }
+    }
+    return installedPMs[0]!.value;
+  }
+
+  // Show only installed in the selection prompt
+  const options = installedPMs.map((pm) => ({
+    value: pm.value,
+    label: pm.value,
+    hint: "Ready to use",
+  }));
+
   const pm = await select({
     message: "Which package manager would you like to use?",
-    options: [
-      { value: "npm", label: "npm" },
-      { value: "pnpm", label: "pnpm" },
-      { value: "bun", label: "bun" },
-    ],
-    initialValue: "pnpm",
+    options,
+    initialValue: installedPMs[0]!.value,
   });
+
   if (isCancel(pm)) {
     cancel("Operation cancelled.");
     process.exit(0);
