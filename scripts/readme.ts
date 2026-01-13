@@ -25,7 +25,7 @@ export const createProjectReadme = async (
   );
 
   const installCmd = `${packageManager} install`;
-  const gettingStarted = `## Getting Started\n\n### Prerequisites\n\n- Node.js 20+\n- ${packageManager}\n- PostgreSQL database\n\n### Setup\n\n1. Install dependencies:\n\n    \u0060\u0060\u0060bash\n    ${installCmd}\n    \u0060\u0060\u0060\n\n2. Configure environment variables:\n   - Copy \`.env.example\` files to \`.env.local\` or \`.env\` in respective packages\n   - Update database connection strings and API keys\n\n3. Generate Prisma client and run migrations:\n\n    \u0060\u0060\u0060bash\n    cd packages/db\n    ${scriptPrefix} db:generate\n    ${scriptPrefix} db:migrate\n    cd ../..\n    \u0060\u0060\u0060\n\n4. Start development server:\n\n    \u0060\u0060\u0060bash\n    ${scriptPrefix} dev\n    \u0060\u0060\u0060\n`;
+  const gettingStarted = `## Getting Started\n\n### Prerequisites\n\n- Node.js 20+\n- ${packageManager}\n- PostgreSQL database\n\n### Setup\n\n1. Install dependencies:\n\n\u0060\u0060\u0060bash\n${installCmd}\n\u0060\u0060\u0060\n\n2. Configure environment variables:\n   - Copy \`.env.example\` files to \`.env.local\` or \`.env\` in respective packages\n   - Update database connection strings and API keys\n\n3. Generate Prisma client and run migrations:\n\n\u0060\u0060\u0060bash\ncd packages/db\n${scriptPrefix} db:generate\n${scriptPrefix} db:migrate\ncd ../..\n\u0060\u0060\u0060\n\n4. Start development server:\n\n\u0060\u0060\u0060bash\n${scriptPrefix} dev\n\u0060\u0060\u0060\n`;
   if (/## Getting Started/.test(content)) {
     content = content.replace(
       /## Getting Started[\s\S]*?(?=\n## |\n# |$)/,
