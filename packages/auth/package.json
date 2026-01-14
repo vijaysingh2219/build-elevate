@@ -23,6 +23,7 @@
     "@workspace/email": "workspace:*",
     "@workspace/rate-limit": "workspace:*",
     "better-auth": "catalog:core",
+    "dotenv": "catalog:core",
     "zod": "catalog:core"
   },
   "devDependencies": {

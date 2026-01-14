@@ -19,6 +19,7 @@
     "@t3-oss/env-nextjs": "catalog:core",
     "@upstash/ratelimit": "catalog:core",
     "@upstash/redis": "catalog:core",
+    "dotenv": "catalog:core",
     "zod": "catalog:core"
   },
   "devDependencies": {

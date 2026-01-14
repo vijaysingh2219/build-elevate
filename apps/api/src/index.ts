@@ -1,13 +1,9 @@
 import dotenv from 'dotenv';
+import path from 'path';
 
-const envFile =
-  process.env.NODE_ENV === 'production'
-    ? '.env.production'
-    : process.env.NODE_ENV === 'test'
-      ? '.env.test'
-      : '.env.local';
-
-dotenv.config({ path: [envFile, '.env'] });
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
+}
 
 import { createServer } from './server';
 
