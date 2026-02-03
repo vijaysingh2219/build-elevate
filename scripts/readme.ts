@@ -1,5 +1,5 @@
 import { readFile, writeFile } from "node:fs/promises";
-import { templateDescriptions } from "./utils.js";
+import { templateDescriptions, toTitleCase, toKebabCase } from "./utils.js";
 
 export const createProjectReadme = async (
   projectName: string,
@@ -18,7 +18,7 @@ export const createProjectReadme = async (
   const scriptPrefix =
     packageManager === "pnpm" ? packageManager : `${packageManager} run`;
 
-  content = content.replace(/^# .*/m, `# ${projectName}\n`);
+  content = content.replace(/^# .*/m, `# ${toTitleCase(projectName)}\n`);
   content = content.replace(
     /^(> .*)?\n*(A modern full-stack monorepo starter[\s\S]*?)(?=\n##|\n#|$)/m,
     `\n${templateDescriptions[template]}\n\nBuilt with [build-elevate](https://github.com/vijaysingh2219/build-elevate) - A production-grade full-stack starter.`,
@@ -46,7 +46,7 @@ export const createProjectReadme = async (
   }
 
   const treeLines = [
-    `${projectName}/`,
+    `${toKebabCase(projectName)}/`,
     "├── apps/",
     template !== "api" ? "│   ├── web/" : "",
     template !== "web" ? "│   ├── api/" : "",

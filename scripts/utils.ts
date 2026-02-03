@@ -40,12 +40,12 @@ export const validateProjectName = (name: string): string | undefined => {
     return "Project name cannot start with . or _";
   }
 
-  if (!/^[a-z0-9-_@/]+$/.test(name)) {
-    return "Project name can only contain lowercase letters, numbers, hyphens, underscores, @, and /";
+  if (!/^[a-zA-Z0-9-_@/ ]+$/.test(name)) {
+    return "Project name can only contain letters, numbers, hyphens, underscores, spaces, @, and /";
   }
 
-  if (name.includes("..") || name.includes(" ")) {
-    return "Project name cannot contain spaces or ..";
+  if (name.includes("..")) {
+    return "Project name cannot contain ..";
   }
 
   const reserved = [
@@ -109,6 +109,12 @@ export const toSnakeCase = (str: string): string => {
     .toLowerCase();
 };
 
+export const toCapitalCase = (str: string): string => {
+  return str
+    .replace(/[-_]/g, " ")
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
 export const toConstantCase = (str: string): string => {
   return toSnakeCase(str).toUpperCase();
 };
@@ -153,6 +159,7 @@ export const replaceProjectName = async (
   content = content.replaceAll("BuildElevate", toPascalCase(newProjectName));
   content = content.replaceAll("build_elevate", toSnakeCase(newProjectName));
   content = content.replaceAll("BUILD_ELEVATE", toConstantCase(newProjectName));
+  content = content.replaceAll("BUILD ELEVATE", toCapitalCase(newProjectName));
   content = content.replaceAll("Build Elevate", toTitleCase(newProjectName));
 
   await writeFile(filePath, content);
@@ -168,6 +175,7 @@ export const getFilesToReplaceProjectName = (): string[] => {
     "apps/web/config/site.ts",
     "docker-compose.prod.yml",
     "packages/db/.env.example",
+    "packages/auth/.env.example",
     "packages/auth/src/server.ts",
     "packages/email/src/branding.ts",
     "packages/rate-limit/src/limiter.ts",

@@ -25,6 +25,7 @@ import {
   url,
   validateProjectName,
   getDescription,
+  toKebabCase,
 } from "./utils.js";
 import { createProjectReadme } from "./readme.js";
 import {
@@ -720,7 +721,7 @@ const updatePnpmCatalog = async (template: string) => {
 const getName = async () => {
   const value = await text({
     message: "What is your project named?",
-    placeholder: "my-app",
+    placeholder: "my app",
     validate(value: string) {
       if (value.length === 0) {
         return "Please enter a project name.";
@@ -841,8 +842,10 @@ const validatePrerequisites = async (
   // Check if directory already exists
   const exists = await directoryExists(projectDir);
   if (exists) {
+    // Extract the directory name from the path for better error message
+    const dirName = projectDir.split(/[\\/]/).pop() || name;
     throw new Error(
-      `Directory "${name}" already exists. Please choose a different name or remove the existing directory.`,
+      `Directory "${dirName}" already exists. Please choose a different name or remove the existing directory.`,
     );
   }
 
@@ -911,7 +914,7 @@ export const initialize = async (
     const includeStudio = options.yes ? true : await getStudioChoice();
 
     const s = spinner();
-    const projectDir = join(cwd, name);
+    const projectDir = join(cwd, toKebabCase(name));
 
     // Validate prerequisites before starting
     s.start("Validating prerequisites...");
@@ -920,7 +923,7 @@ export const initialize = async (
 
     s.start("Cloning Build Elevate...");
     try {
-      await cloneBuildElevate(name);
+      await cloneBuildElevate(toKebabCase(name));
       if (options.verbose) log.info("✓ Cloned repository");
     } catch (error) {
       throw new Error(
@@ -1023,7 +1026,7 @@ export const initialize = async (
     s.stop("Project initialized successfully!");
 
     // Adjust next steps based on skipInstall flag
-    const cdCommand = `cd ${name}`;
+    const cdCommand = `cd ${toKebabCase(name)}`;
     const installCommand = options.skipInstall
       ? `\n  ${packageManager === "pnpm" ? "pnpm" : packageManager} install`
       : "";
