@@ -9,6 +9,7 @@ export const siteConfig: Metadata = {
     apple: '/apple-touch-icon.png',
     shortcut: '/favicon.ico',
   },
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL ?? 'https://nexa-web-app.vercel.app'),
   keywords: [
     'turborepo',
     'starter',
