@@ -17,6 +17,7 @@ import {
   directoryExists,
   exec,
   execSyncOpts,
+  generateSecret,
   internalContentDirs,
   internalContentFiles,
   isCommandAvailable,
@@ -595,16 +596,20 @@ const setupEnvironmentVariables = async (includeDocker: boolean) => {
   const files = [
     { source: join("apps", "api"), target: ".env.local" },
     { source: join("apps", "web"), target: ".env.local" },
+    { source: join("packages", "auth"), target: ".env.local" },
     { source: join("packages", "db"), target: ".env" },
     { source: join("packages", "rate-limit"), target: ".env" },
     { source: join("packages", "email"), target: ".env" },
   ];
 
+  // Generate a single auth secret to share across all env files
+  const authSecret = generateSecret(32);
+
   // Parallelize env file creation
   const envFilePromises = files.map(async ({ source, target }) => {
     try {
       await copyFile(join(source, ".env.example"), join(source, target));
-      await updateAuthSecretInEnvFile(join(source, target));
+      await updateAuthSecretInEnvFile(join(source, target), authSecret);
     } catch (error) {
       // Skip if source app doesn't exist (based on template choice)
     }
@@ -626,7 +631,7 @@ const setupEnvironmentVariables = async (includeDocker: boolean) => {
     const prodEnvFilePromises = prodFiles.map(async ({ source, target }) => {
       try {
         await copyFile(join(source, ".env.example"), join(source, target));
-        await updateAuthSecretInEnvFile(join(source, target));
+        await updateAuthSecretInEnvFile(join(source, target), authSecret);
       } catch (error) {
         // Skip if source app doesn't exist (based on template choice)
       }

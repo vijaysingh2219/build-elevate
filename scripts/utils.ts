@@ -201,10 +201,12 @@ export const generateSecret = (length: number = 32): string => {
 };
 
 // Update BETTER_AUTH_SECRET in env files
-export const updateAuthSecretInEnvFile = async (filePath: string) => {
+export const updateAuthSecretInEnvFile = async (
+  filePath: string,
+  secret: string,
+) => {
   try {
     const content = await readFile(filePath, "utf8");
-    const secret = generateSecret(32);
     const updated = content.replace(
       /BETTER_AUTH_SECRET=.*/,
       `BETTER_AUTH_SECRET="${secret}"`,
