@@ -213,6 +213,9 @@ jobs:
         run: pnpm build
         env:
           DATABASE_URL: "postgresql://user:pass@localhost:5432/test"
+          BETTER_AUTH_SECRET: "ci-dummy-secret-do-not-use-in-production"
+          UPSTASH_REDIS_REST_URL: "https://placeholder.upstash.io"
+          UPSTASH_REDIS_REST_TOKEN: "placeholder-token"
 
   format-check:
     name: Format Check
