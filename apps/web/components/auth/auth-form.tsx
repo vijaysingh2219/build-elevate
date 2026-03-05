@@ -5,7 +5,6 @@ import Google from '@/components/icons/google';
 import Logo from '@/components/ui/logo';
 import { config } from '@/config/site';
 import { useAuthUser } from '@/hooks/use-auth-user';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { signIn } from '@workspace/auth/client';
 import { Button } from '@workspace/ui/components/button';
 import {
@@ -15,6 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@workspace/ui/components/card';
+import { useIsMobile } from '@workspace/ui/hooks/use-mobile';
 import { cn } from '@workspace/ui/lib/utils';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';

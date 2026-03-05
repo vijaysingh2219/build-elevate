@@ -15,24 +15,20 @@
   },
   "prettier": "@workspace/prettier-config",
   "dependencies": {
-    "@radix-ui/react-avatar": "catalog:web",
-    "@radix-ui/react-checkbox": "catalog:web",
-    "@radix-ui/react-dialog": "catalog:web",
-    "@radix-ui/react-dropdown-menu": "catalog:web",
-    "@radix-ui/react-label": "catalog:web",
-    "@radix-ui/react-separator": "catalog:web",
-    "@radix-ui/react-slot": "catalog:web",
-    "@radix-ui/react-tooltip": "catalog:web",
+    "@hookform/resolvers": "catalog:web",
+
     "class-variance-authority": "catalog:web",
     "clsx": "catalog:web",
     "input-otp": "catalog:web",
     "lucide-react": "catalog:web",
     "next-themes": "catalog:web",
+    "radix-ui": "catalog:web",
     "react": "catalog:core",
     "react-dom": "catalog:core",
     "react-hook-form": "catalog:web",
     "tailwind-merge": "catalog:web",
-    "tw-animate-css": "catalog:web"
+    "tw-animate-css": "catalog:web",
+    "zod": "catalog:core"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "catalog:web",
