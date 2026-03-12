@@ -61,7 +61,7 @@ export function AuthForm({ mode, className, ...props }: AuthFormProps) {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-6">
+            <div className="grid gap-4">
               <div className="flex flex-col gap-4">
                 <Button
                   variant="outline"
@@ -79,7 +79,7 @@ export function AuthForm({ mode, className, ...props }: AuthFormProps) {
               </div>
             </div>
 
-            {mode === 'sign-in' ? <SignInForm /> : <SignUpForm />}
+            <div className="mt-2">{mode === 'sign-in' ? <SignInForm /> : <SignUpForm />}</div>
           </CardContent>
         </Card>
       </div>
