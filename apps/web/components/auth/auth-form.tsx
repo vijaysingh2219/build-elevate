@@ -1,6 +1,6 @@
 'use client';
 
-import { CredentialsForm } from '@/components/auth/credentials-form';
+import { SignInForm, SignUpForm } from '@/components/auth';
 import Google from '@/components/icons/google';
 import Logo from '@/components/ui/logo';
 import { config } from '@/config/site';
@@ -78,7 +78,8 @@ export function AuthForm({ mode, className, ...props }: AuthFormProps) {
                 </span>
               </div>
             </div>
-            <CredentialsForm mode={mode} />
+
+            {mode === 'sign-in' ? <SignInForm /> : <SignUpForm />}
           </CardContent>
         </Card>
       </div>
