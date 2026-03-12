@@ -1,17 +1,21 @@
 import { Home } from 'lucide-react';
 import { Metadata } from 'next';
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://build-elevate.vercel.app';
+
+const DOMAIN = process.env.NEXT_PUBLIC_DOMAIN ?? 'turborepo.org';
+
+const DESCRIPTION = 'A starter template for building applications with Turborepo.';
+
 export const siteConfig: Metadata = {
-  title: 'build-elevate',
-  description: 'A starter template for building applications with Turborepo.',
+  title: 'Build Elevate',
+  description: DESCRIPTION,
   icons: {
     icon: [{ url: '/favicon.ico' }],
     apple: '/apple-touch-icon.png',
     shortcut: '/favicon.ico',
   },
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_BASE_URL ?? 'https://build-elevate-web-app.vercel.app',
-  ),
+  metadataBase: new URL(BASE_URL),
   keywords: [
     'turborepo',
     'starter',
@@ -28,16 +32,16 @@ export const siteConfig: Metadata = {
     'react-email',
   ],
   openGraph: {
-    title: 'build-elevate',
+    title: 'Build Elevate',
     description: 'A starter template for building applications with Turborepo.',
-    url: process.env.NEXT_PUBLIC_BASE_URL ?? 'https://turborepo.org',
-    siteName: 'build-elevate',
+    url: BASE_URL,
+    siteName: 'Build Elevate',
     images: [
       {
-        url: 'https://turborepo.com/_next/image?url=%2Fimages%2Fdocs%2Fslow-tasks-dark.png&w=1920&q=75',
+        url: `${BASE_URL}/og-image.png`,
         width: 1200,
         height: 630,
-        alt: 'build-elevate',
+        alt: 'Build Elevate',
       },
     ],
     locale: 'en_US',
@@ -45,19 +49,17 @@ export const siteConfig: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'build-elevate',
+    title: 'Build Elevate',
     description: 'A starter template for building applications with Turborepo.',
-    images: [
-      'https://turborepo.com/_next/image?url=%2Fimages%2Fdocs%2Fslow-tasks-dark.png&w=1920&q=75',
-    ],
+    images: [`${BASE_URL}/og-image.png`],
   },
 };
 
 export const config = {
-  name: 'build-elevate',
-  description: siteConfig.description,
-  baseUrl: process.env.NEXT_PUBLIC_BASE_URL ?? 'https://turborepo.org',
-  domain: process.env.NEXT_PUBLIC_DOMAIN ?? 'turborepo.org',
+  name: 'Build Elevate',
+  description: DESCRIPTION,
+  baseUrl: BASE_URL,
+  domain: DOMAIN,
   providers: [
     {
       id: 'google',

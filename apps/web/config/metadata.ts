@@ -10,7 +10,7 @@ export const generatePageMetadata = (
 ): Metadata => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://build-elevate.vercel.app';
   const ogImage = options?.ogImage || '/og-image.png';
-  const formattedTitle = `${title} | build-elevate`;
+  const formattedTitle = `${title} | Build Elevate`;
 
   return {
     title: formattedTitle,
@@ -23,7 +23,7 @@ export const generatePageMetadata = (
       title: formattedTitle,
       description,
       url: baseUrl,
-      siteName: 'build-elevate',
+      siteName: 'Build Elevate',
       images: [
         {
           url: ogImage,
@@ -46,7 +46,7 @@ export const generatePageMetadata = (
 // Page-specific metadata
 export const pageMetadata = {
   home: {
-    title: 'build-elevate | Fullstack Turborepo Starter Template',
+    title: 'Build Elevate | Fullstack Turborepo Starter Template',
     description:
       'A modern fullstack starter template with Next.js, TypeScript, Prisma, Better Auth, and shadcn/ui. Build scalable applications with Turborepo.',
   },
