@@ -1,6 +1,6 @@
 import { HomeLayout, HomeLayoutProps } from "fumadocs-ui/layouts/home";
 import { baseOptions } from "@/lib/layout.shared";
-import { BookIcon } from "lucide-react";
+import { BookIcon, HistoryIcon } from "lucide-react";
 
 function homeOptions(): HomeLayoutProps {
   return {
@@ -11,6 +11,12 @@ function homeOptions(): HomeLayoutProps {
         icon: <BookIcon />,
         text: "Documentation",
         url: "/docs",
+        secondary: false,
+      },
+      {
+        icon: <HistoryIcon />,
+        text: "Changelog",
+        url: "/changelog",
         secondary: false,
       },
     ],
