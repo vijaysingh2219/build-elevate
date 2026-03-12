@@ -1,5 +1,7 @@
 'use client';
 
+import { NameField } from '@/components/form';
+import { EmailField } from '@/components/form/email';
 import { useRequiredAuthUser } from '@/hooks/use-auth-user';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
@@ -13,21 +15,12 @@ import {
   CardHeader,
   CardTitle,
 } from '@workspace/ui/components/card';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@workspace/ui/components/form';
-import { Input } from '@workspace/ui/components/input';
+import { Form } from '@workspace/ui/components/form';
 import { Skeleton } from '@workspace/ui/components/skeleton';
 import { Spinner } from '@workspace/ui/components/spinner';
 import { updateProfileSchema } from '@workspace/utils/schemas';
 import { UpdateProfileFormValues } from '@workspace/utils/types';
-import { Mail, User } from 'lucide-react';
+import { User } from 'lucide-react';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -150,65 +143,29 @@ export default function GeneralSettingsPage() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <CardContent className="space-y-4">
-              <FormField
+              <NameField
                 control={form.control}
                 name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Name <span className="text-primary">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <User className="text-muted-foreground absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform" />
-                        <Input
-                          placeholder="Enter your name"
-                          autoComplete="name"
-                          className="pl-10"
-                          {...field}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormDescription>
-                      This is the name that will be displayed on your profile.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="Name"
+                description="This is the name that will be displayed on your profile."
               />
 
-              <FormField
+              <EmailField
                 control={form.control}
                 name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Email <span className="text-primary">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Mail className="text-muted-foreground absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform" />
-                        <Input
-                          type="email"
-                          placeholder="Enter your email"
-                          autoComplete="email"
-                          className="pl-10"
-                          {...field}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormDescription className="w-full">
-                      <span className="block">
-                        Your email address is used for signing in and receiving notifications.
-                      </span>
-                      <span className="text-primary mt-2 block">
-                        Changing your email will require verification. A confirmation link will be
-                        sent to your current email address.
-                      </span>
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="Email"
+                placeholder="Enter your email"
+                description={
+                  <>
+                    <span className="block">
+                      Your email address is used for signing in and receiving notifications.
+                    </span>
+                    <span className="text-primary mt-2 block">
+                      Changing your email will require verification. A confirmation link will be
+                      sent to your current email address.
+                    </span>
+                  </>
+                }
               />
             </CardContent>
             <CardFooter className="mt-4">

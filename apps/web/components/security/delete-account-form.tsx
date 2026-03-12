@@ -1,5 +1,6 @@
 'use client';
 
+import { ConfirmField, PasswordField } from '@/components/form';
 import { useHasPassword } from '@/hooks/use-has-password';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
@@ -22,21 +23,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@workspace/ui/components/dialog';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@workspace/ui/components/form';
-import { Input } from '@workspace/ui/components/input';
+import { Form } from '@workspace/ui/components/form';
 import { Skeleton } from '@workspace/ui/components/skeleton';
 import { Spinner } from '@workspace/ui/components/spinner';
 import { deleteAccountSchema } from '@workspace/utils/schemas';
 import { DeleteAccountFormValues } from '@workspace/utils/types';
-import { AlertCircle, Lock, Trash2 } from 'lucide-react';
+import { AlertCircle, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -170,49 +162,22 @@ export function DeleteAccountForm() {
           </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleDeleteAccount)} className="space-y-4">
-              <FormField
+              <PasswordField
                 control={form.control}
                 name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Password <span className="text-primary">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Lock className="text-muted-foreground absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform" />
-                        <Input
-                          type="password"
-                          placeholder="Enter your password"
-                          autoComplete="current-password"
-                          className="pl-10"
-                          {...field}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormDescription>Enter your password to confirm it&apos;s you.</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="Password"
+                placeholder="Enter your password"
+                description="Enter your password to confirm it's you."
+                autoComplete="current-password"
               />
 
-              <FormField
+              <ConfirmField
                 control={form.control}
                 name="confirmation"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Type &quot;DELETE&quot; to confirm <span className="text-primary">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input placeholder="DELETE" autoComplete="off" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      Type DELETE in capital letters to confirm deletion.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label='Type "DELETE" to confirm'
+                placeholder="DELETE"
+                confirmText="DELETE"
+                description="Type DELETE in capital letters to confirm."
               />
 
               <DialogFooter className="gap-2">

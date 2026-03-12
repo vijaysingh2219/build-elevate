@@ -1,5 +1,6 @@
 'use client';
 
+import { EmailField } from '@/components/form/email';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { requestPasswordReset } from '@workspace/auth/client';
@@ -11,16 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@workspace/ui/components/card';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@workspace/ui/components/form';
-import { Input } from '@workspace/ui/components/input';
+import { Form } from '@workspace/ui/components/form';
 import { Spinner } from '@workspace/ui/components/spinner';
 import { forgotPasswordSchema } from '@workspace/utils/schemas';
 import { ForgotPasswordFormValues } from '@workspace/utils/types';
@@ -128,32 +120,11 @@ export default function ForgotPasswordPage() {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-              <FormField
+              <EmailField
                 control={form.control}
                 name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Email Address <span className="text-primary">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Mail className="text-muted-foreground absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform" />
-                        <Input
-                          type="email"
-                          placeholder="yourname@example.com"
-                          autoComplete="email"
-                          className="pl-10"
-                          {...field}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormDescription>
-                      Enter the email address associated with your account
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="Email Address"
+                description="Enter the email address associated with your account"
               />
 
               <Button type="submit" className="w-full" disabled={forgotPasswordMutation.isPending}>

@@ -1,26 +1,16 @@
 'use client';
 
+import { EmailField, NameField, PasswordField } from '@/components/form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { sendVerificationEmail, signIn, signUp } from '@workspace/auth/client';
 import { Button } from '@workspace/ui/components/button';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@workspace/ui/components/form';
-import { Input } from '@workspace/ui/components/input';
+import { Form } from '@workspace/ui/components/form';
 import { Spinner } from '@workspace/ui/components/spinner';
 import { signInSchema, signUpSchema } from '@workspace/utils/schemas';
 import { SignInFormValues, SignUpFormValues } from '@workspace/utils/types';
-import { Eye, EyeOff, Lock, Mail, User } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
@@ -34,8 +24,6 @@ export function CredentialsForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
     defaultValues:
       mode === 'sign-up' ? { name: '', email: '', password: '' } : { email: '', password: '' },
   });
-
-  const [showPassword, setShowPassword] = useState(false);
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (values: SignInFormValues | SignUpFormValues) => {
@@ -111,107 +99,43 @@ export function CredentialsForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6">
         {mode === 'sign-up' && (
-          <FormField
+          <NameField
             control={form.control}
             name="name"
-            render={({ field }) => (
-              <FormItem className="grid gap-3">
-                <FormLabel>
-                  Name <span className="text-primary">*</span>
-                </FormLabel>
-                <FormControl>
-                  <div className="relative">
-                    <User className="text-muted-foreground absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform" />
-                    <Input
-                      type="text"
-                      placeholder="e.g. Your Name"
-                      autoComplete="name"
-                      className="pl-10"
-                      required
-                      {...field}
-                    />
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="name"
+            placeholder="e.g. Your Name"
+            description="Enter your full name."
           />
         )}
 
-        <FormField
+        <EmailField
           control={form.control}
           name="email"
-          render={({ field }) => (
-            <FormItem className="grid gap-3">
-              <FormLabel>
-                Email <span className="text-primary">*</span>
-              </FormLabel>
-              <FormControl>
-                <div className="relative">
-                  <Mail className="text-muted-foreground absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform" />
-                  <Input
-                    type="email"
-                    placeholder="yourname@example.com"
-                    autoComplete="email"
-                    className="pl-10"
-                    required
-                    {...field}
-                  />
-                </div>
-              </FormControl>
-              <FormDescription>We&apos;ll never share your email with anyone else.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
+          label="Email"
+          description="We'll never share your email with anyone else."
         />
 
-        <FormField
+        <PasswordField
           control={form.control}
           name="password"
-          render={({ field }) => (
-            <FormItem className="grid gap-3">
-              <FormLabel>
-                Password <span className="text-primary">*</span>
-              </FormLabel>
-              <FormControl>
-                <div className="relative">
-                  <Lock className="text-muted-foreground absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform" />
-                  <Input
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="Minimum 8 characters"
-                    autoComplete={mode === 'sign-in' ? 'current-password' : 'new-password'}
-                    className="pl-10"
-                    required
-                    {...field}
-                  />
-                  <Button
-                    type="button"
-                    size="icon"
-                    className="text-muted-foreground hover:text-muted-foreground absolute right-0 top-1/2 -translate-y-1/2 transform bg-transparent hover:bg-transparent"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                  </Button>
-                </div>
-              </FormControl>
-              <FormDescription>
-                {mode === 'sign-in' ? (
-                  <span className="flex items-center justify-between">
-                    <span>Enter the password for your account.</span>
-                    <Link
-                      href="/forgot-password"
-                      className="text-muted-foreground hover:text-foreground underline underline-offset-4"
-                    >
-                      Forgot password?
-                    </Link>
-                  </span>
-                ) : (
-                  <>Choose a strong password with at least 8 characters.</>
-                )}
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
+          label="Password"
+          placeholder="Minimum 8 characters"
+          description={
+            mode === 'sign-in' ? (
+              <span className="flex items-center justify-between">
+                <span>Enter the password for your account.</span>
+                <Link
+                  href="/forgot-password"
+                  className="text-muted-foreground hover:text-foreground underline underline-offset-4"
+                >
+                  Forgot password?
+                </Link>
+              </span>
+            ) : (
+              <>Choose a strong password with at least 8 characters.</>
+            )
+          }
+          autoComplete={mode === 'sign-in' ? 'current-password' : 'new-password'}
         />
 
         <Button type="submit" className="mb-6 w-full" disabled={isPending}>

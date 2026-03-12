@@ -1,5 +1,6 @@
 'use client';
 
+import { PasswordField } from '@/components/form';
 import { useHasPassword } from '@/hooks/use-has-password';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
@@ -21,15 +22,12 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from '@workspace/ui/components/form';
-import { Input } from '@workspace/ui/components/input';
 import { Skeleton } from '@workspace/ui/components/skeleton';
 import { Spinner } from '@workspace/ui/components/spinner';
 import { changePasswordSchema, setPasswordSchema } from '@workspace/utils/schemas';
 import { ChangePasswordFormValues, SetPasswordFormValues } from '@workspace/utils/types';
-import { Eye, EyeOff, Lock } from 'lucide-react';
-import { useState } from 'react';
+import { Lock } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
@@ -38,10 +36,6 @@ interface PasswordFormProps {
 }
 
 export function PasswordForm({ onSuccess }: PasswordFormProps) {
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
   const { data: hasPassword, isLoading: isCheckingPassword } = useHasPassword();
   const isChangeMode = hasPassword === true;
 
@@ -134,127 +128,32 @@ export function PasswordForm({ onSuccess }: PasswordFormProps) {
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent className="space-y-4">
             {isChangeMode && (
-              <FormField
+              <PasswordField
                 control={form.control}
                 name="currentPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      Current Password <span className="text-primary">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Lock className="text-muted-foreground absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform" />
-                        <Input
-                          type={showCurrentPassword ? 'text' : 'password'}
-                          placeholder="Enter current password"
-                          autoComplete="current-password"
-                          className="pl-10"
-                          {...field}
-                        />
-                        <Button
-                          type="button"
-                          size="icon"
-                          variant="ghost"
-                          className="text-muted-foreground hover:text-muted-foreground absolute right-0 top-1/2 -translate-y-1/2 transform"
-                          onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                        >
-                          {showCurrentPassword ? (
-                            <EyeOff className="h-5 w-5" />
-                          ) : (
-                            <Eye className="h-5 w-5" />
-                          )}
-                        </Button>
-                      </div>
-                    </FormControl>
-                    <FormDescription>
-                      Enter your current password to confirm it&apos;s you.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                label="Current Password"
+                placeholder="Enter current password"
+                description="Enter your current password to confirm it's you."
+                autoComplete="current-password"
               />
             )}
 
-            <FormField
+            <PasswordField
               control={form.control}
               name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    {isChangeMode ? 'New Password' : 'Password'}{' '}
-                    <span className="text-primary">*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <Lock className="text-muted-foreground absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform" />
-                      <Input
-                        type={showPassword ? 'text' : 'password'}
-                        placeholder="Minimum 8 characters"
-                        autoComplete="new-password"
-                        className="pl-10"
-                        {...field}
-                      />
-                      <Button
-                        type="button"
-                        size="icon"
-                        variant="ghost"
-                        className="text-muted-foreground hover:text-muted-foreground absolute right-0 top-1/2 -translate-y-1/2 transform"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-5 w-5" />
-                        ) : (
-                          <Eye className="h-5 w-5" />
-                        )}
-                      </Button>
-                    </div>
-                  </FormControl>
-                  <FormDescription>
-                    Choose a strong password with at least 8 characters.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
+              label={isChangeMode ? 'New Password' : 'Password'}
+              placeholder="Minimum 8 characters"
+              description=" Choose a strong password with at least 8 characters."
+              autoComplete="new-password"
             />
 
-            <FormField
+            <PasswordField
               control={form.control}
               name="confirmPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    Confirm Password <span className="text-primary">*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <Lock className="text-muted-foreground absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform" />
-                      <Input
-                        type={showConfirmPassword ? 'text' : 'password'}
-                        placeholder="Re-enter your password"
-                        autoComplete="new-password"
-                        className="pl-10"
-                        {...field}
-                      />
-                      <Button
-                        type="button"
-                        size="icon"
-                        variant="ghost"
-                        className="text-muted-foreground hover:text-muted-foreground absolute right-0 top-1/2 -translate-y-1/2 transform"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      >
-                        {showConfirmPassword ? (
-                          <EyeOff className="h-5 w-5" />
-                        ) : (
-                          <Eye className="h-5 w-5" />
-                        )}
-                      </Button>
-                    </div>
-                  </FormControl>
-                  <FormDescription>Re-enter your password to confirm.</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
+              label="Confirm Password"
+              placeholder="Re-enter your password"
+              description="Re-enter your password to confirm."
+              autoComplete="new-password"
             />
 
             {isChangeMode && (
