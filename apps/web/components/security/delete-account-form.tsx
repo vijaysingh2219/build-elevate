@@ -32,7 +32,7 @@ import { AlertCircle, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { toast } from 'sonner';
 
 export function DeleteAccountForm() {
@@ -92,6 +92,13 @@ export function DeleteAccountForm() {
     setShowDialog(true);
   };
 
+  const confirmation = useWatch({
+    control: form.control,
+    name: 'confirmation',
+    defaultValue: '',
+  });
+  const isDeleteDisabled = deleteAccountMutation.isPending || confirmation !== 'DELETE';
+
   return (
     <>
       <Card id="delete-account" className="border-destructive scroll-mt-6">
@@ -135,17 +142,8 @@ export function DeleteAccountForm() {
             onClick={handleOpenDialog}
             disabled={checkingPassword || hasPassword === false}
           >
-            {checkingPassword ? (
-              <>
-                <Spinner />
-                Checking...
-              </>
-            ) : (
-              <>
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete Account
-              </>
-            )}
+            {checkingPassword ? <Spinner /> : <Trash2 className="mr-2 h-4 w-4" />}
+            {checkingPassword ? 'Checking...' : 'Delete Account'}
           </Button>
         </CardFooter>
       </Card>
@@ -189,24 +187,13 @@ export function DeleteAccountForm() {
                 >
                   Cancel
                 </Button>
-                <Button
-                  type="submit"
-                  variant="destructive"
-                  disabled={
-                    deleteAccountMutation.isPending || form.watch('confirmation') !== 'DELETE'
-                  }
-                >
+                <Button type="submit" variant="destructive" disabled={isDeleteDisabled}>
                   {deleteAccountMutation.isPending ? (
-                    <>
-                      <Spinner />
-                      Deleting...
-                    </>
+                    <Spinner />
                   ) : (
-                    <>
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Delete Account
-                    </>
+                    <Trash2 className="mr-2 h-4 w-4" />
                   )}
+                  {deleteAccountMutation.isPending ? 'Deleting...' : 'Delete Account'}
                 </Button>
               </DialogFooter>
             </form>

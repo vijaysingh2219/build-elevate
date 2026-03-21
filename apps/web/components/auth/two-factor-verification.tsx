@@ -142,14 +142,8 @@ export function TwoFactorVerification() {
               }
               className="w-full"
             >
-              {verifyMutation.isPending ? (
-                <>
-                  <Spinner />
-                  Verifying...
-                </>
-              ) : (
-                'Verify'
-              )}
+              {verifyMutation.isPending && <Spinner />}
+              {verifyMutation.isPending ? 'Verifying...' : 'Verify'}
             </Button>
 
             <div className="text-center">

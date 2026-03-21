@@ -161,7 +161,7 @@ export function PasswordForm({ onSuccess }: PasswordFormProps) {
                 control={form.control}
                 name="revokeAllOtherSessions"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                  <FormItem className="flex flex-row items-start space-y-0 space-x-3 rounded-md border p-4">
                     <FormControl>
                       <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                     </FormControl>
@@ -179,16 +179,14 @@ export function PasswordForm({ onSuccess }: PasswordFormProps) {
           </CardContent>
           <CardFooter className="mt-4">
             <Button type="submit" disabled={setPasswordMutation.isPending} className="w-full">
-              {setPasswordMutation.isPending ? (
-                <>
-                  <Spinner />
-                  {isChangeMode ? 'Changing password...' : 'Setting password...'}
-                </>
-              ) : isChangeMode ? (
-                'Change Password'
-              ) : (
-                'Set Password'
-              )}
+              {setPasswordMutation.isPending && <Spinner />}
+              {setPasswordMutation.isPending
+                ? isChangeMode
+                  ? 'Changing password...'
+                  : 'Setting password...'
+                : isChangeMode
+                  ? 'Change Password'
+                  : 'Set Password'}
             </Button>
           </CardFooter>
         </form>

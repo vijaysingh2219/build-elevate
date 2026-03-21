@@ -174,14 +174,8 @@ export default function GeneralSettingsPage() {
                 disabled={updateProfileMutation.isPending || !form.formState.isDirty}
                 className="w-full"
               >
-                {updateProfileMutation.isPending ? (
-                  <>
-                    <Spinner />
-                    Updating profile...
-                  </>
-                ) : (
-                  'Update Profile'
-                )}
+                {updateProfileMutation.isPending && <Spinner />}
+                {updateProfileMutation.isPending ? 'Updating profile...' : 'Update Profile'}
               </Button>
             </CardFooter>
           </form>

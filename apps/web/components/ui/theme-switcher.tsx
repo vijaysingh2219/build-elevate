@@ -1,6 +1,6 @@
 'use client';
 
-import useMounted from '@/hooks/useMounted';
+import useIsMounted from '@/hooks/useIsMounted';
 import { Button } from '@workspace/ui/components/button';
 import {
   DropdownMenu,
@@ -14,12 +14,12 @@ import { LaptopIcon, MoonIcon, SunIcon } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
 export default function ThemeSwitcher() {
-  const mounted = useMounted();
+  const isMounted = useIsMounted();
   const { theme, setTheme } = useTheme();
   const { state } = useSidebar();
 
   const isSidebarExpanded = state === 'expanded';
-  if (!mounted) return null;
+  if (!isMounted) return null;
 
   const currentIcon =
     theme === 'light' ? (

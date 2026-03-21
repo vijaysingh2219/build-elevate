@@ -82,7 +82,7 @@ export const auth = betterAuth({
   user: {
     changeEmail: {
       enabled: true,
-      sendChangeEmailVerification: async ({ user, newEmail, url }) => {
+      sendChangeEmailConfirmation: async ({ user, newEmail, url }) => {
         const { data, success, error } = changeEmailSchema.safeParse({
           currentEmail: user.email,
           newEmail,
@@ -90,7 +90,7 @@ export const auth = betterAuth({
           verificationUrl: url,
         });
         if (error || !success) {
-          throw new Error('Failed to send email change verification');
+          throw new Error('Failed to send email change confirmation');
         }
 
         const { success: rateLimitSuccess } = await changeEmailRateLimiter.limit(user.email);

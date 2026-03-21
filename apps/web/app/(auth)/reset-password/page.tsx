@@ -26,14 +26,12 @@ import { toast } from 'sonner';
 function ResetPasswordContent() {
   const searchParams = useSearchParams();
   const [resetSuccess, setResetSuccess] = useState(false);
-  const [tokenError, setTokenError] = useState(false);
 
   const token = searchParams.get('token');
   const error = searchParams.get('error');
 
   useEffect(() => {
     if (error) {
-      setTokenError(true);
       if (error === 'invalid_token') {
         toast.error('Invalid or expired reset link', {
           description: 'Please request a new password reset link.',
@@ -41,6 +39,8 @@ function ResetPasswordContent() {
       }
     }
   }, [error]);
+
+  const isTokenError = error || !token;
 
   const form = useForm<ResetPasswordFormValues>({
     resolver: zodResolver(resetPasswordSchema),
@@ -81,7 +81,7 @@ function ResetPasswordContent() {
     resetPasswordMutation.mutate(values);
   };
 
-  if (tokenError || !token) {
+  if (isTokenError || !token) {
     return (
       <div className="from-background to-muted/20 flex min-h-screen items-center justify-center bg-gradient-to-b px-4">
         <Card className="w-full max-w-md">
@@ -170,14 +170,8 @@ function ResetPasswordContent() {
               />
 
               <Button type="submit" className="w-full" disabled={resetPasswordMutation.isPending}>
-                {resetPasswordMutation.isPending ? (
-                  <>
-                    <Spinner />
-                    Resetting password...
-                  </>
-                ) : (
-                  'Reset Password'
-                )}
+                {resetPasswordMutation.isPending && <Spinner />}
+                {resetPasswordMutation.isPending ? 'Resetting password...' : 'Reset Password'}
               </Button>
 
               <div className="text-center">

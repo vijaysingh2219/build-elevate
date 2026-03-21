@@ -79,16 +79,11 @@ export function ExtraSecurity() {
                   className="border-orange-300 bg-white hover:bg-orange-50 dark:border-orange-800 dark:bg-orange-950/50 dark:hover:bg-orange-900/50"
                 >
                   {revokeAllMutation.isPending ? (
-                    <>
-                      <Spinner className="mr-2" />
-                      Logging out...
-                    </>
+                    <Spinner className="mr-2" />
                   ) : (
-                    <>
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Log Out All Other Devices
-                    </>
+                    <LogOut className="mr-2 h-4 w-4" />
                   )}
+                  {revokeAllMutation.isPending ? 'Logging out...' : 'Log Out All Other Devices'}
                 </Button>
               </div>
             </div>
@@ -148,14 +143,8 @@ export function ExtraSecurity() {
               disabled={revokeAllMutation.isPending}
               className="bg-orange-600 hover:bg-orange-700 dark:bg-orange-700 dark:hover:bg-orange-800"
             >
-              {revokeAllMutation.isPending ? (
-                <>
-                  <Spinner className="mr-2" />
-                  Logging out...
-                </>
-              ) : (
-                'Yes, Log Out All Other Devices'
-              )}
+              {revokeAllMutation.isPending && <Spinner className="mr-2" />}
+              {revokeAllMutation.isPending ? 'Logging out...' : 'Yes, Log Out All Other Devices'}
             </Button>
           </DialogFooter>
         </DialogContent>

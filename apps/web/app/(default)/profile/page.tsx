@@ -76,7 +76,7 @@ export default function ProfilePage() {
               </div>
               <div className="text-muted-foreground flex flex-wrap items-center gap-2">
                 <Mail className="h-4 w-4" />
-                <span className="break-words text-sm">{user.email}</span>
+                <span className="text-sm break-words">{user.email}</span>
                 <Button
                   type="button"
                   size="icon"
@@ -103,7 +103,7 @@ export default function ProfilePage() {
                   <span className="font-medium">User ID</span>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <p className="break-all font-mono text-sm font-medium">{user.id}</p>
+                  <p className="font-mono text-sm font-medium break-all">{user.id}</p>
                   <Button
                     type="button"
                     size="icon"

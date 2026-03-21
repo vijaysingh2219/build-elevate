@@ -52,7 +52,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10.4.1
+          version: 10.32.1
 
       - name: Get pnpm store directory
         shell: bash
@@ -97,7 +97,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10.4.1
+          version: 10.32.1
 
       - name: Get pnpm store directory
         shell: bash
@@ -140,7 +140,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10.4.1
+          version: 10.32.1
 
       - name: Get pnpm store directory
         shell: bash
@@ -188,7 +188,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10.4.1
+          version: 10.32.1
 
       - name: Get pnpm store directory
         shell: bash
@@ -234,7 +234,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10.4.1
+          version: 10.32.1
 
       - name: Get pnpm store directory
         shell: bash

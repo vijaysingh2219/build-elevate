@@ -224,14 +224,8 @@ export function TwoFactorSetup({
               onClick={handleEnableClick}
               disabled={checkingPassword || hasPassword === false}
             >
-              {checkingPassword ? (
-                <>
-                  <Spinner />
-                  Checking...
-                </>
-              ) : (
-                'Enable 2FA'
-              )}
+              {checkingPassword && <Spinner />}
+              {checkingPassword ? 'Checking...' : 'Enable 2FA'}
             </Button>
           )}
         </CardFooter>
@@ -275,14 +269,8 @@ export function TwoFactorSetup({
                   disabled={enableMutation.isPending || !password}
                   className="w-full"
                 >
-                  {enableMutation.isPending ? (
-                    <>
-                      <Spinner />
-                      Generating...
-                    </>
-                  ) : (
-                    'Generate QR Code'
-                  )}
+                  {enableMutation.isPending && <Spinner />}
+                  {enableMutation.isPending ? 'Generating...' : 'Generate QR Code'}
                 </Button>
               </DialogFooter>
             </div>
@@ -336,14 +324,8 @@ export function TwoFactorSetup({
                   disabled={verifyMutation.isPending || totpCode.length !== 6}
                   className="w-full"
                 >
-                  {verifyMutation.isPending ? (
-                    <>
-                      <Spinner />
-                      Verifying...
-                    </>
-                  ) : (
-                    'Verify Code'
-                  )}
+                  {verifyMutation.isPending && <Spinner />}
+                  {verifyMutation.isPending ? 'Verifying...' : 'Verify Code'}
                 </Button>
               </DialogFooter>
             </div>
@@ -409,14 +391,8 @@ export function TwoFactorSetup({
                 onClick={handleDisable2FA}
                 disabled={disableMutation.isPending || !password}
               >
-                {disableMutation.isPending ? (
-                  <>
-                    <Spinner />
-                    Disabling...
-                  </>
-                ) : (
-                  'Disable 2FA'
-                )}
+                {disableMutation.isPending && <Spinner />}
+                {disableMutation.isPending ? 'Disabling...' : 'Disable 2FA'}
               </Button>
             </DialogFooter>
           </div>

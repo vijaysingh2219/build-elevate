@@ -128,14 +128,8 @@ export default function ForgotPasswordPage() {
               />
 
               <Button type="submit" className="w-full" disabled={forgotPasswordMutation.isPending}>
-                {forgotPasswordMutation.isPending ? (
-                  <>
-                    <Spinner />
-                    Sending reset link...
-                  </>
-                ) : (
-                  'Send Reset Link'
-                )}
+                {forgotPasswordMutation.isPending && <Spinner />}
+                {forgotPasswordMutation.isPending ? 'Sending reset link...' : 'Send Reset Link'}
               </Button>
 
               <div className="text-center">
