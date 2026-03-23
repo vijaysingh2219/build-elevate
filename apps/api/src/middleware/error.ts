@@ -7,7 +7,16 @@ export const errorHandler = (
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   next: NextFunction,
 ) => {
+  const isProd = process.env.NODE_ENV === 'production';
+
   console.error(err.stack);
+
+  if (isProd) {
+    res.status(500).json({
+      error: 'Internal Server Error',
+    });
+    return;
+  }
 
   res.status(500).json({
     error: 'Internal Server Error',
