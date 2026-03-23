@@ -28,6 +28,7 @@ import { Spinner } from '@workspace/ui/components/spinner';
 import { changePasswordSchema, setPasswordSchema } from '@workspace/utils/schemas';
 import { ChangePasswordFormValues, SetPasswordFormValues } from '@workspace/utils/types';
 import { Lock } from 'lucide-react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
@@ -48,6 +49,10 @@ export function PasswordForm({ onSuccess }: PasswordFormProps) {
       revokeAllOtherSessions: false,
     },
   });
+
+  useEffect(() => {
+    form.reset();
+  }, [isChangeMode, form]);
 
   const setPasswordMutation = useMutation({
     mutationFn: async (values: SetPasswordFormValues) => {
@@ -100,6 +105,8 @@ export function PasswordForm({ onSuccess }: PasswordFormProps) {
       setPasswordMutation.mutate(values);
     }
   }
+
+  const isSubmitting = setPasswordMutation.isPending || changePasswordMutation.isPending;
 
   if (isCheckingPassword) {
     return (
@@ -178,9 +185,9 @@ export function PasswordForm({ onSuccess }: PasswordFormProps) {
             )}
           </CardContent>
           <CardFooter className="mt-4">
-            <Button type="submit" disabled={setPasswordMutation.isPending} className="w-full">
-              {setPasswordMutation.isPending && <Spinner />}
-              {setPasswordMutation.isPending
+            <Button type="submit" disabled={isSubmitting} className="w-full">
+              {isSubmitting && <Spinner />}
+              {isSubmitting
                 ? isChangeMode
                   ? 'Changing password...'
                   : 'Setting password...'
