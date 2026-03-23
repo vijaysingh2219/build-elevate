@@ -65,6 +65,10 @@ export function PasswordForm({ onSuccess }: PasswordFormProps) {
         body: JSON.stringify(body),
       });
 
+      if (!response.ok) {
+        throw new Error('Failed to set password');
+      }
+
       return response.json();
     },
     onSuccess: () => {

@@ -67,7 +67,13 @@ export function useAuthUser(options?: UseAuthUserOptions): UseAuthUserReturn {
     let interval: NodeJS.Timeout;
 
     const ping = () => {
-      fetch('/api/session/ping', { method: 'POST' }).catch(() => {});
+      fetch('/api/session/ping', { method: 'POST' })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Session ping failed');
+          }
+        })
+        .catch(() => {});
     };
 
     const startInterval = () => {
@@ -130,7 +136,7 @@ export function useRequiredAuthUser():
 
   // This hook guarantees user is not null when not loading
   return {
-    user: user!,
+    user,
     isLoading: false,
     error,
     refetch,

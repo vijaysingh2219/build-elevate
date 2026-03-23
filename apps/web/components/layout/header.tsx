@@ -10,15 +10,14 @@ function Header() {
   return (
     <header
       className={cn(
-        'bg-background h-12 w-screen items-center justify-between px-4 py-2',
+        'bg-background relative h-12 w-screen items-center px-4 py-2',
         isMobile ? 'flex' : 'hidden',
       )}
     >
       <SidebarTrigger />
-      <Link href="/">
+      <Link href="/" className="absolute left-1/2 -translate-x-1/2">
         <Logo variant="header" />
       </Link>
-      <div className="flex items-center gap-2"></div>
     </header>
   );
 }

@@ -33,14 +33,20 @@ function getResendClient(): Resend {
   if (!resendClient || !emailConfig) {
     initEmailService();
   }
-  return resendClient!;
+  if (!resendClient) {
+    throw new Error('Resend client failed to initialize.');
+  }
+  return resendClient;
 }
 
 function getEmailConfig() {
   if (!emailConfig) {
     initEmailService();
   }
-  return emailConfig!;
+  if (!emailConfig) {
+    throw new Error('Email config failed to initialize.');
+  }
+  return emailConfig;
 }
 
 export const sendEmail = async (email: EmailContent) => {
