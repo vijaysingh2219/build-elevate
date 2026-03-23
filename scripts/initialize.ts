@@ -3,6 +3,7 @@ import yaml from "yaml";
 import { join, resolve } from "node:path";
 import { cwd } from "node:process";
 import degit from "degit";
+import { buildManifest, writeManifest } from "./manifest.js";
 import {
   cancel,
   intro,
@@ -34,7 +35,18 @@ import {
   updateTurboLintEnv,
 } from "./update.js";
 
-const cloneBuildElevate = async (name: string) => {
+const getLatestCommit = async (): Promise<string> => {
+  const res = await fetch(
+    "https://api.github.com/repos/vijaysingh2219/build-elevate/commits/main",
+    { headers: { Accept: "application/vnd.github.sha" } },
+  );
+  if (!res.ok) throw new Error("Failed to resolve latest commit SHA");
+  return (await res.text()).trim(); // returns just the SHA string with this Accept header
+};
+
+const cloneBuildElevate = async (name: string): Promise<string> => {
+  const commitHash = await getLatestCommit();
+
   const emitter = degit(url, {
     cache: false,
     force: true,
@@ -42,6 +54,8 @@ const cloneBuildElevate = async (name: string) => {
   });
 
   await emitter.clone(name);
+
+  return commitHash;
 };
 
 const deleteInternalContent = async () => {
@@ -181,6 +195,11 @@ const getPackageManager = async (provided?: string, yes?: boolean) => {
     );
   }
 
+  const defaultPM = installedPMs[0];
+  if (!defaultPM) {
+    throw new Error("Failed to determine a default package manager.");
+  }
+
   // Show detection results
   const statusLines = availablePMs.map(
     (pm) =>
@@ -196,7 +215,7 @@ const getPackageManager = async (provided?: string, yes?: boolean) => {
         return found.value;
       }
     }
-    return installedPMs[0]!.value;
+    return defaultPM.value;
   }
 
   // Show only installed in the selection prompt
@@ -209,7 +228,7 @@ const getPackageManager = async (provided?: string, yes?: boolean) => {
   const pm = await select({
     message: "Which package manager would you like to use?",
     options,
-    initialValue: installedPMs[0]!.value,
+    initialValue: defaultPM.value,
   });
 
   if (isCancel(pm)) {
@@ -927,8 +946,9 @@ export const initialize = async (
     s.stop("✓ Prerequisites validated");
 
     s.start("Cloning Build Elevate...");
+    let commitHash: string;
     try {
-      await cloneBuildElevate(toKebabCase(name));
+      commitHash = await cloneBuildElevate(toKebabCase(name));
       if (options.verbose) log.info("✓ Cloned repository");
     } catch (error) {
       throw new Error(
@@ -1019,6 +1039,11 @@ export const initialize = async (
       includeDocker,
       packageManager as "npm" | "pnpm" | "bun",
     );
+
+    s.message("Writing upgrade manifest...");
+    const manifest = await buildManifest(commitHash, template, name);
+    await writeManifest(manifest);
+    if (options.verbose) log.info("✓ Written .build-elevate.json manifest");
 
     if (shouldInitGit) {
       s.message("Initializing Git repository...");

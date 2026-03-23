@@ -80,9 +80,43 @@ export type ReleaseTag =
  */
 export const changelog: ChangelogEntry[] = [
   {
+    version: "1.2.0",
+    date: "2026-03-23",
+    tag: "latest",
+    title: "Upgrade Command & Template Diffing",
+    summary:
+      "Adds an upgrade workflow that keeps scaffolded projects in sync with the latest build-elevate template. Files that haven't been modified locally are updated automatically, while modified files are flagged as conflicts and can be inspected with a built-in diff command.",
+    changes: [
+      {
+        category: "added",
+        text: "Introduced the `upgrade` command to automatically update files that remain unchanged since scaffolding, while marking modified files as conflicts for manual review.",
+      },
+      {
+        category: "added",
+        text: "Added a `diff` command that shows a colored, line-by-line comparison between your scaffolded version of a file and the latest template version.",
+      },
+      {
+        category: "added",
+        text: "Created a `.build-elevate.json` manifest during initialization to store the scaffolded commit SHA, template name, project metadata, and per-file hashes used during upgrades.",
+      },
+      {
+        category: "added",
+        text: "Template-aware upgrade filtering ensures projects only receive updates for files that were included during scaffolding (e.g., web projects will not receive api-specific files).",
+      },
+      {
+        category: "fixed",
+        text: "Upgrade now applies initialization-time transformations before comparing template files, preventing false conflicts in files like `package.json`, `turbo.json`, and `pnpm-workspace.yaml`.",
+      },
+      {
+        category: "fixed",
+        text: "Normalized line endings (CRLF → LF) before hashing to prevent false conflicts on Windows environments.",
+      },
+    ],
+  },
+  {
     version: "1.1.0",
     date: "2026-03-12",
-    tag: "latest",
+    tag: "minor",
     title: "Auth Forms, UI Improvements & Fixes",
     summary:
       "Introduced reusable form field components, improved authentication UI structure, upgraded core dependencies, and fixed CI and documentation issues while strengthening auth configuration security.",

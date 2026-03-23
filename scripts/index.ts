@@ -3,6 +3,8 @@ import { readFileSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import { initialize } from "./initialize.js";
+import { upgrade } from "./upgrade.js";
+import { diff } from "./diff.js";
 
 // Get package.json version
 const __filename = fileURLToPath(import.meta.url);
@@ -32,7 +34,39 @@ program
   .option("-v, --verbose", "Show detailed output")
   .action(initialize);
 
-// Show help if no command provided
+program
+  .command("upgrade")
+  .description(
+    "Upgrade your project to the latest build-elevate template version.\n\n" +
+      "Files you have not modified are updated automatically.\n" +
+      "Files you have modified are listed as conflicts for manual review.\n\n" +
+      "Run `build-elevate diff <file>` to inspect what changed in the template for any conflict.",
+  )
+  .option("-y, --yes", "Skip confirmation prompts")
+  .option(
+    "--dry-run",
+    "Preview what would be changed without writing any files",
+  )
+  .action((options) =>
+    upgrade({
+      yes: options.yes,
+      dry: options.dryRun,
+    }),
+  );
+
+program
+  .command("diff <file>")
+  .description(
+    "Show what changed in the build-elevate template for a specific file.\n\n" +
+      "Compares the file between your scaffolded version and the latest template version.\n" +
+      "Use this to understand what you need to manually apply after an upgrade conflict.\n\n" +
+      "Example:\n" +
+      "  build-elevate diff apps/web/next.config.ts\n" +
+      "  build-elevate diff apps/api/src/config/corsOptions.ts",
+  )
+  .action((filePath: string) => diff(filePath));
+
+// Show help if no command is provided
 if (!process.argv.slice(2).length) {
   program.outputHelp();
 }

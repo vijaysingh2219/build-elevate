@@ -15,6 +15,7 @@ export const internalContentFiles = [
   join(".github", "CONTRIBUTING.md"),
   "SCREENSHOTS.md",
   "tsup.config.ts",
+  "tsconfig.scripts.json",
   ".npmignore",
 ];
 
@@ -146,29 +147,34 @@ export const replaceAllInFile = async (
   await writeFile(filePath, updated);
 };
 
-// Replace project name in all common formats
+export const applyProjectName = (
+  content: string,
+  projectName: string,
+): string => {
+  let result = content;
+  result = result.replaceAll("build-elevate", toKebabCase(projectName));
+  result = result.replaceAll("buildElevate", toCamelCase(projectName));
+  result = result.replaceAll("BuildElevate", toPascalCase(projectName));
+  result = result.replaceAll("build_elevate", toSnakeCase(projectName));
+  result = result.replaceAll("BUILD_ELEVATE", toConstantCase(projectName));
+  result = result.replaceAll("BUILD ELEVATE", toCapitalCase(projectName));
+  result = result.replaceAll("Build Elevate", toTitleCase(projectName));
+  return result;
+};
+
 export const replaceProjectName = async (
   filePath: string,
   newProjectName: string,
 ) => {
-  let content = await readFile(filePath, "utf8");
-
-  // Replace all variations
-  content = content.replaceAll("build-elevate", toKebabCase(newProjectName));
-  content = content.replaceAll("buildElevate", toCamelCase(newProjectName));
-  content = content.replaceAll("BuildElevate", toPascalCase(newProjectName));
-  content = content.replaceAll("build_elevate", toSnakeCase(newProjectName));
-  content = content.replaceAll("BUILD_ELEVATE", toConstantCase(newProjectName));
-  content = content.replaceAll("BUILD ELEVATE", toCapitalCase(newProjectName));
-  content = content.replaceAll("Build Elevate", toTitleCase(newProjectName));
-
-  await writeFile(filePath, content);
+  const content = await readFile(filePath, "utf8");
+  await writeFile(filePath, applyProjectName(content, newProjectName));
 };
 
 // Files to replace project name in
 export const getFilesToReplaceProjectName = (): string[] => {
   return [
     "package.json",
+    "apps/api/.env.example",
     "apps/web/.env.example",
     "apps/web/app/(home)/page.tsx",
     "apps/web/config/metadata.ts",
@@ -239,6 +245,7 @@ export const envsByTemplate: Record<string, string[]> = {
     "NODE_ENV",
     "PORT",
     "ALLOWED_ORIGINS",
+    "CORS_ALLOW_MISSING_ORIGIN",
     "BETTER_AUTH_URL",
     "RESEND_TOKEN",
     "RESEND_EMAIL_FROM",
@@ -262,6 +269,7 @@ export const envsByTemplate: Record<string, string[]> = {
     "NODE_ENV",
     "PORT",
     "ALLOWED_ORIGINS",
+    "CORS_ALLOW_MISSING_ORIGIN",
     "BETTER_AUTH_URL",
     "RESEND_TOKEN",
     "RESEND_EMAIL_FROM",
