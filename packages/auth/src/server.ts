@@ -78,6 +78,19 @@ export const auth = betterAuth({
         }),
       });
     },
+    async afterEmailVerification(user, request) {
+      const emailTemplate = getTemplate('welcome');
+      const origin = request ? new URL(request.url).origin : '';
+
+      await sendEmail({
+        to: user.email,
+        subject: emailTemplate.subject,
+        react: emailTemplate.render({
+          name: user.name,
+          getStartedUrl: origin,
+        }),
+      });
+    },
   },
   user: {
     changeEmail: {

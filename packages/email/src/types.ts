@@ -23,3 +23,14 @@ export interface ResetPasswordProps {
   name: string;
   resetUrl: string;
 }
+
+export interface WelcomeEmailProps {
+  name: string;
+  getStartedUrl: string;
+}
+
+export type EmailProps =
+  | VerificationEmailProps
+  | ChangeEmailProps
+  | ResetPasswordProps
+  | WelcomeEmailProps;

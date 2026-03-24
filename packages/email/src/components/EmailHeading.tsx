@@ -1,7 +1,8 @@
 import { Heading as ReactEmailHeading } from '@react-email/components';
+import { ReactNode } from 'react';
 
 interface EmailHeadingProps {
-  children: string;
+  children: ReactNode;
 }
 
 export const EmailHeading = ({ children }: EmailHeadingProps) => {
