@@ -47,6 +47,10 @@
         "UPSTASH_REDIS_REST_TOKEN"
       ]
     },
+    "lint:fix": {
+      "outputs": [],
+      "cache": false
+    },
     "start": {
       "cache": false
     },
