@@ -34,3 +34,11 @@ export type EmailProps =
   | ChangeEmailProps
   | ResetPasswordProps
   | WelcomeEmailProps;
+
+// Discriminated union for type-safe email type -> props mapping
+export type EmailPropsMap = {
+  'verify-email': VerificationEmailProps;
+  'change-email': ChangeEmailProps;
+  'reset-password': ResetPasswordProps;
+  welcome: WelcomeEmailProps;
+};

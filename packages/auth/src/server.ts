@@ -1,9 +1,8 @@
 import { prisma } from '@workspace/db';
 import {
   changeEmailSchema,
-  getTemplate,
   resetPasswordSchema,
-  sendEmail,
+  sendAuthEmail,
   verifyEmailSchema,
 } from '@workspace/email';
 import {
@@ -32,20 +31,11 @@ export const auth = betterAuth({
         throw new Error('Failed to send password reset email');
       }
 
-      const { success: rateLimitSuccess } = await resetPasswordRateLimiter.limit(user.email);
-      if (!rateLimitSuccess) {
-        console.log('Rate limit exceeded. Please try again later.');
-        return;
-      }
-
-      const emailTemplate = getTemplate('reset-password');
-      await sendEmail({
-        to: user.email,
-        subject: emailTemplate.subject,
-        react: emailTemplate.render({
-          name: data.name,
-          resetUrl: data.resetUrl,
-        }),
+      await sendAuthEmail({
+        emailType: 'reset-password',
+        limiter: resetPasswordRateLimiter,
+        user,
+        data,
       });
     },
   },
@@ -62,40 +52,24 @@ export const auth = betterAuth({
         throw new Error('Failed to send verification email');
       }
 
-      const { success: rateLimitSuccess } = await verifyEmailRateLimiter.limit(user.email);
-      if (!rateLimitSuccess) {
-        console.log('Rate limit exceeded. Please try again later.');
-        return;
-      }
-
-      const emailTemplate = getTemplate('verify-email');
-      await sendEmail({
-        to: user.email,
-        subject: emailTemplate.subject,
-        react: emailTemplate.render({
-          name: data.name,
-          email: data.email,
-          verificationUrl: data.verificationUrl,
-        }),
+      await sendAuthEmail({
+        emailType: 'verify-email',
+        limiter: verifyEmailRateLimiter,
+        user,
+        data,
       });
     },
     async afterEmailVerification(user, request) {
-      const { success: rateLimitSuccess } = await welcomeEmailRateLimiter.limit(user.email);
-      if (!rateLimitSuccess) {
-        console.log('Rate limit exceeded. Please try again later.');
-        return;
-      }
-
-      const emailTemplate = getTemplate('welcome');
       const origin = request ? new URL(request.url).origin : '';
 
-      await sendEmail({
-        to: user.email,
-        subject: emailTemplate.subject,
-        react: emailTemplate.render({
+      await sendAuthEmail({
+        emailType: 'welcome',
+        limiter: welcomeEmailRateLimiter,
+        user,
+        data: {
           name: user.name,
           getStartedUrl: origin,
-        }),
+        },
       });
     },
   },
@@ -113,22 +87,11 @@ export const auth = betterAuth({
           throw new Error('Failed to send email change confirmation');
         }
 
-        const { success: rateLimitSuccess } = await changeEmailRateLimiter.limit(user.email);
-        if (!rateLimitSuccess) {
-          console.log('Rate limit exceeded. Please try again later.');
-          return;
-        }
-
-        const emailTemplate = getTemplate('change-email');
-        await sendEmail({
-          to: user.email, // Send to current email
-          subject: emailTemplate.subject,
-          react: emailTemplate.render({
-            name: data.name,
-            currentEmail: data.currentEmail,
-            newEmail: data.newEmail,
-            verificationUrl: data.verificationUrl,
-          }),
+        await sendAuthEmail({
+          emailType: 'change-email',
+          limiter: changeEmailRateLimiter,
+          user,
+          data,
         });
       },
     },

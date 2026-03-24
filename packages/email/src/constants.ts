@@ -6,7 +6,6 @@ import {
 } from './templates';
 import type {
   ChangeEmailProps,
-  EmailProps,
   EmailType,
   ResetPasswordProps,
   VerificationEmailProps,
@@ -15,27 +14,32 @@ import type {
 
 export const EmailTypes = ['welcome', 'verify-email', 'change-email', 'reset-password'] as const;
 
-export const emailTemplates: Record<
-  EmailType,
-  {
-    subject: string;
-    render: (props: EmailProps) => React.ReactNode;
-  }
-> = {
+export const emailTemplates = {
   welcome: {
     subject: 'Welcome!',
-    render: (props) => WelcomeTemplate(props as WelcomeEmailProps),
+    render: (props: WelcomeEmailProps) => WelcomeTemplate(props),
   },
   'verify-email': {
     subject: 'Verify your email address',
-    render: (props) => VerificationEmail(props as VerificationEmailProps),
+    render: (props: VerificationEmailProps) => VerificationEmail(props),
   },
   'change-email': {
     subject: 'Confirm your email address change',
-    render: (props) => ChangeEmailTemplate(props as ChangeEmailProps),
+    render: (props: ChangeEmailProps) => ChangeEmailTemplate(props),
   },
   'reset-password': {
     subject: 'Reset your password',
-    render: (props) => ResetPasswordTemplate(props as ResetPasswordProps),
+    render: (props: ResetPasswordProps) => ResetPasswordTemplate(props),
   },
-};
+} as const;
+
+export type EmailTemplatesMap = typeof emailTemplates;
+
+// Overloaded function for type-safe template lookup
+export function getEmailTemplate(type: 'welcome'): (typeof emailTemplates)['welcome'];
+export function getEmailTemplate(type: 'verify-email'): (typeof emailTemplates)['verify-email'];
+export function getEmailTemplate(type: 'change-email'): (typeof emailTemplates)['change-email'];
+export function getEmailTemplate(type: 'reset-password'): (typeof emailTemplates)['reset-password'];
+export function getEmailTemplate(type: EmailType) {
+  return emailTemplates[type];
+}
