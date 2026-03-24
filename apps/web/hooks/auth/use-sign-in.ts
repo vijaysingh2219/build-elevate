@@ -1,13 +1,15 @@
 import { useMutation } from '@tanstack/react-query';
-import { sendVerificationEmail, signIn } from '@workspace/auth/client';
+import { signIn } from '@workspace/auth/client';
 import { SignInFormValues } from '@workspace/utils/types';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { useVerification } from './use-verification';
 
 const DEFAULT_CALLBACK_URL = '/';
 
 export function useSignIn(callbackUrl: string = DEFAULT_CALLBACK_URL) {
   const router = useRouter();
+  const verificationMutation = useVerification();
 
   return useMutation({
     mutationFn: (values: SignInFormValues) => signIn.email({ ...values, callbackURL: callbackUrl }),
@@ -16,18 +18,9 @@ export function useSignIn(callbackUrl: string = DEFAULT_CALLBACK_URL) {
         if (data.error.status === 403 && data.error.code === 'EMAIL_NOT_VERIFIED') {
           toast.error('Please verify your email address before signing in.', {
             action: {
-              label: 'Resend email',
+              label: verificationMutation.isPending ? 'Sending…' : 'Resend email',
               onClick: async () => {
-                try {
-                  const { error } = await sendVerificationEmail({ email: variables.email });
-                  if (error) {
-                    toast.error('Too many requests. Please try again later.');
-                    return;
-                  }
-                  toast.success('Verification email sent. Please check your inbox.');
-                } catch {
-                  toast.error('Failed to resend verification email.');
-                }
+                verificationMutation.mutate({ email: variables.email, callbackURL: callbackUrl });
               },
             },
           });

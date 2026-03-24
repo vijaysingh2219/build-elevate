@@ -5,6 +5,7 @@
     "paths": {
       "@/*": ["./*"],
       "@workspace/auth/*": ["../../packages/auth/src/*"],
+      "@workspace/rate-limit/*": ["../../packages/rate-limit/src/*"],
       "@workspace/ui/*": ["../../packages/ui/src/*"],
       "@workspace/utils/*": ["../../packages/utils/src/*"]
     },

@@ -10,6 +10,7 @@ import {
   changeEmailRateLimiter,
   resetPasswordRateLimiter,
   verifyEmailRateLimiter,
+  welcomeEmailRateLimiter,
 } from '@workspace/rate-limit';
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
@@ -79,6 +80,12 @@ export const auth = betterAuth({
       });
     },
     async afterEmailVerification(user, request) {
+      const { success: rateLimitSuccess } = await welcomeEmailRateLimiter.limit(user.email);
+      if (!rateLimitSuccess) {
+        console.log('Rate limit exceeded. Please try again later.');
+        return;
+      }
+
       const emailTemplate = getTemplate('welcome');
       const origin = request ? new URL(request.url).origin : '';
 

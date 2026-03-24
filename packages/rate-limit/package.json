@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "exports": {
-    ".": "./dist/index.js"
+    ".": "./dist/index.js",
+    
+    "./limiters": "./dist/limiters/index.js"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
