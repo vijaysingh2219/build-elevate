@@ -1,67 +1,340 @@
 ---
 title: API
-description: Documentation for the API application in the monorepo.
+description: Express.js REST API with authentication, rate limiting, security headers, and database integration
 ---
+
+# API Application
+
+The API application is a secure, production-ready Express.js backend that provides RESTful endpoints for the Web application. It integrates with Better Auth for authentication, Prisma for database access, and Upstash Redis for rate limiting.
 
 ## Overview
 
-The API application serves as the backend for the monorepo, providing RESTful endpoints and handling authentication and data management.
+- **Framework:** Express.js with TypeScript
+- **Location:** `apps/api`
+- **Authentication:** Better Auth with session management
+- **Database:** PostgreSQL via Prisma (shared db package)
+- **Rate Limiting:** Upstash Redis
+- **Port:** `http://localhost:4000`
+
+## Architecture
+
+The API uses shared packages from the monorepo:
+
+- **[@workspace/auth](../packages/auth)** - Session verification and authentication middleware
+- **[@workspace/db](../packages/db)** - Prisma ORM and database client
+- **[@workspace/rate-limit](../packages/rate-limit)** - Rate limiting with Upstash Redis
+- **[@workspace/utils](../packages/utils)** - Shared utilities and type definitions
 
 ## Features
 
-- **RESTful API**: Built with Express.js to handle HTTP requests and responses.
-- **Security**: Implements Helmet for security headers and CORS for cross-origin resource sharing.
-- **Logging**: Uses Morgan for HTTP request logging.
-- **User authentication**: Handled via Better Auth, with session management and user data retrieval.
-- **Rate limiting**: The API uses Upstash Redis for rate limiting to protect against abuse and ensure fair usage.
+### Security
 
-## Configuration
+- **Helmet** - Sets secure HTTP headers (XSS, CSRF, etc.)
+- **CORS** - Configurable cross-origin resource sharing with origin whitelist
+- **Rate Limiting** - Global and per-user rate limits via Upstash Redis
+- **Authentication** - Better Auth session verification on protected routes
+- **Input Validation** - Type-safe request validation with TypeScript
 
-The API server is located in `apps/api`. Below are the main configuration aspects:
+### Performance & Observability
 
-### Environment Variables
+- **Morgan** - HTTP request logging for debugging
+- **Health Checks** - Readiness and liveness endpoints
+- **Error Handling** - Centralized error handling with proper HTTP status codes
 
-Environment variables are managed via `.env` files. See `.env.example` in `apps/api` for all options.
+### Database Integration
 
-<Callout type="info">
-  See the [environment variables guide](../configuration/environment-variables)
-  for details and best practices.
-</Callout>
+- **Prisma ORM** - Type-safe database queries
+- **Connection Pooling** - Efficient database connection management
+- **Migrations** - Version-controlled schema changes
 
-### CORS & Allowed Origins
-
-Allowed origins are set via the `ALLOWED_ORIGINS` env variable as a comma-separated list. For example:
+## Project Structure
 
 ```
+apps/api/
+├── src/
+│   ├── middleware/          # Express middleware
+│   │   ├── auth.ts         # Authentication/session verification
+│   │   ├── errorHandler.ts # Centralized error handling
+│   │   └── ...
+│   ├── routes/             # API route handlers
+│   │   ├── health.ts       # Health check endpoints
+│   │   ├── users.ts        # User endpoints
+│   │   └── ...
+│   ├── controllers/        # Business logic
+│   ├── services/           # Complex operations
+│   ├── config/
+│   │   ├── corsOptions.ts  # CORS configuration
+│   │   ├── allowedOrigins.ts # Allowed origins list
+│   │   └── ...
+│   ├── types/              # TypeScript type definitions
+│   ├── index.ts            # Server entry point
+│   └── env.ts              # Environment variables parsing
+├── .env.example            # Environment variables template
+├── tsconfig.json           # TypeScript configuration
+├── package.json            # Dependencies and scripts
+└── Dockerfile.prod         # Production Docker image
+```
+
+## Environment Variables
+
+For detailed environment variable setup and configuration, see the [Environment Variables Guide](../configuration/environment-variables).
+
+Copy `.env.example` to `.env.local` and fill in the required values following the configuration guide.
+
+## Setup & Installation
+
+Follow the [Getting Started Guide](../getting-started/first-steps) for complete setup instructions.
+
+Quick summary for the API:
+
+```bash
+# 1. Install dependencies
+pnpm install
+
+# 2. Configure environment variables
+cp .env.example .env.local
+
+# 3. Set up database
+pnpm db:generate && pnpm db:migrate
+
+# 4. Start development server
+pnpm dev
+```
+
+The API server will start at `http://localhost:4000`.
+
+<Callout type="info">
+  The development server uses tsx for hot reload, so changes to your code are
+  reflected instantly.
+</Callout>
+
+## Key Scripts
+
+| Command           | Purpose                                  |
+| ----------------- | ---------------------------------------- |
+| `pnpm dev`        | Start development server with hot reload |
+| `pnpm build`      | Build for production                     |
+| `pnpm start`      | Start production server                  |
+| `pnpm lint`       | Check code quality with ESLint           |
+| `pnpm format`     | Format code with Prettier                |
+| `pnpm type-check` | Check TypeScript types                   |
+
+See [Development Workflow](../getting-started/first-steps#development-workflow) for more commands and options.
+
+## Key Files
+
+| File                             | Purpose                                 |
+| -------------------------------- | --------------------------------------- |
+| `src/index.ts`                   | Server entry point and middleware setup |
+| `src/middleware/auth.ts`         | Authentication and session verification |
+| `src/middleware/errorHandler.ts` | Centralized error handling              |
+| `src/config/corsOptions.ts`      | CORS configuration                      |
+| `src/routes/`                    | All API endpoint handlers               |
+| `Dockerfile.prod`                | Production Docker image                 |
+
+## API Endpoints
+
+### Health & Status
+
+- **`GET /api/health`** - Health check (always accessible)
+
+### Users
+
+- **`GET /api/users/session`** - Get current user session (requires authentication)
+
+<Callout type="info">
+  For a complete list of endpoints, check the route handlers in `src/routes/` or
+  use an API testing tool like Postman or Insomnia.
+</Callout>
+
+## Security Configuration
+
+### CORS
+
+Allowed origins are configured via the `ALLOWED_ORIGINS` environment variable:
+
+```bash
 ALLOWED_ORIGINS=http://localhost:3000,https://your-production-domain.com
 ```
 
-See `src/config/allowedOrigins.ts` and `src/config/corsOptions.ts` for implementation. CORS is enforced using these settings.
+This is enforced by:
 
-### Middleware
+- `src/config/corsOptions.ts` - CORS middleware configuration
+- `src/config/allowedOrigins.ts` - Origin whitelist parsing
 
-- **Helmet**: Security headers
-- **Morgan**: HTTP request logging
-- **Body Parsers**: JSON and URL-encoded
-- **Credentials**: Sets `Access-Control-Allow-Credentials` for allowed origins
-- **CORS**: Restricts origins based on config
-- **Error Handling**: Centralized error handler
-- **Rate Limiting**: Global and user-specific rate limits using Redis (see [rate limiting](../packages/rate-limit) for details)
+### Rate Limiting
 
-### Authentication
+The API uses Upstash Redis for distributed rate limiting:
 
-Authentication is handled via Better Auth. Middleware attaches the session and user to each request. See `src/middleware/auth.ts` and type extensions in `src/types/express.d.ts`.
+```bash
+# Global rate limit: 100 requests per minute
+# User rate limit: 30 requests per minute per user
+```
 
-### API Endpoints
+See `@workspace/rate-limit` for configuration details.
 
-- `GET /api/health`: Health check
-- `GET /api/users/session`: Get current user session (requires authentication)
+### Authentication Middleware
 
-### Docker
+Protected routes require valid Better Auth session:
 
-Production builds use `Dockerfile.prod`. The build process uses TurboRepo for efficient builds and installs only production dependencies in the final image. See `apps/api/Dockerfile.prod` for details.
+```typescript
+router.get("/api/users/session", requireAuth, getUserHandler);
+```
+
+The `requireAuth` middleware:
+
+- Ensures the request has a valid Better Auth session
+- Loads the session using `getSession` if it has not already been resolved
+- Verifies that the user is authenticated before allowing access
+
+After successful authentication, the following properties are available on the request:
+
+```ts
+req.user; // Authenticated user object
+req.session; // Active session information
+```
+
+If authentication fails, the request is rejected with:
+
+```http
+401 Unauthorized
+```
+
+Use this middleware on any route that requires an authenticated user.
+
+## Development Tips
+
+### Hot Reload
+
+Code changes automatically reload the server during development - no manual restart needed.
+
+### Database Changes
+
+After modifying `schema.prisma`, run:
+
+```bash
+pnpm db:generate
+pnpm db:migrate
+```
+
+### Testing Endpoints
+
+Use an API client to test endpoints:
+
+```bash
+# Test health check
+curl http://localhost:4000/api/health
+
+# Test with authentication
+curl http://localhost:4000/api/users/session \
+  --cookie "better-auth.session_token=YOUR_SESSION_COOKIE"
+```
+
+### Middleware Order
+
+Middleware is applied in this order:
+
+1. Security headers (Helmet)
+2. Logging (Morgan)
+3. Body parsing
+4. CORS
+5. Rate limiting
+6. Authentication
+7. Route handlers
+8. Error handling (last)
+
+### Type Safety
+
+Always use TypeScript types for:
+
+- Request/response bodies
+- Database models (from Prisma)
+- Shared utilities (from `@workspace/utils`)
+
+## Building for Production
+
+```bash
+# Build the application
+pnpm build
+
+# Start production server
+pnpm start
+
+# Or use Docker
+docker-compose -f docker-compose.prod.yml up api
+```
+
+The build process:
+
+1. Compiles TypeScript to JavaScript
+2. Bundles dependencies
+3. Optimizes for production
+
+<Callout type="warning">
+  Ensure all environment variables (especially `BETTER_AUTH_SECRET` and
+  `UPSTASH_REDIS_REST_TOKEN`) are set correctly in production before building.
+</Callout>
+
+## Troubleshooting
+
+### Port Already in Use
+
+See [Port Already in Use](../troubleshooting#port-already-in-use) in the main troubleshooting guide for platform-specific solutions.
+
+### Database Connection Errors
+
+See [Database Connection Errors](../troubleshooting#database-connection-errors) in the main troubleshooting guide.
+
+### Authentication Middleware Errors
+
+If authentication middleware is failing:
+
+1. Verify `BETTER_AUTH_SECRET` matches the Web app (see [Authentication Not Working](../troubleshooting#authentication-not-working))
+2. Check `ALLOWED_ORIGINS` includes the Web app URL
+3. Ensure cookies are sent with requests (`credentials: 'include'`)
+4. Check `src/middleware/auth.ts` for implementation details
+
+### Rate Limiting Not Working
+
+```bash
+# Verify Upstash Redis credentials
+# Check UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN
+# Test Redis connection:
+curl -H "Authorization: Bearer $UPSTASH_REDIS_REST_TOKEN" \
+  https://YOUR_REDIS_ENDPOINT.upstash.io/get/test
+```
+
+### CORS Errors
+
+```bash
+# Verify ALLOWED_ORIGINS includes the Web app domain
+# Example: ALLOWED_ORIGINS=http://localhost:3000
+
+# Check browser console for specific error
+# Ensure credentials are sent: fetch(url, { credentials: 'include' })
+```
+
+### Build Fails
+
+```bash
+# Clear build cache
+rm -rf dist
+
+# Rebuild
+pnpm build
+
+# Check for TypeScript errors
+pnpm type-check
+```
+
+## Related Documentation
+
+- [Authentication Package](../packages/auth) - Session and OAuth setup
+- [Database Package](../packages/db) - Prisma schema and migrations
+- [Rate Limiting Package](../packages/rate-limit) - Rate limiting configuration
+- [Environment Variables](../configuration/environment-variables) - Detailed config guide
+- [Code Quality](../configuration/formatting) - Linting and formatting
 
 <Callout type="info">
-  See the [Docker configuration guide](../configuration/docker) for detailed
-  setup instructions.
+  For deployment information, see the [Deployment Guide](../deployment).
 </Callout>

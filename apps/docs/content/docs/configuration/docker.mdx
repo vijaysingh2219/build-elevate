@@ -1,17 +1,23 @@
 ---
 title: Docker
-description: Docker setup and best practices for deploying the monorepo applications.
+description: Production-ready Docker configurations using Docker Compose for containerizing and orchestrating all monorepo applications
 ---
+
+# Docker & Containerization
+
+The monorepo includes production-ready Docker configurations for building and deploying all applications.
 
 ## Overview
 
-The monorepo is production-ready with a robust Docker setup for all core services:
+The Docker setup provides a robust, secure foundation for deployment:
 
-- **Multi-stage Dockerfiles** for each app (web, api) for minimal, secure images
-- **docker-compose.prod.yml** for orchestrating web, API, and PostgreSQL
-- Non-root user execution and health checks for security and reliability
+- **Multi-stage Dockerfiles** - Optimized images for web and API with minimal size
+- **Docker Compose** - Orchestrate all services (web, API, database, Redis)
+- **Non-root Execution** - Improved security by running containers as non-root users
+- **Health Checks** - Services verify readiness before dependent services start
+- **Turbo Pruning** - Faster builds with optimized dependency installation
 
-## Usage
+## Production Deployment
 
 To build and run the full stack in production mode:
 
@@ -21,69 +27,201 @@ pnpm docker:prod
 
 This will start:
 
-- Web app at [http://localhost:3000](http://localhost:3000)
-- API server at [http://localhost:4000](http://localhost:4000)
-- PostgreSQL at [localhost:5432](localhost:5432)
+- **Web** - http://localhost:3000
+- **API** - http://localhost:4000
+- **PostgreSQL** - localhost:5432
 
-## Key Files
+## Production Configuration
 
-- **docker-compose.prod.yml**: Orchestrates all services, sets up networks, volumes, and health checks
-- **apps/web/Dockerfile.prod**: Multi-stage build for Next.js frontend
-- **apps/api/Dockerfile.prod**: Multi-stage build for Express backend
+Production deployments use `docker-compose.prod.yml` with optimized settings:
+
+```bash
+docker-compose -f docker-compose.prod.yml up -d
+```
+
+Production setup includes:
+
+- Multi-stage optimized builds
+- Minimal image sizes
+- Non-root user execution
+- Security hardening
+- Health checks and monitoring
+
+## Key Files & Structure
+
+| File                       | Purpose                                          |
+| -------------------------- | ------------------------------------------------ |
+| `docker-compose.prod.yml`  | Production orchestration with optimized settings |
+| `apps/web/Dockerfile.prod` | Multi-stage build for Next.js frontend           |
+| `apps/api/Dockerfile.prod` | Multi-stage build for Express backend            |
+
+## Dockerfiles: Multi-Stage Builds
+
+Both web and API Dockerfiles use a multi-stage build approach:
+
+```
+Stage 1: Builder
+  ├─ Install dependencies
+  ├─ Run build/compilation
+  └─ Generate artifacts
+
+Stage 2: Runtime
+  ├─ Copy only artifacts from builder
+  ├─ Install runtime dependencies only
+  └─ Run application
+```
+
+This approach results in **minimal production images** by excluding build tools and dependencies.
+
+## Environment Configuration
+
+Set environment variables for Docker containers in production (`docker-compose.prod.yml`):
+
+```yaml
+environment:
+  DATABASE_URL: ${DATABASE_URL}
+  NODE_ENV: production
+```
+
+<Callout type="info">
+  Production values should be set via your deployment platform secrets.
+</Callout>
 
 ## Best Practices
 
-- Use `.env.production` files in each app for environment variables
-- Images are built with Turbo pruning for optimal size and speed
-- All containers run as non-root users for security
-- Health checks ensure services are ready before dependent apps start
+### Security
 
-## Example: docker-compose.prod.yml
+- **Non-root Users** - All containers run as non-root users (e.g., `appuser:appuser`)
+- **Read-only Filesystems** - Critical directories are read-only where possible
+- **Minimal Images** - Use Alpine Linux base images (smaller attack surface)
+- **Secret Management** - Never hardcode secrets; use environment variables or secret managers
 
-```yaml
-services:
-	web:
-		build:
-			context: .
-			dockerfile: ./apps/web/Dockerfile.prod
-		ports:
-			- 3000:3000
-		depends_on:
-			postgres:
-				condition: service_healthy
-			api:
-				condition: service_started
-	api:
-		build:
-			context: .
-			dockerfile: ./apps/api/Dockerfile.prod
-		ports:
-			- 4000:4000
-		depends_on:
-			postgres:
-				condition: service_healthy
-	postgres:
-		image: postgres:16-alpine
-		environment:
-			POSTGRES_DB: build-elevate-app
-			POSTGRES_USER: postgres
-			POSTGRES_PASSWORD: password
-		ports:
-			- 5432:5432
-		volumes:
-			- build-elevate-app_postgres_data:/var/lib/postgresql/data
-		healthcheck:
-			test: ["CMD-SHELL", "pg_isready -U postgres"]
-			interval: 10s
-			timeout: 5s
-			retries: 5
-volumes:
-	build-elevate-app_postgres_data:
-networks:
-	app_network:
-		driver: bridge
+### Performance
+
+- **Layer Caching** - Dockerfile layers are ordered for optimal caching
+- **Dependency Caching** - Package installations happen before code changes
+- **Turbo Pruning** - Only necessary dependencies are included in images
+- **Image Size** - Multi-stage builds keep production images minimal
+
+### Reliability
+
+- **Health Checks** - All services have health checks to verify readiness
+- **Depends On** - Proper service dependencies ensure correct startup order
+- **Volume Management** - Persistent data stored in named volumes
+- **Restart Policy** - Services automatically restart on failure
+
+## Common Docker Commands
+
+### Build Images
+
+```bash
+# Build all images
+docker-compose -f docker-compose.prod.yml build
+
+# Build with no cache (fresh build)
+docker-compose -f docker-compose.prod.yml build --no-cache
 ```
 
-## Conclusion
+### Run Services
 
-This Docker configuration provides a solid foundation for deploying the monorepo applications in production. By following best practices and utilizing multi-stage builds, the setup ensures security, performance, and maintainability.
+```bash
+# Start all services
+docker-compose -f docker-compose.prod.yml up
+
+# Start all services in background (detached mode)
+docker-compose -f docker-compose.prod.yml up -d
+
+# Start specific service
+docker-compose -f docker-compose.prod.yml up api
+```
+
+### Monitor & Debug
+
+```bash
+# View logs
+docker-compose -f docker-compose.prod.yml logs
+
+# Follow logs
+docker-compose -f docker-compose.prod.yml logs -f
+
+# Logs for specific service
+docker-compose -f docker-compose.prod.yml logs -f api
+
+# View running containers
+docker-compose -f docker-compose.prod.yml ps
+
+# Execute command in container
+docker-compose -f docker-compose.prod.yml exec api sh
+```
+
+### Stop & Cleanup
+
+```bash
+# Stop all services
+docker-compose -f docker-compose.prod.yml stop
+
+# Stop and remove containers (keeps volumes)
+docker-compose -f docker-compose.prod.yml down
+
+# Remove everything including volumes (destructive)
+docker-compose -f docker-compose.prod.yml down -v
+
+# Remove unused images
+docker image prune
+```
+
+## Troubleshooting
+
+### Container Fails to Start
+
+```bash
+# Check logs
+docker-compose -f docker-compose.prod.yml logs web
+
+# Check health status
+docker-compose -f docker-compose.prod.yml ps
+
+# Restart service
+docker-compose -f docker-compose.prod.yml restart web
+```
+
+### Database Connection Issues
+
+```bash
+# Check if PostgreSQL is healthy
+docker-compose -f docker-compose.prod.yml ps postgres
+
+# Connect to database
+docker-compose -f docker-compose.prod.yml exec postgres psql -U postgres -d build-elevate
+
+# View PostgreSQL logs
+docker-compose -f docker-compose.prod.yml logs postgres
+```
+
+### Clear Docker Resources
+
+```bash
+# Remove stopped containers
+docker container prune
+
+# Remove unused images
+docker image prune
+
+# Remove all unused resources (images, containers, volumes)
+docker system prune -a
+```
+
+For the complete `docker-compose.prod.yml` configuration, refer to the file in your repository root.
+
+## Next Steps
+
+- **Deploy with Docker** - Use Docker Compose on your server or cloud provider
+- **Verify Services** - Run `docker-compose -f docker-compose.prod.yml ps` to check all services are healthy
+- **View Logs** - Use `docker-compose -f docker-compose.prod.yml logs` to monitor application behavior
+- **Scale Services** - Use Docker Compose replicas to run multiple instances (advanced)
+
+<Callout type="info">
+  For deployment guides, see the [Deployment Documentation](../deployment). To
+  configure environment variables for containers, see [Environment
+  Variables](./environment-variables).
+</Callout>

@@ -35,14 +35,16 @@ type MockGetSession = jest.MockedFunction<(args?: GetSessionArgs) => Promise<Get
 
 const mockGetSession = jest.fn() as MockGetSession;
 
-jest.mock('@workspace/auth', () => ({
-  authClient: {},
+jest.mock('@workspace/auth/node-handlers', () => ({
+  fromNodeHeaders: jest.fn((headers) => headers),
+}));
+
+jest.mock('@workspace/auth/server', () => ({
   auth: {
     api: {
       getSession: mockGetSession,
     },
   },
-  fromNodeHeaders: jest.fn((headers) => headers),
 }));
 
 jest.mock('@workspace/rate-limit', () => ({

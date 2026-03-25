@@ -1,80 +1,495 @@
 ---
 title: Database
-description: Database access and schema management using Prisma and PostgreSQL.
+description: Prisma ORM with PostgreSQL, type-safe queries, migrations, and shared schema management
 ---
+
+# Database Package
+
+The `@workspace/db` package provides a type-safe database client and shared schema management for the monorepo using Prisma ORM and PostgreSQL. All applications and packages use this single database client for consistency.
 
 ## Overview
 
-`@workspace/db` provides database access and schema management for the monorepo, including:
+- **Package:** `@workspace/db`
+- **Location:** `packages/db`
+- **ORM:** Prisma with TypeScript
+- **Database:** PostgreSQL
+- **Type Safety:** Full end-to-end type safety
+- **Migrations:** Version-controlled schema changes
 
-- Type-safe database client powered by [Prisma](https://www.prisma.io/)
-- PostgreSQL schema and models
-- Shared configuration and migrations
-- Utilities for safe and efficient queries
+## Architecture
+
+The database package:
+
+- **Centralizes Schema** - Single source of truth for all models
+- **Provides Prisma Client** - Singleton instance exported to all apps
+- **Manages Migrations** - Version-controlled schema changes
+- **Ensures Type Safety** - Generated Prisma types available everywhere
+- **Optimizes Connection** - Reuses connections across deployments
+
+## Project Structure
+
+```
+packages/db/
+├── prisma/
+│   ├── schema.prisma        # Database schema and models
+│   ├── migrations/          # Migration files (version-controlled)
+│   └── seed.ts              # Database seeding script
+├── src/
+│   ├── client.ts            # Prisma client singleton
+│   ├── index.ts             # Package exports
+│   ├── env.ts               # Environment variable validation
+│   └── types.ts             # Re-exported Prisma types
+├── .env.example             # Environment variables template
+├── package.json             # Dependencies and scripts
+└── README.md                # Package documentation
+```
+
+## Environment Variables
+
+For complete environment variable setup and configuration, see the [Environment Variables Guide](../configuration/environment-variables).
+
+This package requires:
+
+- `DATABASE_URL` - PostgreSQL connection string
+
+For production deployments with connection pooling, also set:
+
+- `DATABASE_DIRECT_URL` - Direct database connection for migrations
 
 ## Usage
 
-Import and use the Prisma client in your apps:
+### Importing the Prisma Client
 
 ```ts
 import { prisma } from "@workspace/db";
+```
 
-// Query users
-const users = await prisma.user.findMany({
-  where: { emailVerified: true },
-  include: { sessions: true },
+### Querying Data
+
+#### Find Single Record
+
+```ts
+// Find by ID
+const user = await prisma.user.findUnique({
+  where: { id: "user-123" },
 });
 
-// Create a new user
-const newUser = await prisma.user.create({
-  data: {
-    email: "user@example.com",
-    name: "John Doe",
+// Find first matching record
+const user = await prisma.user.findFirst({
+  where: { email: "user@example.com" },
+});
+```
+
+#### Find Multiple Records
+
+```ts
+// Find all users
+const allUsers = await prisma.user.findMany();
+
+// Find with filters
+const verifiedUsers = await prisma.user.findMany({
+  where: { emailVerified: true },
+  orderBy: { createdAt: "desc" },
+  take: 10, // Limit results
+  skip: 0, // Pagination offset
+});
+
+// Include related data
+const usersWithSessions = await prisma.user.findMany({
+  include: {
+    sessions: true,
+    accounts: true,
   },
 });
 ```
 
-## Features
+#### Create Data
 
-- **Prisma Client**: Type-safe, auto-complete database access
-- **Database Models**: User, Session, Account, TwoFactor, Verification
-- **Migration Management**: Version-controlled schema changes
-- **Singleton Pattern**: Optimized client instantiation for dev/prod
+```ts
+// Create single record
+const user = await prisma.user.create({
+  data: {
+    email: "user@example.com",
+    name: "John Doe",
+    emailVerified: true,
+  },
+});
 
-## Setup
+// Create multiple records
+const users = await prisma.user.createMany({
+  data: [
+    { email: "user1@example.com", name: "User 1" },
+    { email: "user2@example.com", name: "User 2" },
+  ],
+});
+```
 
-1. Set the `DATABASE_URL` environment variable (PostgreSQL connection string).
-2. Run migrations to set up your schema.
+#### Update Data
 
-## Available Scripts
+```ts
+// Update single record
+const user = await prisma.user.update({
+  where: { id: "user-123" },
+  data: { name: "Updated Name" },
+});
 
-- `db:generate`: Generate Prisma Client from schema
-- `db:migrate`: Create/apply new migrations
-- `db:deploy`: Deploy migrations to production
-- `db:reset`: Reset database and apply all migrations (dev only)
+// Update many records
+const result = await prisma.user.updateMany({
+  where: { emailVerified: false },
+  data: { emailVerified: true },
+});
+```
+
+#### Delete Data
+
+```ts
+// Delete single record
+const user = await prisma.user.delete({
+  where: { id: "user-123" },
+});
+
+// Delete many records
+const result = await prisma.user.deleteMany({
+  where: { createdAt: { lt: new Date("2023-01-01") } },
+});
+```
 
 ## Database Schema
 
-The package includes these models:
+The schema is defined in `packages/db/prisma/schema.prisma`. Key models:
 
-- **User**: User accounts with email verification and 2FA
-- **Session**: User sessions with IP/user agent tracking
-- **Account**: OAuth provider accounts
-- **TwoFactor**: 2FA settings
-- **Verification**: Email verification tokens
+### User
 
-See the full schema in `packages/db/prisma/schema.prisma`.
+```prisma
+model User {
+  id               String      @id
+  name             String
+  email            String
+  emailVerified    Boolean     @default(false)
+  image            String?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @default(now()) @updatedAt
+  twoFactorEnabled Boolean?    @default(false)
+  sessions         Session[]
+  accounts         Account[]
+  twofactors       TwoFactor[]
+
+  @@unique([email])
+  @@map("user")
+}
+```
+
+**Fields:**
+
+- `id` - Unique user identifier
+- `name` - User's display name
+- `email` - Email address (unique)
+- `emailVerified` - Whether email is verified
+- `image` - Profile image URL
+- `createdAt` - Account creation timestamp
+- `updatedAt` - Last update timestamp
+- `twoFactorEnabled` - Whether 2FA is enabled
+
+**Relations:**
+
+- `sessions` - User's sessions
+- `accounts` - OAuth/linked provider accounts
+- `twofactors` - 2FA settings
+
+### Session
+
+```prisma
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@map("session")
+}
+```
+
+**Fields:**
+
+- `id` - Session identifier
+- `expiresAt` - Session expiration time
+- `token` - Session token (unique)
+- `createdAt` - Session creation timestamp
+- `updatedAt` - Last update timestamp
+- `ipAddress` - User's IP address
+- `userAgent` - Browser user agent
+- `userId` - Associated user ID
+
+### Account
+
+```prisma
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@map("account")
+}
+```
+
+**Purpose:** Stores OAuth provider accounts (Google, GitHub, etc.)
+
+### TwoFactor
+
+```prisma
+model TwoFactor {
+  id          String @id
+  secret      String
+  backupCodes String
+  userId      String
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("twoFactor")
+}
+```
+
+**Purpose:** Stores 2FA settings and TOTP secret
+
+### Verification
+
+```prisma
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+
+  @@map("verification")
+}
+```
+
+**Purpose:** Stores email verification tokens
+
+## Key Scripts
+
+| Command            | Purpose                                              |
+| ------------------ | ---------------------------------------------------- |
+| `pnpm db:generate` | Generate Prisma client from schema                   |
+| `pnpm db:migrate`  | Create and apply migration                           |
+| `pnpm db:deploy`   | Deploy migrations to production                      |
+| `pnpm db:reset`    | Reset database and reapply all migrations (dev only) |
+| `pnpm db:seed`     | Seed database with initial data                      |
 
 ## Migrations
 
-To create a new migration after modifying the schema:
+### Creating a Migration
+
+After modifying `schema.prisma`:
 
 ```bash
+# Create a new migration
 pnpm db:migrate
 ```
 
-To apply migrations in production:
+You'll be prompted for a migration name:
+
+```
+? Enter a name for this migration: › add_user_avatar
+```
+
+This creates a migration file in `prisma/migrations/` that's version-controlled.
+
+### Reviewing Migrations
 
 ```bash
+# View Prisma Studio
+pnpm db:studio
+
+# View migration files
+ls prisma/migrations/
+```
+
+### Deploying to Production
+
+```bash
+# Deploy all pending migrations
 pnpm db:deploy
 ```
+
+<Callout type="warning">
+  Always review migrations before deploying to production. Test them on a
+  staging database first.
+</Callout>
+
+## Seeding the Database
+
+The seed script in `prisma/seed.ts` populates the database with initial data:
+
+```bash
+# Run seed script
+pnpm db:seed
+```
+
+Modify `prisma/seed.ts` to add test data for development.
+
+## Development Tips
+
+### Prisma Studio
+
+View and edit database records visually:
+
+```bash
+pnpm db:studio
+```
+
+This opens an interactive database browser at `http://localhost:5555`.
+
+### Type Safety
+
+All Prisma types are automatically generated and exported:
+
+```ts
+import { User, Session } from "@workspace/db";
+
+const user: User = {
+  id: "123",
+  email: "user@example.com",
+  // ... other fields
+};
+```
+
+### Connection Management
+
+The Prisma client is a singleton, so it reuses connections:
+
+```ts
+// Safe to import and use anywhere
+import { prisma } from "@workspace/db";
+
+// Connection is reused across requests
+const user = await prisma.user.findUnique({ where: { id: "123" } });
+```
+
+### Transaction Support
+
+For multi-step operations:
+
+```ts
+await prisma.$transaction(async (tx) => {
+  // All queries in this block are transactional
+  const user = await tx.user.create({ data: { email } });
+  await tx.session.create({ data: { userId: user.id } });
+});
+```
+
+## Troubleshooting
+
+### Prisma Client Not Found
+
+```bash
+# Regenerate Prisma client
+pnpm db:generate
+
+# Rebuild the package
+pnpm build
+```
+
+### Migration Conflicts
+
+```bash
+# If migrations are out of sync, reset (dev only)
+pnpm db:reset
+
+# Then re-apply migrations
+pnpm db:migrate
+```
+
+### Database Connection Errors
+
+```bash
+# Verify DATABASE_URL is set
+echo $DATABASE_URL
+
+# Test connection manually
+psql $DATABASE_URL -c "SELECT 1"
+
+# Check PostgreSQL is running
+docker-compose -f docker-compose.prod.yml ps postgres
+```
+
+### Timeout Errors
+
+Increase timeout in `.env`:
+
+```bash
+DATABASE_URL="postgresql://user:pass@host/db?connectTimeoutMs=10000"
+```
+
+### Type Generation Issues
+
+```bash
+# Clear Prisma cache
+rm -rf node_modules/.prisma
+
+# Regenerate types
+pnpm db:generate
+```
+
+## Production Considerations
+
+### Connection Pooling
+
+For production with PgBouncer:
+
+```bash
+# Regular connection string (pooled)
+DATABASE_URL="postgresql://user:pass@pgbouncer:6432/db"
+
+# Direct URL (for migrations)
+DATABASE_DIRECT_URL="postgresql://user:pass@postgres:5432/db"
+```
+
+## Security Best Practices
+
+- **Never expose `DATABASE_URL`** - Keep credentials private
+- **Use environment variables** - Don't hardcode connection strings
+- **Enable SSL** - Use `sslmode=require` in production
+- **Limit database user permissions** - Use principle of least privilege
+- **Rotate credentials regularly** - Especially in production
+- **Audit data access** - Log who accesses what data
+
+## Performance Tips
+
+- **Use indexes** - Add indexes on frequently queried fields
+- **Paginate large result sets** - Use `take` and `skip`
+- **Select specific fields** - Don't use `select: *` unnecessarily
+- **Reuse connections** - Use Prisma singleton
+- **Cache results** - Cache frequently accessed data
+- **Use connection pooling** - In production with many requests
+
+## Related Documentation
+
+- [Authentication Package](./auth) - Uses database for sessions and users
+- [Web Application](../applications/web) - Consumes database via this package
+- [API Application](../applications/api) - Consumes database via this package
+- [Environment Variables](../configuration/environment-variables) - `DATABASE_URL` setup
+- [Prisma Documentation](https://www.prisma.io/docs/) - Official Prisma docs
+
+<Callout type="info">
+  For migration strategies and advanced Prisma features, see the [official
+  Prisma documentation](https://www.prisma.io/docs/).
+</Callout>

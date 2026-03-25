@@ -1,79 +1,434 @@
 ---
 title: Authentication
-description: We use Better Auth to handle authentication and session management.
+description: Better Auth integration with session management, OAuth, 2FA, and email verification
 ---
+
+# Authentication Package
+
+The `@workspace/auth` package provides a complete authentication solution for the monorepo, including email/password auth, Google OAuth, two-factor authentication, and session management via Better Auth.
 
 ## Overview
 
-`@workspace/auth` provides authentication for the monorepo, including:
+- **Package:** `@workspace/auth`
+- **Location:** `packages/auth`
+- **Authentication:** Better Auth with TypeScript
+- **Providers:** Email/password and Google OAuth
+- **Security:** 2FA, email verification, rate limiting
+- **Database:** PostgreSQL via Prisma (shared db package)
 
-- Email/password authentication with verification
-- Google OAuth integration
-- Two-factor authentication (2FA)
-- Session management (Better Auth)
-- Email verification and password reset flows
-- Rate limiting for sensitive actions
+## Architecture
 
-Integrates with:
+The auth package integrates with:
 
-- `@workspace/db` for database storage
-- `@workspace/email` for transactional emails
-- `@workspace/rate-limit` for abuse protection
-
-## Usage
-
-### Client Side (React)
-
-```ts
-import {
-  signIn,
-  signOut,
-  signUp,
-  useSession,
-  twoFactor,
-} from "@workspace/auth";
-
-// Sign in
-await signIn.email({ email, password });
-await signIn.social({ provider: "google" });
-
-// Get session in React components
-const { data: session } = useSession();
-
-// Sign out
-await signOut();
-```
-
-### Server Side (API/Server Components)
-
-```ts
-import { auth } from "@workspace/auth";
-
-// Get session in API routes or server components
-const session = await auth.api.getSession({ headers: request.headers });
-
-// Protect API routes
-if (!session) {
-  return new Response("Unauthorized", { status: 401 });
-}
-```
+- **[@workspace/db](./db)** - User and session storage via Prisma
+- **[@workspace/email](./email)** - Email verification and password reset flows
+- **[@workspace/rate-limit](./rate-limit)** - Protection against brute force attacks
 
 ## Features
 
-- **Email/Password Auth**: Secure credential-based login
-- **OAuth**: Google sign-in
-- **2FA**: TOTP-based two-factor authentication
-- **Email Flows**: Verification, password reset, change email
-- **Rate Limiting**: Prevents abuse of sensitive endpoints
-- **Type-Safe**: Full TypeScript support
+### Authentication Methods
 
-## Setup
+- **Email/Password** - Credential-based login with secure password hashing
+- **Google OAuth** - Sign in with Google account
+- **Social Providers** - Extensible for additional OAuth providers
+- **Email Verification** - Verify user email addresses before account activation
+- **Password Reset** - Secure password reset flows via email
 
-Set these environment variables:
+### Security
 
-- `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` (for OAuth)
-- `NEXT_PUBLIC_BASE_URL` (frontend URL)
-- `DATABASE_URL` (Postgres, from @workspace/db)
-- Email config (see @workspace/email)
+- **Two-Factor Authentication (2FA)** - TOTP-based second factor
+- **Session Management** - Secure session tokens and cookies
+- **Rate Limiting** - Protect against brute force and abuse
 
-See the source in `packages/auth/src/` for advanced usage and extension.
+### Session Management
+
+- **Session Tokens** - Secure, short-lived session tokens
+- **Session Rotation** - Session tokens are securely rotated and validated server-side
+- **Session Persistence** - Server-side session storage in database
+
+## Project Structure
+
+```
+packages/auth/
+├── src/
+│   ├── client.ts            # Client actions (signIn, signOut, etc.)
+│   ├── server.ts            # Better Auth instance
+│   ├── keys.ts              # Environment variable keys and validation
+│   ├── next-handlers.ts     # Next.js API route handlers
+│   ├── node-handlers.ts     # Express middleware handlers
+│   └── index.ts             # Package entry point
+├── .env.example             # Environment variables template
+├── package.json             # Dependencies and scripts
+└── README.md                # Package documentation
+```
+
+## Environment Variables
+
+For complete environment variable setup and configuration, see the [Environment Variables Guide](../configuration/environment-variables).
+
+This package requires:
+
+- `BETTER_AUTH_SECRET` - Authentication encryption key (32+ characters). See [Environment Variables Guide](../configuration/environment-variables#quick-start) for generation instructions. Must be identical across `apps/api/.env.local` and `apps/web/.env.local`.
+- `BETTER_AUTH_URL` - Auth server URL
+- `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` - OAuth credentials
+- `DATABASE_URL` - PostgreSQL connection string
+
+## Usage
+
+### Client Side (React Components)
+
+#### Sign In
+
+```ts
+import { signIn } from "@workspace/auth/client";
+
+// Email/password sign in
+await signIn.email({
+  email: "user@example.com",
+  password: "password123",
+});
+
+// Google OAuth sign in
+await signIn.social({
+  provider: "google",
+});
+```
+
+#### Get Session in Components
+
+```tsx
+import { useSession } from "@workspace/auth/client";
+
+export default function Dashboard() {
+  const { data: session, isPending } = useSession();
+
+  if (isPending) return <div>Loading...</div>;
+  if (!session) return <div>Not authenticated</div>;
+
+  return <div>Welcome, {session.user.name}!</div>;
+}
+```
+
+#### Sign Out
+
+```ts
+import { signOut } from "@workspace/auth/client";
+
+await signOut();
+```
+
+#### 2FA Management
+
+```ts
+import { twoFactor } from "@workspace/auth/client";
+
+// Enable 2FA
+const { secret, qrCode } = await twoFactor.enable();
+
+// Verify 2FA code
+await twoFactor.verify({ code: "123456" });
+
+// Disable 2FA
+await twoFactor.disable();
+```
+
+### Server Side (API Routes & Server Components)
+
+#### Get Session
+
+```ts
+import { auth } from "@workspace/auth/server";
+
+// In API route
+export async function GET(request: Request) {
+  const session = await auth.api.getSession({
+    headers: request.headers,
+  });
+
+  if (!session) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
+  return Response.json(session);
+}
+```
+
+#### Protect Routes
+
+```ts
+import { auth } from "@workspace/auth/server";
+
+export async function protectedAction(request: Request) {
+  const session = await auth.api.getSession({
+    headers: request.headers,
+  });
+
+  if (!session?.user) {
+    throw new Error("Unauthorized");
+  }
+
+  // User is authenticated
+  return { user: session.user };
+}
+```
+
+#### Access User Data
+
+```ts
+const session = await auth.api.getSession({ headers });
+
+// Access user information
+console.log(session.user.id);
+console.log(session.user.email);
+console.log(session.user.name);
+```
+
+## Key Scripts
+
+| Command           | Purpose                        |
+| ----------------- | ------------------------------ |
+| `pnpm dev`        | Watch mode for development     |
+| `pnpm build`      | Build package for production   |
+| `pnpm type-check` | Check TypeScript types         |
+| `pnpm lint`       | Check code quality with ESLint |
+
+## Authentication Flows
+
+### Email/Password Registration
+
+```
+1. User enters email and password
+2. Password validation (strength requirements)
+3. Check email uniqueness
+4. Hash password
+5. Create user in database
+6. Send verification email
+7. User clicks verification link
+8. Account activated
+```
+
+### Email/Password Login
+
+```
+1. User enters email and password
+2. Fetch user from database
+3. Verify password hash
+4. If 2FA enabled: prompt for 2FA code
+5. Create session token
+6. Set secure session cookie
+7. Return session to client
+```
+
+### Google OAuth Flow
+
+```
+1. User clicks "Sign in with Google"
+2. Redirect to Google OAuth consent screen
+3. User authorizes application
+4. Google redirects back with auth code
+5. Exchange code for access token
+6. Fetch user info from Google
+7. Find or create user in database
+8. Create session token
+9. Redirect to dashboard
+```
+
+### Password Reset
+
+```
+1. User requests password reset
+2. Check email exists in database
+3. Generate reset token
+4. Send reset link via email
+5. User clicks link and enters new password
+6. Validate token and password
+7. Update password hash
+8. Invalidate existing sessions (on request)
+9. Redirect to login
+```
+
+## Email Verification
+
+After signup, users receive a verification email:
+
+- **Verification Link** - Expires after 24 hours
+- **Resend** - Users can request new verification email if original expired
+
+## Two-Factor Authentication
+
+### Enable 2FA
+
+1. User requests to enable 2FA
+2. Server generates TOTP secret
+3. Server renders QR code for user's authenticator app
+4. User scans QR code with Google Authenticator, Authy, etc.
+5. User enters 6-digit code to confirm
+6. 2FA is enabled and backup codes are generated
+
+### Login with 2FA
+
+1. User enters email and password
+2. Session created but marked as unverified
+3. Server prompts for 2FA code
+4. User enters code from authenticator app
+5. Code validated against TOTP secret
+6. Session marked as verified
+7. User logged in
+
+## Session Management
+
+### Session Lifespan
+
+- **Session Token** - Expires after 7 days by default
+- **Session Refresh Window** - Can refresh session before expiration
+- **Sliding Expiration** - Active sessions are automatically renewed
+
+### Session Storage
+
+Sessions are stored in PostgreSQL database via Prisma:
+
+```sql
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@map("session")
+}
+```
+
+### Session Cookies
+
+- **Name:** `better-auth.session_token`
+- **HttpOnly:** Yes
+- **Secure:** Yes (HTTPS only in production)
+- **SameSite:** Lax
+- **Path:** `/` (available site-wide)
+
+## Rate Limiting
+
+The auth package integrates with `@workspace/rate-limit` to protect against abuse:
+
+```bash
+# Sensitive endpoints are rate limited:
+# - Sign up: 5 requests per minute per IP
+# - Sign in: 10 requests per minute per IP
+# - Email verification: 5 requests per minute per email
+# - Email change: 5 requests per minute per email
+# - Password reset: 3 requests per minute per IP
+# - 2FA verification: 5 requests per minute per user
+```
+
+## Development Tips
+
+### Testing Authentication
+
+Use the development environment variables to test locally:
+
+```bash
+# Sign in with test account
+Email: test@example.com
+Password: TestPassword123!
+
+# Or use Google OAuth with test account
+```
+
+### Debugging Sessions
+
+```ts
+// Log session info in browser console
+const session = await useSession();
+console.log(session);
+```
+
+### Database Debugging
+
+```bash
+# View auth tables in Prisma Studio
+pnpm db:studio
+```
+
+### Environment Setup
+
+Ensure these are set for development:
+
+```bash
+BETTER_AUTH_SECRET=your-secret-key
+BETTER_AUTH_URL=http://localhost:3000
+DATABASE_URL=your-db-url
+```
+
+## Troubleshooting
+
+### Session Not Persisting
+
+1. **Check Cookies** - Open browser DevTools → Application → Cookies
+2. **Verify Domain** - Cookie domain should match your app domain
+3. **Check Database** - Verify sessions table exists and has data
+4. **Clear Cache** - Clear browser cache and try again
+
+### Google OAuth Not Working
+
+1. **Verify Credentials** - Check `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`
+2. **Check Redirect URI** - Must exactly match in Google Cloud Console
+3. **Scope Permissions** - Ensure `email` and `profile` scopes are requested
+4. **Check CORS** - Verify your domain is allowed in Google Console
+
+### 2FA Issues
+
+1. **Time Sync** - Ensure authenticator app and server time are synchronized
+2. **Backup Codes** - Check that backup codes were saved
+3. **App Clock** - Phone time should be within ±30 seconds of server
+
+### Email Not Sending
+
+1. **Check RESEND_TOKEN** - Verify token is valid and not revoked
+2. **Check Domain** - Email domain must be verified in Resend
+3. **Check Sender** - `RESEND_EMAIL_FROM` must be authorized domain
+4. **Logs** - Check Resend dashboard for delivery status
+
+### Type Errors
+
+```bash
+# Regenerate types if you modify Better Auth config
+pnpm db:generate
+pnpm type-check
+```
+
+## Security Best Practices
+
+### For Developers
+
+- **Never expose secrets** - Keep `BETTER_AUTH_SECRET` private
+- **Use HTTPS** - Always use HTTPS in production
+- **Validate input** - Validate email and password on client and server
+- **Rate limit** - Use `@workspace/rate-limit` on sensitive endpoints
+- **Log events** - Log authentication events for security auditing
+
+### For Users
+
+- **Strong passwords** - Enforce password strength requirements
+- **Enable 2FA** - Recommend users enable two-factor authentication
+- **Verify email** - Require email verification before account activation
+- **Session security** - Log out inactive sessions after period
+- **Breach detection** - Monitor for compromised credentials
+
+## Related Documentation
+
+- [Database Package](./db) - User and session storage via Prisma
+- [Email Package](./email) - Verification and password reset emails
+- [Rate Limiting Package](./rate-limit) - Brute force protection
+- [Web Application](../applications/web) - Frontend authentication UI
+- [API Application](../applications/api) - API authentication middleware
+
+<Callout type="info">
+  For More details on Better Auth configuration, see the [Better Auth
+  documentation](https://www.better-auth.com).
+</Callout>

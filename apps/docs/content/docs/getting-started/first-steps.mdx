@@ -27,6 +27,8 @@ Before starting the development servers, you need to:
 
 build-elevate uses environment variables to configure database connections, authentication secrets, and API keys. You need to set up three `.env` files.
 
+For detailed explanations of all environment variables, see the [Environment Variables Guide](../configuration/environment-variables).
+
 ### Database Configuration
 
 Navigate to the database package:
@@ -41,27 +43,18 @@ Create the environment file:
 cp .env.example .env
 ```
 
-Edit `packages/db/.env`:
+Edit `packages/db/.env` with your database connection string:
 
 ```bash title="packages/db/.env"
-# Database connection string
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/build_elevate?schema=public"
-
-# For Prisma Migrate (development only)
-# Use a separate shadow database for migrations
-# DATABASE_URL="postgresql://postgres:postgres@localhost:5432/build_elevate_shadow?schema=public"
+DATABASE_URL="postgresql://[username]:[password]@[host]:[port]/[database]?schema=public"
 ```
+
+See the [Environment Variables Guide](../configuration/environment-variables#quick-start) for detailed DATABASE_URL format and setup instructions.
 
 <Callout type="warning" title="Important">
-  Replace `postgres:postgres` with your actual PostgreSQL username and password
-  if different.
+  Replace `[username]`, `[password]`, `[host]`, `[port]`, and `[database]` with
+  your actual PostgreSQL credentials.
 </Callout>
-
-#### Database URL Format
-
-```
-postgresql://[username]:[password]@[host]:[port]/[database]?schema=public
-```
 
 ### Backend API Configuration
 
@@ -77,48 +70,18 @@ Create the environment file:
 cp .env.example .env.local
 ```
 
-Edit `apps/api/.env.local`:
+Edit `apps/api/.env.local`. You'll need to set:
 
-```bash title="apps/api/.env"
-# Server Configuration
-NODE_ENV=development
-PORT=4000
-
-# Database (same as packages/db/.env)
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/build_elevate?schema=public"
-
-# CORS Configuration
-ALLOWED_ORIGINS=http://localhost:3000
-
-# Better Auth
-BETTER_AUTH_SECRET="your-secret-key-here-min-32-chars"
-BETTER_AUTH_URL=http://localhost:4000
-
-# Upstash Redis (for rate limiting)
-UPSTASH_REDIS_REST_URL=https://YOUR_REDIS_ENDPOINT.upstash.io
-UPSTASH_REDIS_REST_TOKEN=AXXXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-```
+- `DATABASE_URL` (same as packages/db/.env)
+- `BETTER_AUTH_SECRET` - See [Environment Variables Guide](../configuration/environment-variables#quick-start) for generation instructions
+- `BETTER_AUTH_URL=http://localhost:4000`
+- `ALLOWED_ORIGINS=http://localhost:3000`
+- Other optional variables for email and rate limiting (see [Environment Variables Guide](../configuration/environment-variables) for details)
 
 <Callout type="success" title="Quick Start">
-  For local development, you need to set the variables shown above.
+  For local development, set the required variables shown above. Additional
+  configuration is optional.
 </Callout>
-
-#### Generate a Secret Key
-
-Generate a secure secret for Better Auth:
-
-```bash
-# Option 1: Using Node.js
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-
-# Option 2: Using OpenSSL
-openssl rand -hex 32
-
-# Option 3: Online generator
-# Visit: https://generate-secret.vercel.app/32
-```
-
-Copy the generated string and paste it as `BETTER_AUTH_SECRET`.
 
 ### Frontend Web Configuration
 
@@ -134,39 +97,15 @@ Create the environment file:
 cp .env.example .env.local
 ```
 
-Edit `apps/web/.env.local`:
+Edit `apps/web/.env.local`. You'll need to set:
 
-```bash title="apps/web/.env.local"
-# Google OAuth (Get from https://console.cloud.google.com/apis/credentials)
-GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=GOCSPX-xxxxxxxxxxxxxxxxxxxxxxxx
+- `DATABASE_URL` (same as packages/db/.env)
+- `BETTER_AUTH_SECRET` - Must be **identical** to `apps/api/.env.local` (see [Environment Variables Guide](./configuration/environment-variables#quick-start))
+- `BETTER_AUTH_URL=http://localhost:3000`
+- `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` (OAuth credentials)
+- Other optional variables for email and rate limiting (see [Environment Variables Guide](../configuration/environment-variables) for details)
 
-# Better Auth
-BETTER_AUTH_URL=http://localhost:3000
-BETTER_AUTH_SECRET=your-betterauth-secret
-
-# Database connection string
-DATABASE_URL="postgresql://postgres:password@postgres:5432/build-elevate-app"
-
-# Other
-NEXT_PUBLIC_BASE_URL=http://localhost:3000
-
-# Email service
-RESEND_TOKEN=re_xxxxxxxxxxxxxxxxxxxxxxxxxxxx
-RESEND_EMAIL_FROM=delivered@resend.dev
-
-# Upstash Redis (for rate limiting)
-UPSTASH_REDIS_REST_URL=https://YOUR_REDIS_ENDPOINT.upstash.io
-UPSTASH_REDIS_REST_TOKEN=AXXXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-# Node environment
-NODE_ENV=development
-```
-
-<Callout type="warning">
-  The `BETTER_AUTH_SECRET` must be the **same** in both `apps/api/.env.local`
-  and `apps/web/.env.local` for authentication to work properly.
-</Callout>
+For complete setup instructions and all available variables, see the [Environment Variables Guide](../configuration/environment-variables).
 
 ## Step 2: Set Up the Database
 
@@ -236,18 +175,14 @@ This single command starts:
 
 ### Verify Everything Works
 
-Open your browser and check:
+Open your browser and check each application. For the complete list of URLs and ports, see [Application Ports](../applications#ports-reference).
 
-1. **Frontend**: [http://localhost:3000](http://localhost:3000)
-   - You should see the homepage
+Quick checks:
 
-2. **API Health**: [http://localhost:4000/health](http://localhost:4000/health)
-   - Should return: `{"status":"ok","timestamp":"..."}`
-
-3. **Email Preview**: [http://localhost:3002](http://localhost:3002)
-   - View all email templates
-4. **Prisma Studio**: [http://localhost:5555](http://localhost:5555)
-   - Browse your database tables
+1. **Frontend**: [http://localhost:3000](http://localhost:3000) - You should see the homepage
+2. **API Health**: [http://localhost:4000/health](http://localhost:4000/health) - Should return: `{"status":"ok","timestamp":"..."}`
+3. **Email Preview**: [http://localhost:3002](http://localhost:3002) - View all email templates
+4. **Prisma Studio**: [http://localhost:5555](http://localhost:5555) - Browse your database tables
 
 ## Step 4: Test Authentication
 
@@ -323,3 +258,17 @@ pnpm dev --filter=email
 # Multiple specific apps
 pnpm dev --filter=web --filter=api
 ```
+
+### Custom Ports
+
+By default, applications run on specific ports (see [Application Ports](../applications#ports-reference)). To run an application on a different port:
+
+```bash
+# Web app on custom port
+PORT=3010 pnpm dev --filter=web
+
+# API on custom port
+PORT=4010 pnpm dev --filter=api
+```
+
+This is useful when a default port is already in use. See [Troubleshooting: Port Already in Use](../troubleshooting#port-already-in-use) for more solutions.

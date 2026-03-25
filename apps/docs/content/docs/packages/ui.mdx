@@ -1,37 +1,431 @@
 ---
-title: Design System
-description: Shared UI component library built with shadcn/ui for reusable, themeable React components.
+title: UI Components
+description: Shared component library built with shadcn/ui and Tailwind CSS for consistent UI across all applications
 ---
+
+# UI Component Library
+
+The `@workspace/ui` package provides a shared, reusable React component library built with [shadcn/ui](https://ui.shadcn.com/) and Tailwind CSS. All applications use these components for consistent design and user experience.
 
 ## Overview
 
-`@workspace/ui` is a shared UI component library built with [shadcn/ui](https://ui.shadcn.com/), providing reusable, themeable React components for all apps in the monorepo.
+- **Package:** `@workspace/ui`
+- **Location:** `packages/ui`
+- **Framework:** React with TypeScript
+- **Component Library:** shadcn/ui
+- **Styling:** Tailwind CSS
+- **Theme Support:** Light mode and dark mode
+- **Type Safety:** Full TypeScript support with component props
+
+## Architecture
+
+The UI package:
+
+- **Centralized Components** - Single source of truth for all UI components
+- **Theme Configuration** - Unified Tailwind and color theming
+- **Extensible** - Easy to add new components from shadcn/ui
+- **Type-Safe** - TypeScript component props and exports
+- **Accessible** - Built on accessible UI primitives from Radix UI
+
+## Project Structure
+
+```
+packages/ui/
+├── src/
+│   ├── components/           # UI components
+│   │   ├── button.tsx
+│   │   ├── card.tsx
+│   │   ├── dialog.tsx
+│   │   ├── input.tsx
+│   │   ├── alert.tsx
+│   │   └── [other components]
+│   ├── lib/
+│   │   ├── utils.ts          # Utility functions (cn, etc.)
+│   │   └── styles.ts         # Theme and styling utilities
+│   ├── globals.css           # Global styles and CSS variables
+│   └── index.ts              # Package exports
+├── tailwind.config.ts        # Tailwind configuration
+├── package.json              # Dependencies and scripts
+└── tsconfig.json             # TypeScript configuration
+```
+
+## Features
+
+### Reusable Components
+
+A comprehensive set of components for building applications:
+
+- **Form Controls** - Button, Input, Checkbox, Radio, Select, Textarea, Toggle
+- **Layout** - Card, Container, Flex, Grid, Separator, Spacer
+- **Feedback** - Alert, Badge, Progress, Spinner, Toast, Tooltip
+- **Navigation** - Breadcrumb, Dropdown Menu, Navigation Menu, Tabs
+- **Dialog** - Dialog, Drawer, Popover, Sheet
+- **Data Display** - Table, List, Avatar, Image
+- **And more...** - Collapsible, Hover Card, Accordion, Slider
+
+### Theming System
+
+- **Dark Mode Support** - Built-in light/dark theme switching
+- **CSS Variables** - Theme colors defined as CSS variables for easy customization
+- **Color Palette** - Consistent brand colors across all components
+- **Custom Themes** - Easy to create custom theme variations
+
+### Utility Functions
+
+Helpful utilities for component development:
+
+- **`cn()`** - Merge Tailwind classes with proper override handling
+- **`clsx`** - Conditional class application
+- **Type utilities** - TypeScript helpers for component props
 
 ## Usage
 
-To use a component in your app:
+### Importing Components
 
 ```tsx
 import { Button } from "@workspace/ui/components/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@workspace/ui/components/card";
+import { Input } from "@workspace/ui/components/input";
+import { cn } from "@workspace/ui/lib/utils";
+```
+
+### Using Components
+
+#### Button Example
+
+```tsx
+import { Button } from "@workspace/ui/components/button";
+
+export function MyComponent() {
+  return (
+    <div className="space-y-2">
+      <Button>Default Button</Button>
+      <Button variant="outline">Outline Button</Button>
+      <Button variant="destructive">Destructive Button</Button>
+      <Button size="lg">Large Button</Button>
+      <Button disabled>Disabled Button</Button>
+      <Button isLoading>Loading...</Button>
+    </div>
+  );
+}
+```
+
+#### Card Example
+
+```tsx
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@workspace/ui/components/card";
+
+export function UserCard() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>User Profile</CardTitle>
+        <CardDescription>View your account information</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <p>User details go here</p>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+#### Form Example
+
+```tsx
+import { Input } from "@workspace/ui/components/input";
+import { Label } from "@workspace/ui/components/label";
+import { Button } from "@workspace/ui/components/button";
+
+export function LoginForm() {
+  return (
+    <form className="space-y-4">
+      <div>
+        <Label htmlFor="email">Email</Label>
+        <Input id="email" type="email" placeholder="you@example.com" />
+      </div>
+      <div>
+        <Label htmlFor="password">Password</Label>
+        <Input id="password" type="password" placeholder="••••••••" />
+      </div>
+      <Button type="submit" className="w-full">
+        Sign In
+      </Button>
+    </form>
+  );
+}
+```
+
+### Using Utilities
+
+```tsx
+import { cn } from "@workspace/ui/lib/utils";
+
+export function MyButton({
+  className,
+  ...props
+}: React.ComponentProps<"button">) {
+  return (
+    <button
+      className={cn(
+        "px-4 py-2 rounded-md font-medium",
+        "bg-blue-600 text-white",
+        "hover:bg-blue-700",
+        className, // Custom classes override defaults
+      )}
+      {...props}
+    />
+  );
+}
 ```
 
 ## Adding Components
 
-To add new components from shadcn/ui:
+To add new components from the [shadcn/ui collection](https://ui.shadcn.com/docs/components/accordion):
 
 ```bash
-pnpm dlx shadcn@latest add button -c apps/web
+# Add a component to the UI package
+pnpm --filter ui add-component button
+
+# Or use shadcn's CLI directly
+pnpm dlx shadcn@latest add accordion -c packages/ui
 ```
 
-This will place the component in `packages/ui/src/components/`.
+This places the component in `packages/ui/src/components/` and automatically updates exports.
 
-## Tailwind Setup
+### Component Variants
 
-Tailwind CSS is preconfigured. Use `globals.css` and `tailwind.config.ts` from the UI package for consistent styling.
+Most components support style variants for different use cases:
 
-## Features
+```tsx
+// Buttons with different variants
+<Button variant="default">Default</Button>
+<Button variant="outline">Outline</Button>
+<Button variant="ghost">Ghost</Button>
+<Button variant="destructive">Destructive</Button>
 
-- **Reusable Components**: Button, Alert, Card, Dialog, Tooltip, and more
-- **Themeable**: Built-in support for dark mode and custom themes
-- **Type-Safe**: Full TypeScript support
-- **Utility Functions**: Includes helpers like `cn()` for class merging
+// Buttons with different sizes
+<Button size="sm">Small</Button>
+<Button size="md">Medium</Button>
+<Button size="lg">Large</Button>
+```
+
+## Best Practices
+
+### Component Composition
+
+Build complex UIs by composing smaller components:
+
+```tsx
+export function SettingsCard() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Settings</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div>
+          <Label>Theme</Label>
+          <Select>{/* Theme options */}</Select>
+        </div>
+        <div>
+          <Label>Notifications</Label>
+          <Checkbox />
+        </div>
+        <div className="flex gap-2">
+          <Button>Save</Button>
+          <Button variant="outline">Cancel</Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+### Type-Safe Props
+
+Always type component props properly:
+
+```tsx
+interface MyComponentProps {
+  title: string;
+  description?: string;
+  variant?: "default" | "outline";
+  onClick: () => void;
+}
+
+export function MyComponent({
+  title,
+  description,
+  variant = "default",
+  onClick,
+}: MyComponentProps) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
+        {description && <CardDescription>{description}</CardDescription>}
+      </CardHeader>
+      <CardContent>
+        <Button variant={variant} onClick={onClick}>
+          Action
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+### Consistent Spacing
+
+Use Tailwind's spacing utilities for consistent margins and padding:
+
+```tsx
+<div className="space-y-4">
+  <div>Item 1</div>
+  <div>Item 2</div>
+  <div>Item 3</div>
+</div>
+
+<div className="flex gap-2">
+  <Button>Action 1</Button>
+  <Button>Action 2</Button>
+</div>
+```
+
+### Responsive Design
+
+Use Tailwind's responsive prefixes for mobile-first design:
+
+```tsx
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  {/* Responsive grid */}
+</div>
+
+<Button className="w-full md:w-auto">Responsive Button</Button>
+```
+
+## Key Scripts
+
+| Command         | Purpose                 |
+| --------------- | ----------------------- |
+| `pnpm lint`     | Check code quality      |
+| `pnpm lint:fix` | Fix code quality issues |
+
+## Integration with Apps
+
+All required applications automatically have access to UI components:
+
+### Web App (Next.js)
+
+```tsx
+// apps/web/app/page.tsx
+import { Button } from "@workspace/ui/components/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@workspace/ui/components/card";
+
+export default function Home() {
+  return (
+    <main className="container mx-auto py-8">
+      <Card>
+        <CardHeader>
+          <CardTitle>Welcome</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Button>Get Started</Button>
+        </CardContent>
+      </Card>
+    </main>
+  );
+}
+```
+
+## Accessibility
+
+All components are built on [Radix UI](https://www.radix-ui.com/) primitives, ensuring:
+
+- **WCAG Compliance** - Level AA accessibility standards
+- **Keyboard Navigation** - Full keyboard support
+- **Screen Readers** - Proper ARIA labels and roles
+- **Focus Management** - Visible focus indicators
+
+Example of accessible form:
+
+```tsx
+<form className="space-y-4">
+  <div>
+    <Label htmlFor="email">Email Address</Label>
+    <Input
+      id="email"
+      type="email"
+      required
+      aria-required="true"
+      aria-describedby="email-help"
+    />
+    <p id="email-help" className="text-sm text-gray-600">
+      We'll never share your email
+    </p>
+  </div>
+  <Button type="submit">Submit</Button>
+</form>
+```
+
+## Troubleshooting
+
+### Component Not Found
+
+```bash
+# Ensure the package is installed
+pnpm install
+
+# Check if component exists
+ls packages/ui/src/components/
+```
+
+### Import Errors
+
+```bash
+# Verify the import path
+import { Button } from "@workspace/ui/components/button";
+
+# Check TypeScript is up to date
+pnpm check-types
+```
+
+### Styling Not Applied
+
+```bash
+# Ensure Tailwind is processing the files
+# Check tailwind.config.ts includes the right paths
+
+# Rebuild Tailwind
+pnpm build
+```
+
+## Related Documentation
+
+- [shadcn/ui Components](https://ui.shadcn.com/docs/components) - Full component gallery
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs) - Styling guide
+- [Radix UI Documentation](https://www.radix-ui.com/docs) - Accessible component primitives
+- [Web Application](../applications/web) - Uses UI components
+- [Design System Guide](../configuration/formatting) - Styling and formatting standards
+
+<Callout type="info">
+  For detailed component API and examples, visit the [shadcn/ui
+  documentation](https://ui.shadcn.com/docs/components/accordion).
+</Callout>

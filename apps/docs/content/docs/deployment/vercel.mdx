@@ -1,43 +1,172 @@
 ---
 title: Deploying to Vercel
-description: A step-by-step guide to deploying the monorepo applications to Vercel.
+description: Deploy Next.js web and API applications to Vercel with automatic optimizations, environment configuration, and seamless monorepo integration
 ---
 
-## Deployment
+## Overview
 
-This guide covers deploying the monorepo to [Vercel](https://vercel.com/), a popular platform for hosting Next.js applications.
+This guide covers deploying the build-elevate monorepo to [Vercel](https://vercel.com/), the platform purpose-built for Next.js.
+
+The monorepo contains multiple applications that can be deployed independently:
+
+- **Web** (`apps/web`) - Next.js 16 frontend application
+- **API** (`apps/api`) - Express.js REST API backend
 
 ## Prerequisites
 
-- A Vercel account
-- Access to the monorepo
+- A [Vercel](https://vercel.com/) account
+- GitHub, GitLab, or Bitbucket account with monorepo access
+- All environment variables configured
 
-## Steps to Deploy
+## Deploying the Web Application
 
-1. **Import the Repository**
-   - Log in to your Vercel account.
-   - Click on "New Project" and select "Import Git Repository".
-   - Connect your Git provider and select the monorepo.
+### Step 1: Link Repository
 
-2. **Configure Project Settings**
-   - For each application (e.g., `web`), create a separate Vercel project.
-   - Set the root directory for each project:
-     - For the Web app, set the root to `apps/web`.
-   - Configure the build and output settings
+1. Go to [vercel.com](https://vercel.com/) and click **Add New Project**
+2. Select your Git provider and authorize Vercel
+3. Find and select your monorepo
+4. Click **Import**
 
-3. **Set Environment Variables**
-   - In the Vercel dashboard, navigate to the "Settings" tab of your project
-   - Add the necessary environment variables as defined in `.env` files (see [more](../configuration/environment-variables)).
+### Step 2: Configure Web App
 
-4. **Deploy the Application**
-   - Once everything is configured, click "Deploy".
-   - Vercel will build and deploy your application. You can monitor the deployment process in the dashboard.
+1. **Set Root Directory**
+   - Root Directory: `apps/web`
+   - Vercel auto-detects Next.js configuration
 
-5. **Post-Deployment**
-   - After deployment, verify that the application is running correctly by visiting the provided Vercel URL.
+2. **Environment Variables**
+   - Navigate to Settings → Environment Variables
+   - Add the variables required by the web application:
+     - `NEXT_PUBLIC_API_URL` - Backend API URL (e.g., `https://api.example.com`)
+     - `NEXT_PUBLIC_APP_URL` - Frontend URL (auto-set by Vercel)
 
-## Additional Tips
+3. **Build Settings**
+   - Build Command: `pnpm build`
+   - Output Directory: `.next` (auto-detected)
 
-- Use Vercel's preview deployments for testing changes before going live.
-- Monitor performance and logs through the Vercel dashboard.
-- Set up custom domains in the Vercel settings for production use.
+### Step 3: Deploy
+
+Click **Deploy** to build and deploy your Next.js application.
+
+## Deploying the API
+
+### Step 1: Create API Project
+
+1. Click **Add New Project** in your Vercel dashboard
+2. Select the same repository
+3. Set Root Directory to `apps/api`
+
+### Step 2: Configure API
+
+1. **Framework Detection**
+   - Vercel may not auto-detect Express.js
+   - Ensure `package.json` at `apps/api/package.json` has correct exports
+
+2. **Environment Variables**
+   - Add all required environment variables:
+     - `DATABASE_URL` - PostgreSQL connection string
+     - `BETTER_AUTH_SECRET` - Authentication secret
+     - `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`
+     - `RESEND_TOKEN` - Email service API key
+     - `UPSTASH_REDIS_REST_URL` and token - Rate limiting
+
+3. **Build Settings**
+   - Build Command: `pnpm build`
+   - Output Directory: Leave empty or set to `dist`
+   - Serverless Function: Node.js runtime
+
+### Step 3: Deploy
+
+Click **Deploy** to deploy your Express.js API as Vercel Functions.
+
+## Environment Variables Reference
+
+All applications share these core variables:
+
+| Variable                   | Type   | Purpose                           |
+| -------------------------- | ------ | --------------------------------- |
+| `DATABASE_URL`             | Secret | PostgreSQL connection string      |
+| `BETTER_AUTH_SECRET`       | Secret | Auth encryption key (32+ chars)   |
+| `GOOGLE_CLIENT_ID`         | Secret | OAuth client ID                   |
+| `GOOGLE_CLIENT_SECRET`     | Secret | OAuth client secret               |
+| `RESEND_TOKEN`             | Secret | Email service API token           |
+| `UPSTASH_REDIS_REST_URL`   | Secret | Redis REST API endpoint           |
+| `UPSTASH_REDIS_REST_TOKEN` | Secret | Redis API token                   |
+| `NEXT_PUBLIC_API_URL`      | Public | Backend API URL (web app only)    |
+| `NEXT_PUBLIC_APP_URL`      | Public | Frontend URL (auto-set by Vercel) |
+
+<Callout type="info">
+  For detailed setup instructions and descriptions of all environment variables,
+  see the [Configuration Guide](../configuration/environment-variables).
+</Callout>
+
+## Post-Deployment
+
+### Verify Applications
+
+1. **Test Web Application**
+   - Visit the provided Vercel URL
+   - Verify authentication flows
+   - Test API connectivity
+
+2. **Test API Endpoints**
+   - Use curl or Postman to test endpoints
+   - Verify database connectivity
+   - Check rate limiting works
+
+### Database Migrations
+
+Run database migrations after deploying API:
+
+```bash
+pnpm db:migrate
+```
+
+Or use a custom build step in Vercel:
+
+```bash
+cd apps/api && npm run db:migrate && npm run build
+```
+
+### Custom Domains
+
+1. Go to your project Settings → Domains
+2. Add your custom domain
+3. Follow DNS configuration steps
+
+### Monitoring
+
+Monitor your deployments:
+
+- **Analytics** - View traffic and performance
+- **Logs** - Check build and runtime logs
+- **Deployments** - Toggle between versions
+- **Preview URLs** - Test pull requests automatically
+
+## Troubleshooting
+
+### Build Fails with Module Not Found
+
+Ensure `pnpm` configuration is correct:
+
+- `pnpm-workspace.yaml` exists at root
+- All workspace dependencies are installed: `pnpm install`
+
+### Environment Variables Not Loading
+
+- Verify variables are set in Vercel dashboard
+- Check variable names exactly match your code
+- Redeploy after updating variables
+- For public variables, prefix with `NEXT_PUBLIC_`
+
+### API Not Connecting
+
+- Verify `API_URL` matches deployed API domain
+- Check CORS configuration in Express app
+- Ensure `ALLOWED_ORIGINS` includes web domain
+
+## Next Steps
+
+- Set up [GitHub integration](https://vercel.com/docs/git) for preview deployments
+- Configure [custom domains and SSL](https://vercel.com/docs/concepts/projects/domains)
+- Enable [Analytics](https://vercel.com/analytics) for performance monitoring
+- Set up [error tracking](https://vercel.com/docs/concepts/observability)

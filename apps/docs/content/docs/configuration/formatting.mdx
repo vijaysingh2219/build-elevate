@@ -1,21 +1,196 @@
 ---
-title: Formatting
-description: Linting and formatting configuration for the monorepo using ESLint and Prettier.
+title: Code Formatting & Linting
+description: Unified ESLint and Prettier setup for automatic code quality checks and consistent formatting with IDE integration
 ---
+
+# Code Formatting & Linting
 
 We use [ESLint](https://eslint.org/) and [Prettier](https://prettier.io/) to maintain code quality and consistency across the monorepo.
 
+## Overview
+
+The monorepo includes shared, preconfigured ESLint and Prettier packages that enforce consistent coding standards across all applications and packages:
+
+- **[@workspace/eslint-config](../packages/eslint-config)** - Unified linting rules for JavaScript/TypeScript
+- **[@workspace/prettier-config](../packages/prettier-config)** - Consistent code formatting standards
+- **Pre-commit Hooks** - Hooks automatically lint and format staged files
+
 ## Benefits
 
-- Enforces coding standards
-- Catches potential errors early
-- Ensures consistent code style
-- Integrates with IDEs for real-time feedback
-- Works seamlessly with Git hooks for pre-commit checks
+- **Enforces Coding Standards** - Catches common errors and code quality issues
+- **Consistent Style** - Maintains uniform formatting across the entire monorepo
+- **Early Error Detection** - Identifies problems during development, not in production
+- **IDE Integration** - Real-time feedback while you code
+- **Automated Pre-commit** - Hooks automatically fix issues before committing
 
-## Usage
+## Quick Commands
 
-The formtter and linter are preconfigured for all packages and apps in the monorepo. To use them:
+### Linting
 
-- `pnpm lint`: Runs ESLint to check for code quality issues.
-- `pnpm format`: Runs Prettier to format code according to defined style rules.
+```bash
+# Check for linting issues
+pnpm lint
+
+# Fix auto-fixable issues
+pnpm lint:fix
+```
+
+### Formatting
+
+```bash
+# Check formatting
+pnpm format:check
+
+# Auto-format all files
+pnpm format
+```
+
+### Type Checking
+
+```bash
+# Check TypeScript types
+pnpm check-types
+```
+
+## Configuration Files
+
+| File               | Location                 | Purpose                               |
+| ------------------ | ------------------------ | ------------------------------------- |
+| `eslint.config.js` | Root                     | ESLint configuration for the monorepo |
+| `index.js`         | packages/prettier-config | Prettier formatting rules             |
+| `tsconfig.json`    | Root                     | TypeScript compiler options           |
+
+## ESLint Configuration
+
+The monorepo uses `@workspace/eslint-config` which extends industry-standard configurations:
+
+- **React Plugin** - Rules for React and JSX files
+- **TypeScript Plugin** - Type-aware linting for `.ts` and `.tsx` files
+- **Next.js Plugin** - Optimization for Next.js applications
+- **Import Plugin** - Ensures correct module imports and prevents circular dependencies
+
+### Common ESLint Rules
+
+The configuration enforces:
+
+- No console statements (dev warnings allowed)
+- Proper error handling
+- Consistent naming conventions
+- Unused variable detection
+- Import/export validation
+
+### Fix ESLint Issues
+
+```bash
+# Auto-fix all issues
+pnpm lint:fix
+```
+
+## Prettier Configuration
+
+The monorepo uses `@workspace/prettier-config` with the following settings:
+
+- **Print Width** - 100 characters (wraps long lines)
+- **Indentation** - 2 spaces
+- **Quotes** - Single quotes for strings
+- **Trailing Commas** - Enabled for all supported syntax
+- **Line Endings** - LF (`\n`)
+- **Import Sorting** - Automatically organizes imports using `prettier-plugin-organize-imports`
+- **Tailwind Sorting** - Automatically sorts Tailwind classes using `prettier-plugin-tailwindcss`
+- **package.json Sorting** - Keeps `package.json` fields organized using `prettier-plugin-packagejson`
+
+### File Support
+
+Formatting is applied to:
+
+- TypeScript (`.ts`)
+- TSX (`.tsx`)
+- Markdown (`.md`)
+
+### Format Files
+
+```bash
+# Format all files
+pnpm format
+
+# Format check (dry-run)
+pnpm format:check
+
+# Format specific file
+pnpm format:path apps/api/src/index.ts
+```
+
+## IDE Integration
+
+### VS Code
+
+Install the [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) extensions.
+
+Add to `.vscode/settings.json`:
+
+```json
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "eslint.validate": [
+    "javascript",
+    "typescript",
+    "typescriptreact",
+    "javascriptreact"
+  ]
+}
+```
+
+## Pre-commit Hooks
+
+The monorepo includes Git hooks (via husky) that automatically:
+
+1. Lint staged files with ESLint
+2. Format with Prettier
+3. Type-check TypeScript
+4. Prevent commits with errors
+
+No manual action needed - hooks run automatically before each commit.
+
+## Troubleshooting
+
+### ESLint Errors Won't Go Away
+
+```bash
+# Clear ESLint cache
+pnpm lint:fix
+
+# Or manually:
+rm -rf .eslintcache
+```
+
+### Prettier Formatting Conflicts
+
+```bash
+# Format all files with Prettier (should match ESLint)
+pnpm format
+
+# Then run lint to verify
+pnpm lint:fix
+```
+
+### IDE Not Showing Errors
+
+1. Ensure ESLint extension is installed
+2. Restart the IDE
+3. Check output panel for errors: `View → Output → ESLint`
+
+<Callout type="info">
+  See the [ESLint Config Package](../packages/eslint-config) and [Prettier
+  Config Package](../packages/prettier-config) documentation for detailed
+  configuration options.
+</Callout>

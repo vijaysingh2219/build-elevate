@@ -1,7 +1,68 @@
 ---
 title: Applications
+description: Complete overview of production applications - Next.js web, Express API, email service, database UI
 ---
+
+import { Globe, Server, Mail, Database } from "lucide-react";
 
 ## Applications in the Monorepo
 
-This section describes each application and its purpose.
+This section describes each application and its purpose. Applications are user-facing services that can be deployed independently.
+
+## Available Applications
+
+<Cards>
+  <Card icon={<Globe />} title="Web" href="./web">
+    Next.js 16 frontend with authentication (port 3000)
+  </Card>
+  <Card icon={<Server />} title="API" href="./api">
+    Express REST API backend (port 4000)
+  </Card>
+  <Card icon={<Mail />} title="Email" href="./email">
+    React Email preview & development (port 3002)
+  </Card>
+  <Card icon={<Database />} title="Studio" href="./studio">
+    Prisma Studio database UI (port 5555)
+  </Card>
+</Cards>
+
+## Quick Start: Running Applications
+
+All applications can be started with a single command:
+
+```npm
+npm run dev
+```
+
+See [Development Workflow](../getting-started/first-steps#development-workflow) in the Getting Started guide for:
+
+- Running individual applications
+- Custom port configuration
+- Other common development commands
+
+For a complete list of application URLs and ports, see the [Ports Reference](#ports-reference) below.
+
+## Ports Reference
+
+All applications run on the following ports:
+
+| Service | Port | URL                   | Purpose                      |
+| ------- | ---- | --------------------- | ---------------------------- |
+| Web     | 3000 | http://localhost:3000 | Next.js frontend application |
+| API     | 4000 | http://localhost:4000 | Express REST API server      |
+| Email   | 3002 | http://localhost:3002 | Email template preview       |
+| Studio  | 5555 | http://localhost:5555 | Prisma database UI           |
+
+<Callout type="warning">
+  If a port is already in use, see [Troubleshooting: Port Already in
+  Use](../troubleshooting#port-already-in-use) for solutions.
+</Callout>
+
+## Detailed Documentation
+
+See individual application documentation for features, setup, and configuration:
+
+- **[Web Application](/docs/applications/web)** - Next.js frontend, authentication UI, and dashboard
+- **[API Application](/docs/applications/api)** - Express server, REST endpoints, and middleware
+- **[Email Application](/docs/applications/email)** - Email template development and preview
+- **[Studio Application](/docs/applications/studio)** - Database management and exploration

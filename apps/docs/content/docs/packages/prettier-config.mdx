@@ -1,0 +1,121 @@
+---
+title: Prettier Configuration
+description: Unified Prettier configuration with plugin support for import sorting and Tailwind CSS class ordering across the monorepo
+---
+
+## Overview
+
+`@workspace/prettier-config` provides unified code formatting configuration for all applications and packages in the monorepo. This ensures consistent code style with automatic formatting.
+
+## Features
+
+- **Shared Formatting Rules** - Consistent code style across all workspaces
+- **Plugin Support** - Integration with specialized plugins for different file types
+- **Import Organization** - Automatic import sorting via `prettier-plugin-organize-imports`
+- **Tailwind CSS** - Proper class ordering with `prettier-plugin-tailwindcss`
+- **Package.json** - Organized package.json formatting with `prettier-plugin-packagejson`
+
+## Installed Plugins
+
+- **prettier-plugin-organize-imports** - Sorts and organizes imports
+- **prettier-plugin-packagejson** - Formats package.json files
+- **prettier-plugin-tailwindcss** - Orders Tailwind CSS classes for consistency
+
+## Usage
+
+### Formatting Code
+
+Format all code in the monorepo:
+
+```bash
+pnpm format
+```
+
+Format a specific file or directory:
+
+```bash
+pnpm format:path apps/web/src
+```
+
+### Checking Formatting
+
+Check if code is properly formatted without making changes:
+
+```bash
+pnpm format:check
+```
+
+### Configuration
+
+The Prettier configuration is stored in `packages/prettier-config/index.js`.
+
+Current configuration:
+
+```ts
+export default {
+  plugins: [
+    "prettier-plugin-organize-imports",
+    "prettier-plugin-tailwindcss",
+    "prettier-plugin-packagejson",
+  ],
+  singleQuote: true,
+  trailingComma: "all",
+  printWidth: 100,
+  endOfLine: "lf",
+  overrides: [
+    {
+      files: ["**/*.{ts,tsx,md}"],
+    },
+  ],
+};
+```
+
+### Configuration Options
+
+| Option          | Value | Purpose                                                          |
+| --------------- | ----- | ---------------------------------------------------------------- |
+| `singleQuote`   | true  | Use single quotes instead of double quotes                       |
+| `trailingComma` | "all" | Add trailing commas where valid in ES5                           |
+| `printWidth`    | 100   | Maximum line length before wrapping                              |
+| `endOfLine`     | "lf"  | Unix line endings for consistency                                |
+| `plugins`       | array | Enable import sorting, Tailwind CSS, and package.json formatting |
+
+## Format on Save
+
+Configure your editor to format on save for a seamless development experience:
+
+### VS Code
+
+Add to `.vscode/settings.json`:
+
+```json
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+}
+```
+
+### Cursor
+
+Cursor has built-in Prettier support. Enable it in settings for automatic formatting.
+
+## Ignoring Files
+
+Files and directories can be ignored via `.prettierignore`:
+
+```
+node_modules
+dist
+.next
+build
+coverage
+```
+
+<Callout type="info">
+  For more details, see the [Prettier
+  documentation](https://prettier.io/docs/en/index.html) for configuration
+  options and editor integration.
+</Callout>

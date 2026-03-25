@@ -1,0 +1,17 @@
+{
+  "title": "Packages",
+  "icon": "Package",
+  "pages": [
+    "auth",
+    "db",
+    "email",
+    "rate-limit",
+    "ui",
+    "utils",
+    "eslint-config",
+    "prettier-config",
+    "typescript-config",
+    "jest-presets"
+  ],
+  "defaultOpen": false
+}

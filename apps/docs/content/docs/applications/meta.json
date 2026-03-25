@@ -1,6 +1,6 @@
 {
   "title": "Applications",
-  "icon": "MyIcon",
-  "pages": ["web", "api", "studio", "email"],
+  "icon": "AppWindow",
+  "pages": ["web", "api", "email", "studio"],
   "defaultOpen": false
 }

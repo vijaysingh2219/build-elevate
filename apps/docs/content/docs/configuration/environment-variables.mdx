@@ -1,11 +1,21 @@
 ---
 title: Environment Variables
-description: Managing environment variables for different applications and packages in the monorepo.
+description: Secure configuration management across development, staging, and production environments using .env files and proper secret handling
 ---
+
+# Environment Variables
+
+Environment variables securely manage configuration across different environments (development, production) without committing sensitive data to version control.
 
 ## Overview
 
-Each app and package may have its own `.env` file for environment-specific configuration. These files are not committed to version control and should be created from the provided `.env.example` files.
+Each application and package uses `.env` files for environment-specific configuration:
+
+- **`.env.local`** - Local development variables (gitignored)
+- **`.env.example`** - Template showing required variables
+- **`.env.production`** - Production environment variables
+
+These files are **not** committed to version control and should be created from the provided `.env.example` files.
 
 ## Setup
 
@@ -39,7 +49,32 @@ DATABASE_URL=postgres://postgres:password@localhost:5432/app
   string.
 </Callout>
 
-2.  **Authentication**
+2.  **Authentication Secret**
+
+Add to both `apps/api/.env.local` and `apps/web/.env.local` (must be identical):
+
+- `BETTER_AUTH_SECRET=your-generated-secret`
+
+Generate a secure secret for Better Auth:
+
+```bash
+# Option 1: Using Node.js
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+
+# Option 2: Using OpenSSL
+openssl rand -hex 32
+
+# Option 3: Online generator
+# Visit: https://generate-secret.vercel.app/32
+```
+
+<Callout type="warning">
+  The `BETTER_AUTH_SECRET` must be **identical** in both `apps/api/.env.local`
+  and `apps/web/.env.local`. Copy and paste the same generated value in both
+  files.
+</Callout>
+
+3.  **OAuth Credentials**
 
 Add to `apps/web/.env.local` and `apps/api/.env`:
 
@@ -53,7 +88,7 @@ Add to `apps/web/.env.local` and `apps/api/.env`:
   `http://localhost:3000/api/auth/callback/google` as the redirect URI.
 </Callout>
 
-3.  **Email Service (Resend)**
+4.  **Email Service (Resend)**
 
 Add to `apps/web/.env.local`, `apps/api/.env.local` and `packages/email/.env.local`:
 
@@ -65,7 +100,7 @@ Add to `apps/web/.env.local`, `apps/api/.env.local` and `packages/email/.env.loc
   verified sender email.
 </Callout>
 
-4.  **Rate Limiting**
+5.  **Rate Limiting**
 
 Add to `apps/api/.env.local` and `packages/rate-limit/.env.local`:
 

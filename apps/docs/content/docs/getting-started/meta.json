@@ -1,6 +1,6 @@
 {
   "title": "Getting Started",
-  "icon": "MyIcon",
+  "icon": "Rocket",
   "pages": ["installation", "first-steps", "structure"],
   "defaultOpen": true
 }

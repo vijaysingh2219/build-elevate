@@ -1,7 +1,42 @@
 ---
 title: Configuration
+description: Configure environment variables, Docker, code quality tools, and development settings
 ---
 
-## Configuration
+import { FileJson, Package, Code2 } from "lucide-react";
 
-This section explains configuration files and options for the monorepo.
+# Configuration
+
+This section explains configuration files and options for the monorepo. Learn how to set up environment variables, containerize your applications, and maintain code quality standards.
+
+## Configuration Guides
+
+<Cards>
+  <Card
+    icon={<FileJson />}
+    title="Environment Variables"
+    href="/docs/configuration/environment-variables"
+  >
+    Database, API keys, OAuth credentials, and secrets management
+  </Card>
+  <Card icon={<Package />} title="Docker" href="/docs/configuration/docker">
+    Multi-stage builds and Docker Compose orchestration
+  </Card>
+  <Card
+    icon={<Code2 />}
+    title="Code Formatting"
+    href="/docs/configuration/formatting"
+  >
+    ESLint and Prettier configuration for code quality
+  </Card>
+</Cards>
+
+## Overview
+
+The build-elevate monorepo uses a unified configuration strategy across all applications and packages:
+
+- **Environment Variables** - Manage configuration for different environments (development, production)
+- **Docker** - Production-ready containerization with multi-stage builds and Docker Compose
+- **Code Quality** - ESLint, Prettier, TypeScript, and Jest for consistent development standards
+
+Visit the guides above for detailed setup instructions and best practices.

@@ -1,59 +1,593 @@
 ---
 title: Rate Limiting
-description: Rate limiting utilities and predefined limiters for authentication flows.
+description: Rate limiting with Upstash Redis for protecting against abuse and brute force attacks
 ---
+
+# Rate Limiting Package
+
+The `@workspace/rate-limit` package provides distributed rate limiting powered by Upstash Redis. It includes pre-configured limiters for common authentication flows and allows creating custom limiters for any use case.
 
 ## Overview
 
-`@workspace/rate-limit` provides rate limiting for the monorepo, including:
+- **Package:** `@workspace/rate-limit`
+- **Location:** `packages/rate-limit`
+- **Backend:** Upstash Redis (serverless)
+- **Algorithm:** Sliding window for accurate limiting
+- **Type Safety:** Full TypeScript support
+- **Distributed:** Works across multiple servers/deployments
 
-- Powered by [Upstash Redis](https://upstash.com/)
-- Pre-configured rate limiters for authentication flows
-- Customizable rate limiting strategies
-- Shared configuration and types
+## Architecture
 
-## Usage
+The rate-limit package:
 
-Import and use rate limiting utilities in your apps:
-
-```ts
-import {
-  createRateLimiter,
-  verifyEmailRateLimiter,
-} from "@workspace/rate-limit";
-
-// Use a predefined limiter
-const { success, limit, remaining, reset } =
-  await verifyEmailRateLimiter.limit(userId);
-if (!success) throw new Error("Rate limit exceeded");
-
-// Create a custom limiter
-const customLimiter = createRateLimiter({
-  prefix: "my-action",
-  limiter: Ratelimit.slidingWindow(5, "10 m"),
-});
-```
+- **Integrates with Upstash Redis** - Serverless Redis for rate limiting data
+- **Provides Pre-configured Limiters** - Common auth flow limiters ready to use
+- **Supports Custom Limiters** - Flexible configuration for any use case
+- **Tracks Rate Limit State** - Records remaining requests and reset times
+- **Cross-deployment Compatible** - Works with serverless and traditional deployments
 
 ## Features
 
-- **Predefined Rate Limiters**: For common auth operations
-- **Custom Limiter Creation**: Flexible config for any use case
-- **Sliding Window Algorithm**: Accurate, fair rate limiting
-- **Type-Safe APIs**: Full TypeScript support
+### Pre-configured Auth Limiters
 
-## Setup
+- **Sign Up** - Limit account creation to prevent registration abuse per IP
+- **Sign In** - Protect against brute-force login attempts per IP
+- **Password Reset** - Prevent password reset abuse and takeover attempts per user
 
-1. Configure Upstash Redis credentials in your environment variables:
-   - `UPSTASH_REDIS_REST_URL`
-   - `UPSTASH_REDIS_REST_TOKEN`
-2. Use predefined limiters or create your own as needed.
+### Pre-configured Email Limiters
 
-## Predefined Rate Limiters
+- **Email Verification** - Reduce verification email abuse and account enumeration per user
+- **Email Change** - Prevent email address change spam and account takeover per user
+- **Send Email** - Limit transactional email sending to protect deliverability per user
+- **Welcome Email** - Prevent welcome email spam during onboarding per user
 
-The package includes rate limiters for common authentication flows:
+### Custom Limiters
 
-- **verifyEmailRateLimiter**: 3 requests per hour
-- **changeEmailRateLimiter**: 2 requests per 24 hours
-- **resetPasswordRateLimiter**: 3 requests per hour
+- **Flexible Configuration** - Create limiters with custom prefix and Upstash algorithms
+- **Sliding Window Algorithm** - Accurate, fair rate limiting with Upstash-powered windows
+- **Prefix-based Keys** - Organized rate limit tracking by operation type
+- **Customizable Algorithms** - Use Upstash's sliding window or counter algorithms
 
-See the source in `packages/rate-limit/src/` for advanced usage and extension.
+### Granular Control
+
+- **Response Details** - Know exactly how many requests remain
+- **Reset Times** - When the rate limit window resets
+- **Success Status** - Clear indication of whether request was allowed
+- **Error Messages** - Detailed rejection information
+
+## Project Structure
+
+```
+packages/rate-limit/
+├── src/
+│   ├── client.ts                # Upstash Redis client setup
+│   ├── keys.ts                  # Environment variable validation
+│   ├── create.ts                # Custom limiter factory
+│   ├── limiters/                # Pre-configured limiters
+│   │   ├── auth.ts              # Authentication limiters
+│   │   ├── email.ts             # Email operation limiters
+│   │   └── index.ts             # Limiter exports
+│   └── index.ts                 # Package entry point
+├── .env.example                 # Environment variables template
+├── package.json                 # Dependencies and scripts
+└── tsconfig.json                # TypeScript configuration
+```
+
+## Environment Variables
+
+Create `.env.local` and configure:
+
+```bash
+# Upstash Redis (get from https://upstash.com/redis)
+UPSTASH_REDIS_REST_URL=https://YOUR_ENDPOINT.upstash.io
+UPSTASH_REDIS_REST_TOKEN=AXXXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+
+<Callout type="info">
+  Get free Upstash Redis at [https://upstash.com](https://upstash.com). The free
+  tier includes 500,000 commands/month, sufficient for development.
+</Callout>
+
+## Usage
+
+### Using Pre-configured Limiters
+
+```ts
+import {
+  signupRateLimiter,
+  signinRateLimiter,
+  verifyEmailRateLimiter,
+} from "@workspace/rate-limit";
+
+// Sign up limiter - per IP
+const signupLimit = await signupRateLimiter.limit(ipAddress);
+if (!signupLimit.success) {
+  throw new Error(
+    `Too many signup attempts. Try again in ${signupLimit.resetAfter}s`,
+  );
+}
+
+// Sign in limiter - per IP
+const signinLimit = await signinRateLimiter.limit(ipAddress);
+if (!signinLimit.success) {
+  throw new Error("Too many login attempts. Please try again later.");
+}
+
+// Email verification limiter - per user
+const verifyLimit = await verifyEmailRateLimiter.limit(userId);
+if (!verifyLimit.success) {
+  throw new Error("Too many verification attempts");
+}
+```
+
+See [Pre-configured Limiters Reference](#pre-configured-limiters-reference) below for all available limiters (password reset, email change, send email, welcome email, etc.).
+
+### Creating Custom Limiters
+
+```ts
+import { createRateLimiter, slidingWindow } from "@workspace/rate-limit";
+
+// Create a custom limiter: 10 requests per minute
+const customLimiter = createRateLimiter({
+  prefix: "my-custom-action",
+  limiter: slidingWindow(10, "1 m"), // 10 requests per 1 minute
+});
+
+// Use the custom limiter
+const result = await customLimiter.limit("user-123");
+
+if (result.success) {
+  console.log(`Request allowed. ${result.remaining} requests remaining.`);
+} else {
+  console.log(`Rate limit exceeded. Reset in ${result.resetAfter} seconds`);
+}
+```
+
+### Advanced Configuration
+
+```ts
+import { createRateLimiter, slidingWindow } from "@workspace/rate-limit";
+
+// Complex limiter: 100 requests per hour
+const apiCallLimiter = createRateLimiter({
+  prefix: "api-calls",
+  limiter: slidingWindow(100, "1 h"),
+});
+
+// Limiter for data exports: 5 per day per user
+const exportLimiter = createRateLimiter({
+  prefix: "user-exports",
+  limiter: slidingWindow(5, "24 h"),
+});
+
+// Limiter for bulk operations: 2 per minute per user
+const bulkOpLimiter = createRateLimiter({
+  prefix: "bulk-operations",
+  limiter: slidingWindow(2, "1 m"),
+});
+```
+
+## Response Format
+
+All limiter calls return a response object from Upstash:
+
+```ts
+interface RatelimitResponse {
+  success: boolean; // Whether the request was allowed
+  limit: number; // Total requests allowed in window
+  remaining: number; // Requests remaining in window
+  resetAfter: number; // Seconds until window resets
+  pending?: Promise<void>; // Promise that resolves when rate limit data is synced
+}
+```
+
+### Example Response
+
+```ts
+// Request allowed
+{
+  success: true,
+  limit: 10,
+  remaining: 7,
+  resetAfter: 45  // Seconds until reset
+}
+
+// Rate limit exceeded
+{
+  success: false,
+  limit: 10,
+  remaining: 0,
+  resetAfter: 45  // Seconds until reset
+}
+```
+
+## Pre-configured Limiters Reference
+
+### Sign Up Rate Limiter
+
+```ts
+await signupRateLimiter.limit(ipAddress);
+```
+
+- **Limit:** 3 requests per 1 hour per IP
+- **Purpose:** Prevent abuse of account creation and signup spam
+- **Use:** Protect public signup endpoint
+- **Prefix:** `auth:signup`
+
+### Sign In Rate Limiter
+
+```ts
+await signinRateLimiter.limit(ipAddress);
+```
+
+- **Limit:** 3 requests per 15 minutes per IP
+- **Purpose:** Protect against brute-force and credential-stuffing attacks
+- **Use:** Protect sign-in endpoints
+- **Prefix:** `auth:signin`
+
+### Password Reset Rate Limiter
+
+```ts
+await resetPasswordRateLimiter.limit(userId);
+```
+
+- **Limit:** 3 requests per 1 hour per user
+- **Purpose:** Reduce password-reset abuse, email spam, and takeover attempts
+- **Use:** Protect password reset flow
+- **Prefix:** `auth:reset-password`
+
+### Email Verification Rate Limiter
+
+```ts
+await verifyEmailRateLimiter.limit(userId);
+```
+
+- **Limit:** 3 requests per 1 hour per user
+- **Purpose:** Reduce email verification abuse and account enumeration attempts
+- **Use:** Protect email verification flow
+- **Prefix:** `auth:verify-email`
+
+### Email Change Rate Limiter
+
+```ts
+await changeEmailRateLimiter.limit(userId);
+```
+
+- **Limit:** 2 requests per 24 hours per user
+- **Purpose:** Prevent change-email spam and account takeover abuse
+- **Use:** Protect email address change flow
+- **Prefix:** `auth:change-email`
+
+### Send Email Rate Limiter
+
+```ts
+await sendEmailRateLimiter.limit(userId);
+```
+
+- **Limit:** 10 requests per 1 hour per user
+- **Purpose:** Prevent abuse of transactional email sending and protect deliverability
+- **Use:** Protect general email sending operations
+- **Prefix:** `email:send`
+
+### Welcome Email Rate Limiter
+
+```ts
+await welcomeEmailRateLimiter.limit(userId);
+```
+
+- **Limit:** 5 requests per 1 hour per user
+- **Purpose:** Prevent welcome-email abuse and preserve sender reputation
+- **Use:** Protect welcome email dispatch during onboarding
+- **Prefix:** `email:welcome`
+
+## Integration Examples
+
+### In Authentication Package
+
+The auth package integrates rate limiters with email sending:
+
+```ts
+// packages/auth/src/server.ts
+import {
+  verifyEmailRateLimiter,
+  resetPasswordRateLimiter,
+  changeEmailRateLimiter,
+  welcomeEmailRateLimiter,
+} from "@workspace/rate-limit";
+import { sendAuthEmail } from "@workspace/email";
+
+export const auth = betterAuth({
+  // ...
+  emailVerification: {
+    sendVerificationEmail: async ({ user, url }) => {
+      await sendAuthEmail({
+        emailType: "verify-email",
+        limiter: verifyEmailRateLimiter,
+        user,
+        data: { email: user.email, name: user.name, verificationUrl: url },
+      });
+    },
+    async afterEmailVerification(user) {
+      await sendAuthEmail({
+        emailType: "welcome",
+        limiter: welcomeEmailRateLimiter,
+        user,
+        data: { name: user.name, getStartedUrl: origin },
+      });
+    },
+  },
+  emailAndPassword: {
+    sendResetPassword: async ({ user, url }) => {
+      await sendAuthEmail({
+        emailType: "reset-password",
+        limiter: resetPasswordRateLimiter,
+        user,
+        data: { name: user.name, resetUrl: url },
+      });
+    },
+  },
+  user: {
+    changeEmail: {
+      sendChangeEmailConfirmation: async ({ user, newEmail, url }) => {
+        await sendAuthEmail({
+          emailType: "change-email",
+          limiter: changeEmailRateLimiter,
+          user,
+          data: {
+            currentEmail: user.email,
+            newEmail,
+            name: user.name,
+            verificationUrl: url,
+          },
+        });
+      },
+    },
+  },
+});
+```
+
+### Sign Up Protection with IP Detection
+
+```ts
+// apps/api/src/routes/auth.ts
+import { signupRateLimiter } from "@workspace/rate-limit";
+
+export async function handleSignup(
+  req: Request,
+  email: string,
+  password: string,
+) {
+  const ip = getClientIp(req);
+
+  const limit = await signupRateLimiter.limit(ip);
+  if (!limit.success) {
+    return {
+      status: 429,
+      error: `Too many signup attempts. Try again in ${limit.resetAfter} seconds`,
+    };
+  }
+
+  // Continue with signup...
+}
+```
+
+### Sign In Protection with IP Detection
+
+```ts
+// apps/api/src/routes/auth.ts
+import { signinRateLimiter } from "@workspace/rate-limit";
+
+export async function handleSignin(
+  req: Request,
+  email: string,
+  password: string,
+) {
+  const ip = getClientIp(req);
+
+  const limit = await signinRateLimiter.limit(ip);
+  if (!limit.success) {
+    return {
+      status: 429,
+      error: "Too many login attempts. Please try again later.",
+      retryAfter: limit.resetAfter,
+    };
+  }
+
+  // Verify credentials...
+}
+```
+
+## Key Scripts
+
+| Command           | Purpose                        |
+| ----------------- | ------------------------------ |
+| `pnpm dev`        | Watch mode for development     |
+| `pnpm build`      | Build package for production   |
+| `pnpm type-check` | Check TypeScript types         |
+| `pnpm lint`       | Check code quality with ESLint |
+
+## Getting Client IP
+
+To use IP-based limiters, extract the client IP from requests:
+
+### Express.js
+
+```ts
+// apps/api/src/middleware/getClientIp.ts
+export function getClientIp(req: Request): string {
+  return (
+    req.headers["x-forwarded-for"]?.split(",")[0] ||
+    req.headers["x-real-ip"] ||
+    req.socket?.remoteAddress ||
+    "unknown"
+  ).trim();
+}
+
+// Usage
+const ip = getClientIp(request);
+const limit = await signupRateLimiter.limit(ip);
+```
+
+### Next.js
+
+```ts
+// apps/web/lib/get-client-ip.ts
+import { headers } from "next/headers";
+
+export async function getClientIp(): Promise<string> {
+  const headersList = await headers();
+  return (
+    headersList.get("x-forwarded-for")?.split(",")[0] ||
+    headersList.get("x-real-ip") ||
+    "unknown"
+  ).trim();
+}
+
+// Usage in server action
+const ip = await getClientIp();
+const limit = await signupRateLimiter.limit(ip);
+```
+
+## Best Practices
+
+### Use Per-IP for Sign Up
+
+Rate limit signup attempts per IP address to prevent automated account creation:
+
+```ts
+import { signupRateLimiter } from "@workspace/rate-limit";
+
+const ip = getClientIp(request);
+const limit = await signupRateLimiter.limit(ip);
+```
+
+### Use Per-IP for Sign In
+
+Rate limit sign-in attempts per IP address to prevent brute force attacks:
+
+```ts
+import { signinRateLimiter } from "@workspace/rate-limit";
+
+const ip = getClientIp(request);
+const limit = await signinRateLimiter.limit(ip);
+```
+
+### Use Per-User for Password Reset
+
+Rate limit password reset per user to prevent account takeover:
+
+```ts
+import { resetPasswordRateLimiter } from "@workspace/rate-limit";
+
+const limit = await resetPasswordRateLimiter.limit(userId);
+```
+
+### Return HTTP 429
+
+Return HTTP 429 (Too Many Requests) for rate-limited responses:
+
+```ts
+if (!limit.success) {
+  return new Response(JSON.stringify({ error: "Rate limit exceeded" }), {
+    status: 429,
+    headers: {
+      "Retry-After": String(limit.resetAfter),
+    },
+  });
+}
+```
+
+### Log Rate Limit Events
+
+Log when rate limits are triggered for security monitoring:
+
+```ts
+const limit = await signinRateLimiter.limit(email);
+
+if (!limit.success) {
+  console.warn(
+    `Rate limit triggered for ${email} after ${limit.limit} attempts`,
+  );
+}
+```
+
+### Handle Rate Limit Responses
+
+Include reset time information in error responses:
+
+```ts
+const limit = await signinRateLimiter.limit(email);
+
+if (!limit.success) {
+  console.warn(
+    `Rate limit triggered for ${email} (${limit.limit} requests per window)`,
+  );
+
+  throw new Error(
+    `Too many attempts. Please wait ${limit.resetAfter} seconds before trying again.`,
+  );
+}
+```
+
+## Troubleshooting
+
+### Rate Limiter Not Working
+
+```bash
+# Check Upstash credentials
+echo $UPSTASH_REDIS_REST_URL
+echo $UPSTASH_REDIS_REST_TOKEN
+
+# Test Redis connection with PING
+curl -X POST \
+  -H "Authorization: Bearer $UPSTASH_REDIS_REST_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '["PING"]' \
+  $UPSTASH_REDIS_REST_URL
+```
+
+### Rate Limit Always Fails
+
+1. Verify `UPSTASH_REDIS_REST_TOKEN` is valid
+2. Check `UPSTASH_REDIS_REST_URL` is correct
+3. Ensure Upstash database is active (not paused)
+4. Check your IP is whitelisted (if applicable)
+
+### Always Getting Remaining 0
+
+This usually means the key was already rate-limited. The `remaining` field shows requests left in the current window, which will be 0 until the window resets.
+
+### Different Results Across Deployments
+
+Make sure all deployments use the same Upstash Redis instance. Each deployment pointing to different Redis will have separate rate limit counters.
+
+## Security Considerations
+
+### Distribute Rate Limits Fairly
+
+- Use IP-based limiting for public endpoints
+- Use user-based limiting for authenticated operations
+- Consider email-based limiting for account operations
+
+### Monitor for Attacks
+
+- Log rate limit events for suspicious patterns
+- Alert on high volume of rate-limited requests from single IP
+- Implement temporary IP blocking for coordinated attacks
+
+### Don't Expose Limits
+
+- Don't tell users exact rate limits (prevents gaming)
+- Show generic "try again later" messages
+- Include `Retry-After` header in responses
+
+## Related Documentation
+
+- [Authentication Package](./auth) - Uses rate limiting for auth flows
+- [API Application](../applications/api) - Implements rate limiting middleware
+- [Upstash Documentation](https://upstash.com/docs/redis) - Official Upstash docs
+
+<Callout type="info">
+  For advanced Redis operations and monitoring, see the [Upstash
+  Dashboard](https://console.upstash.com).
+</Callout>

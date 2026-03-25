@@ -1,0 +1,254 @@
+---
+title: Jest Presets
+description: Unified Jest testing configuration with presets for Node.js and React applications ensuring consistent test execution across the monorepo
+---
+
+## Overview
+
+`@workspace/jest-presets` provides unified testing configuration for all packages in the monorepo. This ensures consistent test execution and coverage reporting across the entire project.
+
+## Features
+
+- **Shared Presets** - Consistent testing configuration for different environments
+- **Node.js Preset** - For server-side, API, and package testing
+- **TypeScript Support** - Built-in TypeScript test support via ts-jest
+- **Coverage Reporting** - Integrated coverage tracking
+
+## Project Structure
+
+```
+packages/jest-presets/
+├── node/
+│   └── jest-preset.js   # Node.js/server testing configuration
+├── package.json         # Dependencies
+└── README.md           # Package documentation
+```
+
+## Available Presets
+
+### Node.js Preset
+
+For server-side code, Express APIs, backend packages, and utilities:
+
+```js
+// jest.config.js
+const preset = require("@workspace/jest-presets/node");
+
+module.exports = preset;
+```
+
+Configuration includes:
+
+- Jest environment: `node`
+- TypeScript and TSX support via `ts-jest`
+- Path alias mapping for `@workspace/utils` packages
+- Module extensions: `.ts`, `.tsx`, `.js`, `.jsx`, `.json`, `.node`
+- Ignores test fixtures, node_modules, and dist directories
+
+## Usage
+
+### Running Tests
+
+Run all tests across the monorepo:
+
+```bash
+pnpm test
+```
+
+Run tests for a specific workspace:
+
+```bash
+pnpm test --filter=auth
+pnpm test --filter=db
+```
+
+Watch mode for development:
+
+```bash
+pnpm test -- --watch
+```
+
+### Coverage Reports
+
+Generate coverage reports:
+
+```bash
+pnpm test
+```
+
+Coverage output goes to the `coverage/` directory in each workspace.
+
+## File Structure for Testing
+
+Recommended test file organization:
+
+```
+src/
+├── utils/
+│   ├── format.ts
+│   └── format.test.ts
+├── services/
+│   ├── api.ts
+│   └── api.test.ts
+└── helpers/
+    ├── helpers.ts
+    └── helpers.test.ts
+```
+
+## Writing Tests
+
+### Example: Utility Function Test
+
+```ts
+import { capitalize } from "@workspace/utils/helpers";
+
+describe("capitalize", () => {
+  it("capitalizes the first letter", () => {
+    expect(capitalize("hello")).toBe("Hello");
+  });
+
+  it("handles empty strings", () => {
+    expect(capitalize("")).toBe("");
+  });
+});
+```
+
+### Example: API Function Test
+
+```ts
+import { getUserById } from "@/services/user";
+
+describe("getUserById", () => {
+  it("returns user data", async () => {
+    const user = await getUserById("123");
+    expect(user.id).toBe("123");
+  });
+
+  it("throws on invalid ID", async () => {
+    await expect(getUserById("invalid")).rejects.toThrow();
+  });
+});
+```
+
+## Customizing Jest Configuration
+
+To customize Jest for a specific workspace, extend the preset:
+
+```js
+const preset = require("@workspace/jest-presets/node");
+
+module.exports = {
+  ...preset,
+  testPathIgnorePatterns: ["node_modules", "dist/"],
+  collectCoverageFrom: [
+    "src/**/*.{ts,tsx}",
+    "!src/**/*.d.ts",
+    "!src/**/*.test.{ts,tsx}",
+  ],
+  coverageThreshold: {
+    global: {
+      branches: 70,
+      functions: 70,
+      lines: 70,
+      statements: 70,
+    },
+  },
+};
+```
+
+## Key Scripts
+
+Run from the **monorepo root**:
+
+| Command     | Purpose                 |
+| ----------- | ----------------------- |
+| `pnpm test` | Run all workspace tests |
+
+Run from **individual workspaces** (e.g., `apps/api`, `packages/utils`):
+
+| Command                | Purpose                           |
+| ---------------------- | --------------------------------- |
+| `pnpm test`            | Run tests with coverage reporting |
+| `pnpm test -- --watch` | Watch mode for development        |
+
+## Best Practices
+
+### Write Descriptive Test Names
+
+```ts
+// ✓ Good
+it("returns user when ID is valid", () => {
+  // implementation
+});
+
+// ✗ Vague
+it("works", () => {
+  // implementation
+});
+```
+
+### Test Edge Cases
+
+```ts
+describe("calculateTotal", () => {
+  it("sums positive numbers", () => {
+    expect(calculateTotal([1, 2, 3])).toBe(6);
+  });
+
+  it("handles empty array", () => {
+    expect(calculateTotal([])).toBe(0);
+  });
+
+  it("handles negative numbers", () => {
+    expect(calculateTotal([1, -2])).toBe(-1);
+  });
+});
+```
+
+### Use Async/Await
+
+```ts
+// ✓ Good
+it("fetches user data", async () => {
+  const user = await fetchUser(123);
+  expect(user.name).toBe("John");
+});
+
+// ✓ Also good with done callback
+it("fetches user data", (done) => {
+  fetchUser(123).then((user) => {
+    expect(user.name).toBe("John");
+    done();
+  });
+});
+```
+
+## Troubleshooting
+
+### Tests Not Found
+
+```bash
+# Ensure test files follow naming convention
+# Should be *.test.ts or *.spec.ts
+
+# Check jest.config.ts includes correct patterns
+```
+
+### TypeScript Errors
+
+```bash
+# Regenerate types
+pnpm check-types
+
+# Clear Jest cache
+pnpm test --clearCache
+```
+
+### Coverage Thresholds
+
+If tests pass but coverage thresholds fail, add more test cases for untested code paths.
+
+<Callout type="info">
+  For more details on Jest configuration, see the [Jest
+  documentation](https://jestjs.io/docs/getting-started).
+</Callout>

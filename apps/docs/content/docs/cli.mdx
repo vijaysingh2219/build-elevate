@@ -1,0 +1,346 @@
+---
+title: Command Line Interface
+description: Reference for all build-elevate CLI commands - init, upgrade, and diff.
+icon: Terminal
+---
+
+The `build-elevate` CLI is the entry point for scaffolding new projects and keeping them in sync with the latest template. It is distributed as an npm package.
+
+```npm
+pnpm dlx build-elevate@latest <command>
+```
+
+<Callout type="info">
+  Run <code>help</code> command to see all available commands and options in the
+  CLI.
+</Callout>
+
+---
+
+## Commands
+
+### `init`
+
+Scaffolds a new project from the `build-elevate` template.
+
+```npm
+pnpm dlx build-elevate@latest init [project-name] [options]
+```
+
+#### Arguments
+
+| Argument       | Description                                                                    |
+| -------------- | ------------------------------------------------------------------------------ |
+| `project-name` | Optional. The name of the project to create. If omitted, you will be prompted. |
+
+#### Options
+
+| Flag                              | Description                                                                                                                        |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `-t, --template <type>`           | Project template: `fullstack`, `web`, or `api`. Defaults to `fullstack` if `--yes` is set.                                         |
+| `-p, --package-manager <manager>` | Package manager to use: `pnpm`, `npm`, or `bun`. Auto-detected from your environment if omitted.                                   |
+| `--no-git`                        | Skip Git repository initialization.                                                                                                |
+| `--skip-install`                  | Skip dependency installation.                                                                                                      |
+| `-y, --yes`                       | Skip all prompts and use defaults (`fullstack` template, best available package manager, Docker included, Prisma Studio included). |
+| `-v, --verbose`                   | Print detailed output for each step.                                                                                               |
+
+#### Templates
+
+<Callout>
+  Each template removes the parts of the monorepo that are not relevant, so your
+  scaffolded project only contains what you need.
+</Callout>
+
+| Template    | Includes                                                       |
+| ----------- | -------------------------------------------------------------- |
+| `fullstack` | `apps/web` + `apps/api` + `apps/email` + all packages          |
+| `web`       | `apps/web` + `packages/ui` + auth/db/email packages            |
+| `api`       | `apps/api` + db/auth/rate-limit packages (no UI, no email app) |
+
+#### What `init` does internally
+
+1. Resolves the latest commit SHA on `main` from the GitHub API before cloning - this SHA becomes the baseline for future upgrades.
+2. Clones the repository via `degit` (no `.git` history).
+3. Removes apps and packages not relevant to the chosen template.
+4. Runs `updateTurboLintEnv` to strip environment variables from `turbo.json` that are not used by the template.
+5. Replaces all occurrences of `build-elevate` (in all case formats - kebab, camel, pascal, snake, constant, title) with your project name across all relevant files.
+6. Cleans up CLI-specific fields from `package.json` (`bin`, `files`, `homepage`, `repository`, etc.) and resets `version` to `1.0.0`.
+7. Strips the `cli:` catalog from `pnpm-workspace.yaml` and removes template-irrelevant catalog sections.
+8. Configures the chosen package manager (replaces `workspace:` protocols, updates `packageManager` field, adjusts Dockerfiles).
+9. Copies `.env.example` files to `.env.local` / `.env` with a shared generated `BETTER_AUTH_SECRET`.
+10. Deletes internal-only content (`scripts/`, `assets/`, `apps/docs/`, `SCREENSHOTS.md`, etc.).
+11. Writes a `.build-elevate.json` manifest recording the commit SHA, template, project name, and a SHA-256 hash of every tracked file in its final post-mutation state.
+12. Initialises a Git repository and creates the initial commit.
+
+#### Examples
+
+```bash
+# Interactive - prompts for name, template, package manager, etc.
+pnpm dlx build-elevate@latest init
+
+# Non-interactive fullstack project
+pnpm dlx build-elevate@latest init my-app --yes
+
+# Frontend-only project with bun
+pnpm dlx build-elevate@latest init my-app -t web -p bun
+
+# API-only project, skip Git
+pnpm dlx build-elevate@latest init my-api -t api --no-git
+
+# Scaffold without installing dependencies
+pnpm dlx build-elevate@latest init my-app --skip-install
+```
+
+---
+
+### `upgrade`
+
+Upgrades your scaffolded project to the latest `build-elevate` template.
+
+```npm
+pnpm dlx build-elevate@latest upgrade [options]
+```
+
+<Callout type="warn">
+  This command must be run from the root of a project that was scaffolded with
+  `init` command. It requires a `.build-elevate.json` manifest to be present.
+</Callout>
+
+#### Options
+
+| Flag        | Description                                          |
+| ----------- | ---------------------------------------------------- |
+| `--dry-run` | Preview what would change without writing any files. |
+| `-y, --yes` | Skip confirmation prompts.                           |
+
+#### How upgrade works
+
+The upgrade command uses a **commit SHA + file hash** strategy to determine what is safe to update automatically.
+
+For each tracked file, it compares three values:
+
+| Value         | Description                                                                                    |
+| ------------- | ---------------------------------------------------------------------------------------------- |
+| `savedHash`   | SHA-256 of the file at scaffold time, stored in `.build-elevate.json`                          |
+| `currentHash` | SHA-256 of the file as it exists on disk right now                                             |
+| `newHash`     | SHA-256 of the file fetched from the latest GitHub commit, after applying init-time transforms |
+
+The decision matrix:
+
+| Situation                                               | Result                                                         |
+| ------------------------------------------------------- | -------------------------------------------------------------- |
+| `currentHash === newHash`                               | Already in sync - skip                                         |
+| `currentHash === savedHash` and `newHash !== savedHash` | Untouched since scaffold - **auto-update**                     |
+| `newHash === savedHash` and `currentHash !== savedHash` | Template unchanged, user edited - skip (your changes are kept) |
+| All three differ                                        | Both you and the template changed this file - **conflict**     |
+
+Files that are conflicts are listed with a message directing you to `build-elevate diff <file>`.
+
+#### Init-time transforms
+
+Before comparing or writing, `upgrade` applies the same transformations that `init` ran after cloning:
+
+- Project name replacement (all case formats)
+- `turbo.json` - env vars filtered to your template
+- `package.json` - CLI fields removed, version reset to `1.0.0`
+- `pnpm-workspace.yaml` - `cli:` catalog and irrelevant template catalogs removed
+- `packages/auth/src/index.ts`, `keys.ts`, `package.json` - client exports removed for `api` template
+
+This ensures that fetched template content is directly comparable to your post-init files, eliminating false conflicts on these files.
+
+#### Files never upgraded
+
+The following are always skipped regardless of changes:
+
+- `.env`, `.env.local`, `.env.production`, `.env.development` - secrets, user-owned
+- `.env.example` - intentionally upgradeable (see below)
+- `README.md` - rewritten by `init` with project-specific content
+- `pnpm-lock.yaml`, `bun.lockb`, `package-lock.json` - regenerated by package manager
+- `.build-elevate.json` - the manifest itself
+- `apps/docs/` - internal documentation app, deleted during `init`
+- `scripts/`, `assets/` - internal CLI content, deleted during `init`
+- Binary and generated files (images, fonts, `.map` files, etc.)
+
+`.env.example` **is** upgraded when the template changes it - it contains no secrets and serves as documentation for required environment variables.
+
+#### Template-aware filtering
+
+Files outside the scope of your original template are never added:
+
+| Your template | Files never added                                                               |
+| ------------- | ------------------------------------------------------------------------------- |
+| `web`         | `apps/api/**`, `apps/email/**`                                                  |
+| `api`         | `apps/web/**`, `apps/email/**`, `packages/ui/**`, `packages/auth/src/client.ts` |
+| `fullstack`   | Nothing excluded                                                                |
+
+#### Manifest and conflict tracking
+
+The `.build-elevate.json` manifest commit pointer is **only advanced when all conflicts are resolved**. If conflicts remain after a run, the manifest keeps the old commit SHA so that `build-elevate diff` can still show what needs to be applied.
+
+Once you manually resolve all conflicts and re-run `upgrade` with no new conflicts, the commit pointer advances to the latest.
+
+#### Examples
+
+```bash
+# Preview changes without writing
+pnpm dlx build-elevate upgrade --dry-run
+
+# Apply upgrade
+pnpm dlx build-elevate upgrade
+
+# Apply upgrade, skip prompts
+pnpm dlx build-elevate upgrade --yes
+```
+
+#### Example output
+
+```
+┌  build-elevate upgrade
+│
+◇  Current: d55f5fa  →  Latest: 6669a80
+│
+◆  Auto-updated 8 file(s):
+│    ✔ apps/web/next.config.ts
+│    ✔ turbo.json
+│    ✔ packages/auth/src/server.ts
+│    ...
+│
+◆  Added 1 new file(s) from template:
+│    + packages/auth/.env.example
+│
+▲  1 file(s) were modified by you and could not be upgraded automatically:
+│
+│    ⚠ apps/api/src/config/corsOptions.ts
+│
+│  Run `build-elevate diff <file>` to see exactly what changed in the template.
+│
+└  Upgraded to 6669a80 with 1 conflict(s) to resolve manually.
+```
+
+---
+
+### `diff`
+
+Shows a colored line-by-line diff of what changed in the **build-elevate template** for a specific file between your scaffolded commit and the latest.
+
+```npm
+pnpm dlx build-elevate diff <file>
+```
+
+<Callout>
+  This command shows changes in the **template**, not in your local file. Use it
+  to understand what you need to manually apply to a file that was listed as a
+  conflict by `upgrade`.
+</Callout>
+
+#### Arguments
+
+| Argument | Description                                                                                     |
+| -------- | ----------------------------------------------------------------------------------------------- |
+| `file`   | Path to the file relative to the project root. Accepts Windows (`\`) and Unix (`/`) separators. |
+
+#### How to read the diff
+
+```
+--- apps/api/src/config/corsOptions.ts (d55f5fa)
++++ apps/api/src/config/corsOptions.ts (6669a80)
+
+    3 | import { env } from "../env";
+-   4 | const allowedOrigins = [env.ALLOWED_ORIGINS];
++   4 | const allowedOrigins = env.ALLOWED_ORIGINS.split(",");
+    5 |
+
+1 insertions(+), 1 deletion(-)
+```
+
+- Lines marked `-` were **removed** from the template
+- Lines marked `+` were **added** to the template
+- Context lines (dimmed) are unchanged
+- The summary line shows total insertions and deletions across the whole file, even if the displayed diff is truncated
+
+#### When there are no template changes
+
+If the template did not modify the file between your commit and the latest, the command tells you so:
+
+```
+No template changes to apps/api/src/config/corsOptions.ts between d55f5fa and 6669a80.
+The template did not touch this file - your local changes are yours to keep.
+```
+
+This is expected behaviour, it means the file was listed as modified by you, but the template never changed it, so there is nothing to apply.
+
+#### Examples
+
+```bash
+# Show what changed in the template for next.config.ts
+pnpm dlx build-elevate diff apps/web/next.config.ts
+
+# Windows paths work too
+pnpm dlx build-elevate diff .\apps\web\next.config.ts
+```
+
+---
+
+## The `.build-elevate.json` manifest
+
+The manifest is written by `init` and read by `upgrade` and `diff`. It is committed to your repository and should never be added to `.gitignore`.
+
+```json
+{
+  "commit": "6669a80f3c2d1a4b5e6f7a8b9c0d1e2f3a4b5c6d",
+  "template": "fullstack",
+  "projectName": "my-app",
+  "scaffoldedAt": "2026-03-23T10:00:00.000Z",
+  "files": {
+    "turbo.json": "a3f8c2d1b4e5",
+    "package.json": "b7e4a10912f3",
+    "apps/web/next.config.ts": "c1d2e3f4a5b6"
+    ...
+  }
+}
+```
+
+| Field          | Description                                                                                                                                                 |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `commit`       | The exact GitHub commit SHA the project was cloned from. Used as the base for all upgrade comparisons.                                                      |
+| `template`     | The template used at scaffold time (`fullstack`, `web`, or `api`). Used by `upgrade` to filter out files not relevant to your template.                     |
+| `projectName`  | Your project name in kebab-case. Used by `upgrade` to apply name replacements to fetched template content before comparison.                                |
+| `scaffoldedAt` | ISO timestamp of when `init` was run. Informational only.                                                                                                   |
+| `files`        | A map of file paths to their SHA-256 hashes (first 12 characters) at scaffold time, after all init-time mutations. This is what `upgrade` compares against. |
+
+<Callout type="warn">
+  If your manifest is missing the `projectName` field (projects scaffolded
+  before `v1.2.0`), `upgrade` will exit with an error. Add `"projectName":
+  "your-project-name"` manually to `.build-elevate.json` to resolve this.
+</Callout>
+
+---
+
+## Upgrade workflow
+
+The recommended flow for keeping your project up to date:
+
+```bash
+# 1. Check what would change
+pnpm dlx build-elevate upgrade --dry-run
+
+# 2. Apply the upgrade
+pnpm dlx build-elevate upgrade
+
+# 3. For each conflict listed, inspect the template diff
+pnpm dlx build-elevate diff apps/api/src/config/corsOptions.ts
+
+# 4. Manually apply the relevant changes to your file
+
+# 5. Re-run upgrade - with conflicts resolved, the manifest advances
+pnpm dlx build-elevate upgrade
+
+# 6. Install updated dependencies
+pnpm install
+```
+
+---
+
+## Line endings on Windows
+
+On Windows, Git may check out files with CRLF line endings while GitHub always serves LF. The CLI normalizes line endings to LF before hashing, so file comparisons are consistent across platforms.

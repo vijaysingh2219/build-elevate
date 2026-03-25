@@ -1,6 +1,7 @@
 ---
 title: Troubleshooting
-description: Common issues and their solutions for the monorepo.
+description: Solutions for common issues including port conflicts, dependency problems, database errors, and environment configuration errors
+icon: TriangleAlert
 ---
 
 # Guide
@@ -55,7 +56,13 @@ If the installation fails:
 
 ## Port Already in Use
 
-If you see an error like "Port 3000 is already in use":
+If you see an error like "Port 3000 is already in use", you have two options:
+
+**Option 1: Change the port** (Recommended)
+
+See [Custom Ports](./getting-started/first-steps#custom-ports) in the Getting Started guide for how to run applications on different ports. This is the simplest solution.
+
+**Option 2: Kill the process using the port**
 
 ```bash tab="Linux/Mac"
 # Find what's using the port
@@ -63,9 +70,6 @@ lsof -i :3000
 
 # Kill the process
 kill -9 <PID>
-
-# Or use a different port
-PORT=3001 pnpm dev --filter=web
 ```
 
 ```bash tab="Windows"
@@ -74,15 +78,36 @@ netstat -ano | findstr :3000
 
 # Kill the process
 taskkill /PID <PID> /F
+```
 
-# Or use a different port
-set PORT=3001 && pnpm dev --filter=web
+## Database Connection Errors
+
+If you encounter database connection issues:
+
+```bash
+# 1. Verify DATABASE_URL is set correctly
+echo $DATABASE_URL
+
+# 2. Check PostgreSQL is running
+# For local PostgreSQL:
+psql postgres://user:password@localhost:5432/dbname
+
+# 3. Test Prisma connection
+pnpm db:migrate
+
+# 4. View databases and tables in Prisma Studio
+pnpm db:studio
 ```
 
 ## Authentication Not Working
 
 If you can't sign in:
 
-1. **Verify `BETTER_AUTH_SECRET` is the same** in `apps/api/.env.local` and `apps/web/.env.local`
+1. **Verify `BETTER_AUTH_SECRET` is identical** in both `apps/api/.env.local` and `apps/web/.env.local`. See [Environment Variables Guide](./configuration/environment-variables#quick-start) for generation and setup instructions.
 2. **Check `ALLOWED_ORIGINS`** in `apps/api/.env.local` matches your web app URL
 3. **Clear cookies** and try again
+
+For app-specific authentication issues:
+
+- **Web app:** See [Web Application - Troubleshooting](./applications/web#troubleshooting)
+- **API:** See [API Application - Troubleshooting](./applications/api#troubleshooting)

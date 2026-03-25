@@ -1,7 +1,56 @@
 ---
 title: Packages
+description: Reusable application and configuration packages including auth, database, email, UI components, and development tools
 ---
 
 ## Monorepo Packages
 
-This section provides an overview and deep dives for each package in the monorepo.
+This section provides an overview and deep dives for each package in the monorepo. Packages are internal libraries that provide reusable code, configuration, and utilities shared across applications.
+
+## Application Packages
+
+These packages provide core functionality used by the web and API applications:
+
+- **[@workspace/auth](./auth)** - Authentication with Better Auth, session management, and OAuth
+- **[@workspace/db](./db)** - Prisma ORM, database schema, and PostgreSQL client
+- **[@workspace/ui](./ui)** - React component library built with shadcn/ui and Tailwind CSS
+- **[@workspace/email](./email)** - React Email templates and Resend integration
+- **[@workspace/utils](./utils)** - Shared utility functions and TypeScript types
+- **[@workspace/rate-limit](./rate-limit)** - API rate limiting with Upstash Redis
+
+## Configuration Packages
+
+These packages provide shared configuration for development tooling:
+
+- **[@workspace/eslint-config](./eslint-config)** - Unified ESLint rules for the monorepo
+- **[@workspace/prettier-config](./prettier-config)** - Consistent code formatting configuration
+- **[@workspace/typescript-config](./typescript-config)** - Shared TypeScript compiler options
+- **[@workspace/jest-presets](./jest-presets)** - Testing configuration for Node.js and React
+
+## How Packages Work
+
+Each package is self-contained with its own:
+
+- `package.json` - Dependencies and scripts
+- `tsconfig.json` - TypeScript configuration (extends base)
+- `jest.config.ts` - (if testing is included)
+- `src/` - Source code and type definitions
+
+Packages are published internally and can be imported using `@workspace/package-name` in any app or package.
+
+## Using Packages
+
+Import from any package in your code:
+
+```ts
+// From web or API applications
+import { useSession } from "@workspace/auth";
+import { prisma } from "@workspace/db";
+import { Button } from "@workspace/ui";
+import { formatDate } from "@workspace/utils";
+```
+
+<Callout type="info">
+  See individual package documentation for detailed API reference and usage
+  examples.
+</Callout>

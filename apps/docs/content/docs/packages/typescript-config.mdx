@@ -1,0 +1,151 @@
+---
+title: TypeScript Configuration
+description: Unified TypeScript configuration with path aliases and strict type checking for consistent compiler behavior across all projects
+---
+
+## Overview
+
+`@workspace/typescript-config` provides a unified TypeScript configuration for all applications and packages in the monorepo. This ensures consistent type checking and compiler behavior across the entire project.
+
+## Features
+
+- **Strict Mode** - Enabled by default for better type safety
+- **Modern Targets** - ES2022 for modern JavaScript features
+- **Enhanced Type Safety** - `noUncheckedIndexedAccess` and `isolatedModules` for safer code
+- **Monorepo Optimized** - Composite projects with incremental compilation
+- **Module Resolution** - NodeNext modules with bundler support for Next.js
+- **Path Aliases** - Simplified imports across the monorepo
+- **JSX Support** - React and Next.js compatible with automatic React imports
+- **Multiple Presets** - Base, Next.js, and React Library configurations
+
+## Project Structure
+
+```
+packages/typescript-config/
+├── base.json           # Base TypeScript configuration
+├── nextjs.json         # Next.js-optimized configuration
+├── react-library.json  # React library configuration
+├── package.json        # Dependencies
+└── README.md          # Package documentation
+```
+
+## Usage
+
+### Applying TypeScript Configuration
+
+Each workspace extends a configuration from `@workspace/typescript-config` in its own `tsconfig.json`:
+
+```json
+{
+  "extends": "@workspace/typescript-config/base",
+  "compilerOptions": {
+    "outDir": "dist"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
+```
+
+### Type Checking
+
+Type-check all workspaces:
+
+```bash
+pnpm check-types
+```
+
+Type-check a specific workspace:
+
+```bash
+pnpm check-types --filter=web
+pnpm check-types --filter=api
+```
+
+## Available Configurations
+
+### Base (`base.json`)
+
+The default configuration for Node.js packages and general projects:
+
+- **Target:** ES2022 for modern JavaScript features
+- **Module System:** NodeNext with proper ESM/CJS interoperability
+- **Strict Type Checking:** All strict options enabled
+- **Declaration Files:** Generated with source maps for better IDE support
+- **Composite & Incremental:** Optimized for monorepo project references
+- **Enhanced Type Safety:** `noUncheckedIndexedAccess` and `isolatedModules` enabled
+- **JSON Module Resolution:** Supports importing JSON files
+
+### Next.js (`nextjs.json`)
+
+Optimized for Next.js applications (extends base):
+
+- **Module & Resolution:** ESNext modules with Bundler resolution for optimal tree-shaking
+- **JSX Handling:** Preserved for Next.js's JSX transformation
+- **Next.js Plugin:** Official Next.js TypeScript plugin integration
+- **No Emit:** Relies on Next.js build system for compilation
+- **JavaScript Support:** Allows mixing TypeScript and JavaScript files
+
+### React Library (`react-library.json`)
+
+For React component libraries (extends base):
+
+- **JSX Support:** Native `react-jsx` for automatic React imports
+- **Compiled Output:** Generates declaration files for type exports
+- **Monorepo Ready:** Full TypeScript support for workspace dependencies
+
+## Compiler Options Reference
+
+| Option                     | Value                     | Purpose                                  |
+| -------------------------- | ------------------------- | ---------------------------------------- |
+| `target`                   | ES2022                    | Target JavaScript version                |
+| `module`                   | NodeNext                  | Module system (base config)              |
+| `moduleResolution`         | NodeNext                  | Module resolution strategy (base config) |
+| `lib`                      | es2022, DOM, DOM.Iterable | Library definitions included             |
+| `strict`                   | true                      | Enable all strict type-checking options  |
+| `skipLibCheck`             | true                      | Skip type checking of declaration files  |
+| `esModuleInterop`          | true                      | Interop with CommonJS modules            |
+| `resolveJsonModule`        | true                      | Allow importing JSON files               |
+| `declaration`              | true                      | Generate `.d.ts` files                   |
+| `declarationMap`           | true                      | Generate source maps for declarations    |
+| `composite`                | true                      | Enable monorepo project references       |
+| `incremental`              | true                      | Enable incremental compilation           |
+| `isolatedModules`          | true                      | Treat each file as separate module       |
+| `noUncheckedIndexedAccess` | true                      | Safer array/object index access          |
+| `moduleDetection`          | force                     | Force ES modules detection               |
+
+## Path Aliases
+
+Configure import paths in `tsconfig.json`:
+
+```json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@workspace/*": ["../../packages/*"]
+    }
+  }
+}
+```
+
+Then use in code:
+
+```ts
+import { useSession } from "@workspace/auth";
+import { Button } from "@/components/ui/button";
+```
+
+## Updating Configuration
+
+To update TypeScript configuration across the monorepo:
+
+1. Modify the appropriate config file in `packages/typescript-config/`
+2. Workspaces will automatically use the updated configuration
+3. Run `pnpm check-types` to verify all workspaces comply
+
+<Callout type="info">
+  For more details, see the [TypeScript
+  Handbook](https://www.typescriptlang.org/docs/) for compiler options and best
+  practices.
+</Callout>

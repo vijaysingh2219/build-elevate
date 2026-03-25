@@ -1,53 +1,618 @@
 ---
 title: Email
-description: Email features including templates and sending via Resend.
+description: React Email templates with Resend integration for transactional emails
 ---
+
+# Email Package
+
+The `@workspace/email` package provides a complete email solution for the monorepo, including React Email templates, Resend integration, and type-safe email sending for transactional emails like verification, password reset, and account notifications.
 
 ## Overview
 
-`@workspace/email` provides email features for the monorepo, including:
+- **Package:** `@workspace/email`
+- **Location:** `packages/email`
+- **Templates:** React Email components
+- **Delivery:** Resend transactional email service
+- **Type Safety:** Full TypeScript support
+- **Preview:** Development app at `apps/email`
 
-- Transactional email templates built with [React Email](https://react.email/)
-- Email sending via [Resend](https://resend.com/)
-- Shared configuration, schemas, and types
+## Architecture
+
+The email package integrates with:
+
+- **[@workspace/auth](./auth)** - Uses email templates for verification and password reset
+- **[@workspace/db](./db)** - Stores email preferences and delivery logs (optional)
+- **React Email** - Component-based email builder
+- **Resend** - Email delivery service
+
+## Features
+
+### Email Templates
+
+- **Email Verification** - Confirm email addresses during signup
+- **Password Reset** - Secure password recovery flow
+- **Change Email** - Confirm email address changes
+- **Welcome Email** - Greet new users
+- **Customizable** - Easy to modify and extend
+
+### Email Delivery
+
+- **Resend Integration** - Reliable transactional email service
+- **Type-Safe Sending** - TypeScript validation for email content
+- **Error Handling** - Comprehensive validation and error messages
+- **Development Logging** - Console logs in development mode for debugging
+- **Testing** - Easy to test with development mode and mock props
+
+### Development
+
+- **Live Preview** - See templates in real-time via `apps/email`
+- **Reusable Components** - Component library for building emails
+- **Responsive Design** - Mobile-friendly templates
+
+## Project Structure
+
+```
+packages/email/
+├── src/
+│   ├── components/             # Reusable email components
+│   │   ├── EmailHeader.tsx
+│   │   ├── EmailHeading.tsx
+│   │   ├── EmailText.tsx
+│   │   ├── EmailButton.tsx
+│   │   ├── EmailDivider.tsx
+│   │   ├── EmailContainer.tsx
+│   │   ├── EmailLayout.tsx
+│   │   ├── EmailLink.tsx
+│   │   └── index.ts
+│   ├── templates/              # Email template components
+│   │   ├── email-verification.tsx
+│   │   ├── reset-password.tsx
+│   │   ├── change-email.tsx
+│   │   ├── welcome.tsx
+│   │   ├── custom-template.tsx # Boilerplate for custom emails
+│   │   └── index.ts
+│   ├── send-email.ts           # Email sending utility with Resend integration
+│   ├── send-auth-email.ts      # Consolidated auth email helper (validates → rate limits → sends)
+│   ├── constants.ts            # Email templates registry
+│   ├── create-template.ts      # Type-safe template factory
+│   ├── types.ts                # TypeScript type definitions
+│   ├── schemas.ts              # Zod validation schemas
+│   ├── config.ts               # Email service configuration
+│   ├── keys.ts                 # Environment variable access
+│   ├── branding.ts             # App branding constants
+│   ├── fonts.tsx               # Font imports for email styling
+│   └── index.ts                # Package exports
+├── .env.example                # Environment variables template
+├── package.json                # Dependencies and scripts
+└── README.md                   # Package documentation
+```
+
+## Environment Variables
+
+Create `.env.local` and configure:
+
+```bash
+# Resend API Token (get from https://resend.com/api-keys)
+RESEND_TOKEN=re_xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+# Sender email address (must be verified domain in Resend)
+RESEND_EMAIL_FROM=noreply@yourdomain.com
+
+# Environment
+NODE_ENV=development
+```
+
+<Callout type="info">
+  **For production:** You must verify your domain and set it as the sender. Use format: `Sender Name <noreply@yourdomain.com>`
+</Callout>
 
 ## Usage
 
-Import and use email utilities in your apps:
+### Direct Email Sending
 
 ```ts
-import { sendEmail, getTemplate } from "@workspace/email";
+import { sendEmail, emailTemplates } from "@workspace/email";
 
-// Send an email
+// Send email using emailTemplates directly
+const template = emailTemplates["verify-email"];
 await sendEmail({
   to: "user@example.com",
-  subject: "Welcome!",
-  react: getTemplate("verify-email").render({
-    name: "User",
+  subject: template.subject,
+  react: template.render({
+    name: "John Doe",
     email: "user@example.com",
-    verificationUrl: "https://example.com/verify",
+    verificationUrl: "https://app.com/verify?token=xyz",
   }),
 });
 ```
 
-## Features
+### Using sendAuthEmail Helper (Recommended for Auth Flows)
 
-- **Predefined Templates**: Verification, password reset, change email
-- **Type-safe Schemas**: Zod-validated email content
-- **Simple API**: `sendEmail` for sending, `getTemplate` for rendering
-- **React Components**: Modular, customizable email UIs
+The `sendAuthEmail` helper consolidates validation, rate limiting, and sending into one call:
 
-## Setup
+```ts
+import { sendAuthEmail } from "@workspace/email";
+import { verifyEmailRateLimiter } from "@workspace/rate-limit";
 
-1. Configure Resend API keys in your environment variables (`RESEND_API_KEY`, `RESEND_EMAIL_FROM`).
-2. Customize templates in `packages/email/src/templates/` as needed.
+// Validates → rate limits → sends email
+await sendAuthEmail({
+  emailType: "verify-email",
+  limiter: verifyEmailRateLimiter,
+  user: { email: "user@example.com", name: "John Doe" },
+  data: {
+    name: "John Doe",
+    email: "user@example.com",
+    verificationUrl: "https://app.com/verify?token=xyz",
+  },
+});
+```
 
-## Templates
+### Using Email Templates
 
-The following templates are included:
+```ts
+import { emailTemplates } from "@workspace/email";
 
-- **Verification Email**: For account confirmation
-- **Change Email**: For email address changes
-- **Reset Password**: For password recovery
+// Accessing templates from registry
+const welcomeTemplate = emailTemplates.welcome;
+const resetTemplate = emailTemplates["reset-password"];
+const verifyTemplate = emailTemplates["verify-email"];
+const changeTemplate = emailTemplates["change-email"];
 
-Templates use shared React components for consistent design. See `packages/email/src/templates/` and `packages/email/src/components/` for details.
+// Render template with type-safe props
+const html = welcomeTemplate.render({
+  name: "John Doe",
+  getStartedUrl: "https://app.com/getting-started",
+});
+```
+
+### Creating Custom Templates
+
+To create a custom email template, use the boilerplate template in `packages/email/src/templates/custom-template.tsx` as a starting point.
+
+**Steps:**
+
+1. **Copy the template** - Start with the `custom-template.tsx` file
+2. **Rename it** - Create a new file (e.g., `notification.tsx`, `announcement.tsx`)
+3. **Update the interface** - Define your custom props in the exported interface
+4. **Customize content** - Edit the email layout and text
+5. **Add preview props** - Set `PreviewProps` for testing in the email app
+6. **Export the component** - Export as default and named export
+
+**Example:**
+
+```tsx
+import {
+  EmailButton,
+  EmailContainer,
+  EmailHeader,
+  EmailHeading,
+  EmailLayout,
+  EmailText,
+} from "../components";
+
+export interface AnnouncementEmailProps {
+  name: string;
+  title: string;
+  description: string;
+  learnMoreUrl: string;
+}
+
+export const AnnouncementTemplate = ({
+  name,
+  title,
+  description,
+  learnMoreUrl,
+}: AnnouncementEmailProps) => {
+  return (
+    <EmailLayout preview={title}>
+      <EmailContainer>
+        <EmailHeader />
+        <EmailHeading>{title}</EmailHeading>
+        <EmailText variant="greeting">Hi {name},</EmailText>
+        <EmailText>{description}</EmailText>
+        <EmailButton href={learnMoreUrl}>Learn More</EmailButton>
+      </EmailContainer>
+    </EmailLayout>
+  );
+};
+
+AnnouncementTemplate.PreviewProps = {
+  name: "Example User",
+  title: "New Feature Announcement",
+  description: "We just launched something awesome!",
+  learnMoreUrl: "https://example.com/features",
+} as AnnouncementEmailProps;
+
+export default AnnouncementTemplate;
+```
+
+**To use custom templates:**
+
+```ts
+import { sendEmail } from "@workspace/email";
+import { AnnouncementTemplate } from "@workspace/email/templates/announcement";
+
+const template = AnnouncementTemplate;
+await sendEmail({
+  to: "user@example.com",
+  subject: "New Feature Announcement",
+  react: template({
+    name: "John Doe",
+    title: "New Feature",
+    description: "Check out our new feature",
+    learnMoreUrl: "https://app.com/features",
+  }),
+});
+```
+
+**Styling Components Available:**
+
+Use the provided email components for consistent styling:
+
+- `EmailLayout` - Wrapper with preview text
+- `EmailContainer` - Content container
+- `EmailHeader` - App header
+- `EmailHeading` - Main heading
+- `EmailText` - Text with variants: `greeting`, `body`, `secondary`, `footer`
+- `EmailButton` - Styled action button
+- `EmailLink` - Styled hyperlink
+- `EmailDivider` - Visual separator
+
+## Email Templates Reference
+
+### Email Verification
+
+```tsx
+// Type-safe render
+emailTemplates["verify-email"].render({
+  name: "John Doe",
+  email: "john@example.com",
+  verificationUrl: "https://app.com/verify?token=...",
+});
+```
+
+**Used for:** Confirming email addresses during signup
+
+**Props:**
+
+- `name` - User's name
+- `email` - Email address to verify
+- `verificationUrl` - Link to verify email
+
+### Password Reset
+
+```tsx
+emailTemplates["reset-password"].render({
+  name: "John Doe",
+  resetUrl: "https://app.com/reset?token=...",
+});
+```
+
+**Used for:** Password recovery flow
+
+**Props:**
+
+- `name` - User's name
+- `resetUrl` - Link to reset password
+
+### Change Email
+
+```tsx
+emailTemplates["change-email"].render({
+  name: "John Doe",
+  currentEmail: "john@example.com",
+  newEmail: "newemail@example.com",
+  verificationUrl: "https://app.com/verify?token=...",
+});
+```
+
+**Used for:** Confirming email address changes
+
+**Props:**
+
+- `name` - User's name
+- `currentEmail` - Current email address
+- `newEmail` - New email address
+- `verificationUrl` - Link to confirm change
+
+### Welcome
+
+```tsx
+emailTemplates.welcome.render({
+  name: "John Doe",
+  getStartedUrl: "https://app.com/getting-started",
+});
+```
+
+**Used for:** Greeting new users after signup
+
+**Props:**
+
+- `name` - User's name
+- `getStartedUrl` - Link to getting started guide
+
+## Integration Examples
+
+### With Authentication Package
+
+The auth package automatically sends verification emails using `sendAuthEmail`:
+
+```ts
+// packages/auth/src/server.ts
+import { sendAuthEmail } from "@workspace/email";
+import { verifyEmailRateLimiter } from "@workspace/rate-limit";
+
+// During email verification flow
+await sendAuthEmail({
+  emailType: "verify-email",
+  limiter: verifyEmailRateLimiter,
+  user: { email: user.email, name: user.name },
+  data: {
+    name: user.name,
+    email: user.email,
+    verificationUrl: url,
+  },
+});
+```
+
+## Key Scripts
+
+| Command                     | Purpose                              |
+| --------------------------- | ------------------------------------ |
+| `pnpm dev --filter email`   | Start email preview app on port 3002 |
+| `pnpm build --filter email` | Build package for production         |
+
+For a comprehensive list of development commands and options, see the [Development Workflow](../getting-started/first-steps#development-workflow) guide.
+
+## API Reference
+
+### sendEmail
+
+Sends an email via Resend with validation.
+
+```ts
+import { sendEmail } from "@workspace/email";
+
+await sendEmail({
+  to: "user@example.com",
+  subject: "Welcome!",
+  react: reactComponent,
+  from?: "sender@domain.com",  // optional
+});
+```
+
+**Parameters:**
+
+- `to` - Email address(es) to send to
+- `subject` - Email subject line
+- `react` - React component to render
+- `from` (optional) - Sender email address
+- `cc`, `bcc`, `replyTo` (optional) - Additional email fields
+
+### sendAuthEmail
+
+Consolidated helper for authentication emails with automatic rate limiting.
+
+```ts
+import { sendAuthEmail } from "@workspace/email";
+import { verifyEmailRateLimiter } from "@workspace/rate-limit";
+
+await sendAuthEmail({
+  emailType: "verify-email",
+  limiter: verifyEmailRateLimiter,
+  user: { email: "user@example.com", name: "John Doe" },
+  data: {
+    name: "John Doe",
+    email: "user@example.com",
+    verificationUrl: "https://app.com/verify?token=xyz",
+  },
+});
+```
+
+**Parameters:**
+
+- `emailType` - Type of email to send (`'welcome'`, `'verify-email'`, `'reset-password'`, `'change-email'`)
+- `limiter` - Rate limiter from `@workspace/rate-limit`
+- `user` - User object with `email` and `name`
+- `data` - Email template props (type-safe based on emailType)
+
+**Returns:** Void (logs if rate limit exceeded)
+
+### emailTemplates
+
+Registry of all email templates.
+
+```ts
+import { emailTemplates } from "@workspace/email";
+
+// Access templates
+const welcomeTemplate = emailTemplates.welcome;
+const verifyTemplate = emailTemplates["verify-email"];
+
+// Get subject and render
+const subject = welcomeTemplate.subject;
+const html = welcomeTemplate.render({ name, getStartedUrl });
+```
+
+### EmailPropsMap
+
+Type mapping for email templates to their props.
+
+```ts
+import type { EmailPropsMap } from "@workspace/email";
+
+type WelcomeProps = EmailPropsMap["welcome"];
+type VerifyProps = EmailPropsMap["verify-email"];
+type ResetProps = EmailPropsMap["reset-password"];
+type ChangeProps = EmailPropsMap["change-email"];
+```
+
+## Development
+
+### Preview Templates
+
+Use the email development app to preview templates:
+
+```bash
+pnpm dev --filter email
+```
+
+Visit `http://localhost:3002` to see all templates with live reload.
+
+### Styling Best Practices
+
+Email styling is limited, so use:
+
+- **Inline styles** - Most compatible
+- **Avoid CSS classes** - Not supported in email clients
+- **Web-safe fonts** - Arial, Helvetica, Georgia
+- **Max width 600px** - Mobile-friendly
+- **Test in email clients** - Gmail, Outlook, Apple Mail
+
+## Production Considerations
+
+### Domain Verification
+
+Before sending production emails:
+
+1. **Verify Domain** - Add domain to Resend dashboard
+2. **Set SPF Record** - Improve deliverability
+3. **Set DKIM** - Email signing
+4. **Monitor Bounce Rate** - Keep under 5%
+5. **Test Emails** - Send test emails to verify
+
+### Environment Variables
+
+Set production values in your deployment:
+
+```bash
+# Production
+RESEND_TOKEN=re_prod_xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+RESEND_EMAIL_FROM="App Name <noreply@yourdomain.com>"
+```
+
+### Error Handling
+
+```ts
+import { sendEmail, emailTemplates } from "@workspace/email";
+
+try {
+  const template = emailTemplates.welcome;
+  await sendEmail({
+    to: email,
+    subject: template.subject,
+    react: template.render({ name, getStartedUrl }),
+  });
+} catch (error) {
+  console.error("Failed to send email:", error);
+  // Handle gracefully - don't block user signup/flow
+  // Optionally queue for retry
+}
+```
+
+### Rate Limiting with sendAuthEmail
+
+Rate limiting is handled automatically:
+
+```ts
+import { sendAuthEmail } from "@workspace/email";
+import { verifyEmailRateLimiter } from "@workspace/rate-limit";
+
+await sendAuthEmail({
+  emailType: "verify-email",
+  limiter: verifyEmailRateLimiter,
+  user: { email, name },
+  data: { name, email, verificationUrl },
+});
+
+// If rate limit exceeded:
+// - Logs "Rate limit exceeded. Please try again later."
+// - Returns early without error
+// - User should retry after rate limit window
+```
+
+## Troubleshooting
+
+### Email Not Sending
+
+```bash
+# Check Resend token
+echo $RESEND_TOKEN
+
+# Verify sender email is set
+echo $RESEND_EMAIL_FROM
+
+# Check Resend dashboard for errors
+```
+
+### Type Errors on emailTemplates
+
+Ensure you're accessing templates by the correct key:
+
+```ts
+// ✓ Correct
+emailTemplates["verify-email"];
+emailTemplates.welcome;
+emailTemplates["reset-password"];
+emailTemplates["change-email"];
+
+// ✗ Wrong
+emailTemplates.verifyEmail; // Use kebab-case
+emailTemplates.resetPassword;
+```
+
+### Props Type Errors
+
+If you see prop type errors, check the `EmailPropsMap` for the correct props:
+
+```ts
+import type { EmailPropsMap } from "@workspace/email";
+
+// Check required props for each template type
+type WelcomeProps = EmailPropsMap["welcome"];
+type VerifyProps = EmailPropsMap["verify-email"];
+type ResetProps = EmailPropsMap["reset-password"];
+type ChangeProps = EmailPropsMap["change-email"];
+```
+
+### Rate Limit Exceeded
+
+If `sendAuthEmail` returns early without sending:
+
+```ts
+// The limiter prevented sending (rate limit exceeded)
+// This logs: "Rate limit exceeded. Please try again later."
+// Check your rate limiter configuration in @workspace/rate-limit
+```
+
+### Domain Not Verified
+
+1. Go to Resend dashboard
+2. Add domain in settings
+3. Add DNS records (SPF, DKIM)
+4. Wait for verification (can take hours)
+5. Update `RESEND_EMAIL_FROM` to use domain
+
+### Template Not Rendering
+
+Check that template exports are correct:
+
+```bash
+# Verify templates are exported
+grep -r "export" packages/email/src/templates/
+
+# Restart dev server
+pnpm dev --filter email
+```
+
+## Related Documentation
+
+- [Authentication Package](./auth) - Uses email for verification and password reset
+- [Email Application](../applications/email) - Development and preview app
+- [Resend Documentation](https://resend.com/docs) - Official Resend docs
+- [React Email Docs](https://react.email/) - Email component library
+
+<Callout type="info">
+  For testing email sending, use Resend's test mode. For production, ensure
+  domain is verified and monitor delivery metrics in the Resend dashboard.
+</Callout>

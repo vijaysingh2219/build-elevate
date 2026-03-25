@@ -1,7 +1,85 @@
 ---
 title: Deployment
+description: Production deployment strategies, best practices, security considerations, and environment setup guides for deploying applications to Vercel and other platforms
 ---
 
-## Deployment
+import { Cloud, Package, Shield, Zap } from "lucide-react";
 
-This section explains deployment strategies and best practices for the monorepo.
+# Deployment
+
+This section explains deployment strategies and best practices for deploying your applications to production.
+
+## Deployment Options
+
+Choose the deployment platform that best fits your needs:
+
+<Cards>
+  <Card icon={<Cloud />} title="Vercel" href="./vercel">
+    Deploy Next.js frontend and Node.js API to Vercel with zero configuration
+  </Card>
+  <Card icon={<Package />} title="Docker" href="../configuration/docker">
+    Package your entire stack with Docker Compose for any cloud provider
+  </Card>
+  <Card icon={<Shield />} title="Self-Hosted">
+    Deploy to your own VPS or cloud instance using Docker Compose
+  </Card>
+</Cards>
+
+## Key Deployment Considerations
+
+### Database
+
+Prepare your production database:
+
+- Use a managed PostgreSQL service: [Supabase](https://supabase.com/), [Neon](https://neon.tech/), or [AWS RDS](https://aws.amazon.com/rds/)
+- Set `DATABASE_URL` in production environment variables
+- Run migrations before deploying: `pnpm db:migrate`
+
+### Environment Variables
+
+Set all required environment variables in your hosting platform.
+
+The key variables needed for deployment are:
+
+- `DATABASE_URL` - Production PostgreSQL connection
+- `BETTER_AUTH_SECRET` - Authentication secret (must be identical across all services; see [Environment Variables Guide](./configuration/environment-variables#quick-start))
+- `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` - OAuth credentials
+- `RESEND_TOKEN` - Email service API key
+- `UPSTASH_REDIS_REST_URL` and token - Rate limiting
+
+For detailed setup instructions and complete variable reference, see the [Environment Variables Guide](../configuration/environment-variables).
+
+### Security
+
+Follow these best practices for production:
+
+- **HTTPS Only** - Enable TLS/SSL encryption
+- **CORS** - Restrict `ALLOWED_ORIGINS` to your domain only
+- **Secrets** - Never commit `.env` files or API keys
+- **Updated Dependencies** - Keep all packages up to date
+- **Health Checks** - Monitor application health regularly
+
+## Preparation Checklist
+
+Before deploying to production:
+
+- [ ] Database migrated successfully
+- [ ] All environment variables configured
+- [ ] Build completes without errors: `pnpm build`
+- [ ] Tests pass: `pnpm test`
+- [ ] No TypeScript errors: `pnpm check-types`
+- [ ] Linting passes: `pnpm lint`
+- [ ] Google OAuth credentials verified
+- [ ] Email service credentials set up
+- [ ] Rate limiting (Redis) configured
+- [ ] CORS origins whitelisted
+
+## Deployment Guides
+
+- **[Vercel](/docs/deployment/vercel)** - Best for Next.js frontend and serverless API
+- **[Docker](/docs/configuration/docker)** - Self-hosted or any cloud provider
+
+<Callout type="info">
+  Need help? Check the [Troubleshooting Guide](/docs/troubleshooting) or open an
+  issue on [GitHub](https://github.com/vijaysingh2219/build-elevate/issues).
+</Callout>

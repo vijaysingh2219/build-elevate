@@ -1,54 +1,251 @@
 ---
 title: Web
-description: Documentation for the Web application in the monorepo.
+description: Next.js 16 frontend application with authentication, database integration, and modern UI
 ---
 
-## Frontend Application
+# Web Application
 
-- Built with Next.js 16 and TypeScript.
-- Located in `apps/web`.
-- Uses shared UI, authentication, and utility packages from the monorepo.
-- Features a modern, responsive UI built with shadcn/ui and Tailwind CSS.
-- Integrates authentication via Better Auth and supports Google OAuth.
-- Connects to a PostgreSQL database via Prisma and the shared db package.
+The Web application is a modern, responsive Next.js 16 frontend built with TypeScript, shadcn/ui, and Tailwind CSS. It integrates with the API, authentication, and database packages for a complete user experience.
 
-### Features
+## Overview
 
-- **Design System:** The app is built using the [shadcn/ui](https://ui.shadcn.com/) design system with Tailwind CSS for styling.
-- **Authentication:** Session management, Google OAuth, and two-factor support via [Better Auth](https://www.better-auth.com/).
-- **SEO**: Server-side rendering and meta tags for better search engine visibility.
+- **Framework:** Next.js 16 with TypeScript
+- **Location:** `apps/web`
+- **UI Library:** shadcn/ui with Tailwind CSS
+- **Authentication:** Better Auth with Google OAuth and two-factor support
+- **Database:** PostgreSQL via Prisma (shared db package)
+- **Port:** `http://localhost:3000`
 
-### Setup
+## Architecture
 
-1. Install dependencies:
-   ```npm
-   npm install
-   ```
-2. Copy and configure environment variables:
-   ```sh
-   cp .env.example .env.local
-   # Edit .env.local as needed
-   ```
-3. Set up the database (see [database](../packages/db) for details):
+The Web app uses shared packages from the monorepo:
 
-   ```npm
-   cd ../../packages/db
-   npm run db:generate
-   npm run db:migrate
-   ```
+- **[@workspace/auth](../packages/auth)** - Session management, OAuth, and authentication flows
+- **[@workspace/db](../packages/db)** - Prisma ORM and database client
+- **[@workspace/ui](../packages/ui)** - Reusable React components and design system
+- **[@workspace/email](../packages/email)** - Email templates for notifications
+- **[@workspace/utils](../packages/utils)** - Shared utilities and type definitions
 
-4. Run the app:
-   ```npm
-   npm run dev
-   ```
-   <Callout type="info">
-     The web application runs on port 3000 (http://localhost:3000) by default.
-   </Callout>
+## Features
 
-### Example Pages
+### Design System
 
-- **Home**: Welcome and project overview
-- **Dashboard**: User dashboard (requires authentication)
-- **Auth**: Sign-in, sign-up, two-factor flows, and [more](../packages/auth)
-- **Profile**: User profile management
-- **Settings**: Application settings and preferences
+- **shadcn/ui Components** - High-quality, accessible React components
+- **Tailwind CSS** - Utility-first styling with responsive design
+- **Dark Mode Support** - Built-in light/dark mode using shadcn/ui themes
+- **Responsive Layout** - Mobile-first design that works on all screen sizes
+
+### Authentication
+
+- **Session Management** - Secure session handling with Better Auth
+- **Google OAuth** - Sign in with Google account
+- **Two-Factor Authentication** - Additional security layer for user accounts
+- **Protected Routes** - Middleware ensures authenticated access
+
+### SEO & Performance
+
+- **Server-Side Rendering** - SSR for better performance and SEO
+- **Meta Tags** - Automatic generation of Open Graph and Twitter Card tags
+- **Image Optimization** - Next.js Image component for responsive images
+- **Static Generation** - ISR (Incremental Static Regeneration) for frequently accessed pages
+
+## Project Structure
+
+```
+apps/web/
+├── app/                  # Next.js app directory
+│   ├── layout.tsx        # Root layout with providers
+│   ├── page.tsx          # Home page
+│   ├── (auth)/           # Authentication routes
+│   │   ├── signin/
+│   │   ├── signup/
+│   │   └── ...
+│   ├── (dashboard)/      # Protected dashboard routes
+│   │   ├── page.tsx
+│   │   ├── profile/
+│   │   └── settings/
+│   └── api/              # API route handlers
+├── components/           # React components
+│   ├── ui/               # shadcn/ui components
+│   ├── forms/            # Form components
+│   └── layout/           # Layout components
+├── lib/                  # Utility functions
+├── hooks/                # Custom React hooks
+├── types/                # TypeScript type definitions
+├── public/               # Static assets
+├── .env.example          # Environment variables template
+├── next.config.ts        # Next.js configuration
+├── tsconfig.json         # TypeScript configuration
+└── package.json          # Dependencies and scripts
+```
+
+## Environment Variables
+
+For detailed environment variable setup and configuration, see the [Environment Variables Guide](../configuration/environment-variables).
+
+Copy `.env.example` to `.env.local` and fill in the required values following the configuration guide.
+
+## Setup & Installation
+
+Follow the [Getting Started Guide](../getting-started/first-steps) for complete setup instructions.
+
+Quick summary for the web app:
+
+```bash
+# 1. Install dependencies
+pnpm install
+
+# 2. Configure environment variables
+cp .env.example .env.local
+
+# 3. Set up database
+pnpm db:generate && pnpm db:migrate
+
+# 4. Start development server
+pnpm dev
+```
+
+Visit `http://localhost:3000` to see the application.
+
+<Callout type="info">
+  The development server includes hot reload, so changes to your code are
+  reflected instantly.
+</Callout>
+
+## Key Scripts
+
+| Command           | Purpose                                  |
+| ----------------- | ---------------------------------------- |
+| `pnpm dev`        | Start development server with hot reload |
+| `pnpm build`      | Build for production                     |
+| `pnpm start`      | Start production server                  |
+| `pnpm lint`       | Check code quality with ESLint           |
+| `pnpm format`     | Format code with Prettier                |
+| `pnpm type-check` | Check TypeScript types                   |
+
+See [Development Workflow](../getting-started/first-steps#development-workflow) for more commands and options.
+
+## Key Files
+
+| File                  | Purpose                                         |
+| --------------------- | ----------------------------------------------- |
+| `app/layout.tsx`      | Root layout with providers (auth, theme, etc.)  |
+| `app/(home)/page.tsx` | Home page                                       |
+| `proxy.ts`            | Next.js proxy for authentication checks         |
+| `components`          | All React components                            |
+| `next.config.ts`      | Next.js configuration (images, redirects, etc.) |
+
+## Pages & Routes
+
+### Public Pages
+
+- **Home (`/`)** - Welcome page with project overview
+- **Sign In (`/sign-in`)** - User login
+- **Sign Up (`/sign-up`)** - User registration
+- **Forgot Password (`/forgot-password`)** - Password reset flow
+- **Reset Password (`/reset-password`)** - Set new password after reset request
+
+### Protected Pages (Requires Auth)
+
+- **Dashboard (`/dashboard`)** - User dashboard and overview
+- **Profile (`/profile`)** - User profile management
+- **Settings (`/settings`)** - Account and app settings
+- **Auth Pages** - Two-factor setup, session management, etc.
+
+## Development Tips
+
+### Hot Reload
+
+Code changes automatically reload in the browser during development - no manual refresh needed.
+
+### Database Changes
+
+After modifying `schema.prisma`, run:
+
+```bash
+pnpm db:generate
+pnpm db:migrate
+```
+
+### Component Development
+
+Use the shadcn/ui component library for UI - all components are pre-configured and styled consistently.
+
+### API Integration
+
+The app communicates with the API on `http://localhost:4000` (configurable via `NEXT_PUBLIC_API_URL`).
+
+### Type Safety
+
+Always use TypeScript types for database models and API responses - use `@workspace/db` for Prisma types.
+
+## Building for Production
+
+```bash
+# Build the application
+pnpm build
+
+# Start production server
+pnpm start
+
+# Or use Docker
+docker-compose -f docker-compose.prod.yml up web
+```
+
+The build process:
+
+1. Compiles TypeScript to JavaScript
+2. Bundles dependencies
+3. Optimizes images and static assets
+4. Generates static pages where possible
+
+<Callout type="warning">
+  Ensure all environment variables are set correctly in production before
+  building.
+</Callout>
+
+## Troubleshooting
+
+### Port Already in Use
+
+See [Port Already in Use](../troubleshooting#port-already-in-use) in the main troubleshooting guide for platform-specific solutions.
+
+### Database Connection Errors
+
+See [Database Connection Errors](../troubleshooting#database-connection-errors) in the main troubleshooting guide.
+
+### Authentication Not Working
+
+If you can't sign in:
+
+1. Verify `BETTER_AUTH_SECRET` is set correctly
+2. Check `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` for OAuth
+3. Ensure `proxy.ts` is protecting routes correctly
+4. Clear browser cookies and try again
+
+For shared authentication configuration, see [Authentication Not Working](../troubleshooting#authentication-not-working) in the main guide.
+
+### Build Fails
+
+```bash
+# Clear Next.js cache
+rm -rf .next
+
+# Rebuild
+pnpm build
+
+# Or check for TypeScript errors
+pnpm type-check
+```
+
+## Related Documentation
+
+- [Authentication Package](../packages/auth) - Session and OAuth setup
+- [Database Package](../packages/db) - Prisma schema and migrations
+- [UI Components](../packages/ui) - Available components and usage
+- [Environment Variables](../configuration/environment-variables) - Detailed config guide
+- [Code Quality](../configuration/formatting) - Linting and formatting
+
+<Callout type="info">
+  For deployment information, see the [Deployment Guide](../deployment).
+</Callout>

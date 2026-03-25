@@ -1,0 +1,123 @@
+---
+title: ESLint Configuration
+description: Unified ESLint rules with configs for Next.js, React, and Node.js ensuring consistent code quality across all projects
+---
+
+## Overview
+
+`@workspace/eslint-config` provides a unified ESLint configuration for all applications and packages in the monorepo. This ensures consistent code quality and linting rules across the entire project.
+
+## Features
+
+- **Shared Rules** - Consistent linting across all workspaces
+- **Multiple Configurations** - Base, Next.js, and React configurations for different use cases
+- **Framework Support** - Optimized configs for Next.js, React, and Node.js
+- **Type Safety** - Integration with TypeScript ESLint parser
+- **Import Sorting** - Organized imports
+
+## Project Structure
+
+```
+packages/eslint-config/
+├── base.js              # Base ESLint configuration
+├── next.js              # Next.js-optimized configuration
+├── react-internal.js    # React-specific configuration
+├── package.json         # Dependencies
+└── README.md           # Package documentation
+```
+
+## Usage
+
+The ESLint configuration is applied through the root `eslint.config.js` file in each workspace.
+
+### Applying Linting
+
+Run linting across all workspaces:
+
+```bash
+pnpm lint
+```
+
+Run linting for a specific workspace:
+
+```bash
+pnpm lint --filter=web
+pnpm lint --filter=api
+```
+
+### Configuration Selection
+
+Choose the appropriate configuration from the package:
+
+```js
+// For any Node.js or general package
+import { config } from "@workspace/eslint-config/base";
+export default config;
+
+// For Next.js applications
+import { nextJsConfig } from "@workspace/eslint-config/next-js";
+export default nextJsConfig;
+
+// For React libraries
+import { config } from "@workspace/eslint-config/react-internal";
+export default config;
+```
+
+## Configurations Included
+
+### Base (`base.js`)
+
+The default configuration for Node.js and general packages:
+
+- ES2024 syntax support
+- TypeScript type checking
+- Best practices for code quality
+- Prettier code formatting integration
+
+### Next.js (`next.js`)
+
+Optimized for Next.js applications:
+
+- Inherits from base configuration
+- Next.js-specific rules and Web Vitals checks
+- React and React Hooks rules for JSX
+- Service worker globals support
+
+### React (`react-internal.js`)
+
+For React component libraries:
+
+- React and React Hooks rules
+- JSX best practices
+- Browser and service worker globals
+
+## Customizing Rules
+
+To customize ESLint rules for a specific workspace, extend the base config:
+
+```js
+import { config as baseConfig } from "@workspace/eslint-config/base";
+
+export default [
+  ...baseConfig,
+  {
+    rules: {
+      "no-console": "warn",
+      // Add custom rules here
+    },
+  },
+];
+```
+
+## Updating Configuration
+
+To update ESLint rules across the entire monorepo:
+
+1. Modify the appropriate config file in `packages/eslint-config/`
+2. Rules are automatically used by all workspaces
+3. Run `pnpm lint` to verify all workspaces comply with new rules
+
+<Callout type="info">
+  For more details on ESLint rules and configuration, see the [ESLint
+  documentation](https://eslint.org/docs/latest/).
+</Callout>
