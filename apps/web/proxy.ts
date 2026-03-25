@@ -1,4 +1,4 @@
-import { auth } from '@workspace/auth';
+import { auth } from '@workspace/auth/server';
 import { NextRequest, NextResponse } from 'next/server';
 
 // Auth pages — redirect logged-in users away

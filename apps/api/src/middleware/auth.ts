@@ -1,4 +1,5 @@
-import { auth, fromNodeHeaders } from '@workspace/auth';
+import { fromNodeHeaders } from '@workspace/auth/node-handlers';
+import { auth } from '@workspace/auth/server';
 import { NextFunction, Request, Response } from 'express';
 
 /**

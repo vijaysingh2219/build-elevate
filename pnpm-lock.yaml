@@ -477,6 +477,9 @@ importers:
       '@hookform/resolvers':
         specifier: catalog:web
         version: 5.2.2(react-hook-form@7.62.0(react@19.2.4))
+      '@t3-oss/env-nextjs':
+        specifier: catalog:core
+        version: 0.13.10(typescript@5.9.3)(valibot@1.2.0(typescript@5.9.3))(zod@4.3.6)
       '@tanstack/react-query':
         specifier: catalog:web
         version: 5.87.4(react@19.2.4)

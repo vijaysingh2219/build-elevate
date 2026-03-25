@@ -45,7 +45,7 @@
     "lint": "turbo lint",
     "lint:fix": "turbo run lint:fix",
     "format": "prettier --write .",
-    "format:file": "prettier --write",
+    "format:path": "prettier --write",
     "format:check": "prettier --check .",
     "check-types": "turbo check-types",
     "start": "turbo start",

@@ -1,4 +1,4 @@
-import { auth } from '@workspace/auth';
+import { auth } from '@workspace/auth/server';
 import { NextResponse } from 'next/server';
 
 export async function requireAuth(req: Request) {

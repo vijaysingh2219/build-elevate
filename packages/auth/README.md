@@ -17,7 +17,7 @@ Import and use authentication utilities in your apps:
 import { signIn, signOut, useSession } from '@workspace/auth';
 
 // Server-side (API routes, server components)
-import { auth } from '@workspace/auth';
+import { auth } from '@workspace/auth/server';
 ```
 
 ## Features
@@ -62,7 +62,7 @@ await signOut();
 ## Server-Side API
 
 ```ts
-import { auth } from '@workspace/auth';
+import { auth } from '@workspace/auth/server';
 
 // Get session in API routes or server components
 const session = await auth.api.getSession({ headers: request.headers });

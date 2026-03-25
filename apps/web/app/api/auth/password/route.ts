@@ -1,5 +1,5 @@
 import { requireAuth } from '@/lib/auth-helpers';
-import { auth } from '@workspace/auth';
+import { auth } from '@workspace/auth/server';
 import { prisma } from '@workspace/db';
 import { passwordSchema } from '@workspace/utils';
 import { NextResponse } from 'next/server';

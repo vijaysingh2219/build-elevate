@@ -3,12 +3,33 @@
   "version": "1.0.0",
   "private": true,
   "exports": {
-    ".": "./dist/index.js",
-    "./client": "./dist/client.js",
-    "./server": "./dist/server.js"
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./client": {
+      "types": "./src/client.ts",
+      "import": "./src/client.ts",
+      "default": "./dist/client.js"
+    },
+    "./server": {
+      "types": "./src/server.ts",
+      "import": "./src/server.ts",
+      "default": "./dist/server.js"
+    },
+    "./next-handlers": {
+      "types": "./src/next-handlers.ts",
+      "import": "./src/next-handlers.ts",
+      "default": "./dist/next-handlers.js"
+    },
+    "./node-handlers": {
+      "types": "./src/node-handlers.ts",
+      "import": "./src/node-handlers.ts",
+      "default": "./dist/node-handlers.js"
+    }
   },
   "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsc --build",
     "check-types": "tsc --noEmit",

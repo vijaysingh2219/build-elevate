@@ -1,4 +1,4 @@
-import { type Session } from '@workspace/auth';
+import { type Session } from '@workspace/auth/server';
 
 declare global {
   namespace Express {

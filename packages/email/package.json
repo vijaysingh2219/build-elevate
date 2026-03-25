@@ -3,10 +3,13 @@
   "version": "1.0.0",
   "private": true,
   "exports": {
-    ".": "./dist/index.js"
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./dist/index.js"
+    }
   },
   "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsc --build",
     "check-types": "tsc --noEmit",
