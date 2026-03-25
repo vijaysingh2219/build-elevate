@@ -9,13 +9,78 @@ The monorepo includes production-ready Docker configurations for building and de
 
 ## Overview
 
-The Docker setup provides a robust, secure foundation for deployment:
+The Docker setup provides a robust, secure foundation for both development and production:
 
 - **Multi-stage Dockerfiles** - Optimized images for web and API with minimal size
 - **Docker Compose** - Orchestrate all services (web, API, database, Redis)
 - **Non-root Execution** - Improved security by running containers as non-root users
 - **Health Checks** - Services verify readiness before dependent services start
 - **Turbo Pruning** - Faster builds with optimized dependency installation
+- **Development Environment** - Simplified docker-compose for local development
+
+## Development Setup
+
+For local development, use the `docker-compose.yml` file in the repository root:
+
+```bash
+docker-compose up -d
+```
+
+This starts the PostgreSQL database for development:
+
+- **PostgreSQL** - localhost:5432
+- **Database** - build-elevate-app
+- **User** - postgres
+- **Password** - password
+
+### Development Docker Compose Structure
+
+The development setup includes:
+
+```yaml
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: build-elevate-postgres-dev
+    environment:
+      POSTGRES_DB: build-elevate-app
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - 5432:5432
+    volumes:
+      - build-elevate-app_postgres_data_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+```
+
+<Callout type="warning">
+  The development docker-compose uses hardcoded credentials for convenience.
+  **Never use these credentials in production**.
+</Callout>
+
+### Common Development Commands
+
+```bash
+# Start PostgreSQL
+docker-compose up -d
+
+# Stop PostgreSQL
+docker-compose down
+
+# View logs
+docker-compose logs -f postgres
+
+# Connect to database directly
+docker-compose exec postgres psql -U postgres -d build-elevate-app
+
+# Remove volume and start fresh
+docker-compose down -v && docker-compose up -d
+```
 
 ## Production Deployment
 
