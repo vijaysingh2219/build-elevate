@@ -26,13 +26,16 @@ import {
   updateAuthSecretInEnvFile,
   url,
   validateProjectName,
-  getDescription,
   toKebabCase,
 } from "./utils.js";
 import { createProjectReadme } from "./readme.js";
 import {
   removeAuthClientArtifactsForApi,
   updateTurboLintEnv,
+  applyPackageJsonCleanup,
+  applyPnpmCatalogCleanup,
+  applyDockerComposeCleanup,
+  applyDockerfilesPackageManagerCleanup,
 } from "./update.js";
 
 const getLatestCommit = async (): Promise<string> => {
@@ -123,22 +126,14 @@ const updateDockerComposeForTemplate = async (template: string) => {
 
   try {
     const content = await readFile(dockerComposePath, "utf8");
-
-    if (template === "web") {
-      // Remove API service and its Dockerfile
-      let updated = content.replace(/\n  api:[\s\S]*?(?=\n  \w+:|$)/, "");
-      // Remove API dependency from web service
-      updated = updated.replace(
-        /\n      api:\n        condition: service_started/,
-        "",
-      );
+    const updated = applyDockerComposeCleanup(content, template);
+    if (updated !== content) {
       await writeFile(dockerComposePath, updated);
-      await rm("apps/api/Dockerfile.prod", { force: true });
-    } else if (template === "api") {
-      // Remove web service and its Dockerfile
-      let updated = content.replace(/\n  web:[\s\S]*?(?=\n  \w+:|$)/, "");
-      await writeFile(dockerComposePath, updated);
+    }
+    if (template === "api") {
       await rm("apps/web/Dockerfile.prod", { force: true });
+    } else if (template === "web") {
+      await rm("apps/api/Dockerfile.prod", { force: true });
     }
   } catch (error) {
     log.warn(
@@ -454,64 +449,13 @@ const addWorkspacesField = async () => {
 const updateDockerfilesForPackageManager = async (packageManager: string) => {
   const dockerfiles = ["apps/api/Dockerfile.prod", "apps/web/Dockerfile.prod"];
 
-  // Helper to replace pnpm commands with npm or bun
-  const replaceCommands = (content: string, pm: string) => {
-    if (pm === "pnpm") return content;
-    let updated = content;
-    // Regex to match the pnpm install block with flexible whitespace
-    const pnpmBlock =
-      /# ✅ Install pnpm and manually configure PNPM_HOME\s*\nENV PNPM_HOME="[^"]*"\s*\nENV PATH="[^"]*"\s*\nRUN npm install -g pnpm\s*\\\s*\n\s*&&\s*pnpm config set global-bin-dir "\$PNPM_HOME"\s*\\\s*\n\s*&&\s*pnpm add -g turbo\s*\n?/g;
-    // Regex to match the pnpm cache mount with flexible whitespace
-    const cacheMount =
-      /--mount=type=cache,id=pnpm,target=\/root\/\.local\/share\/pnpm\/store\s*\\\s*\n\s*/g;
-    // Regex for the install command
-    const installRegex = /pnpm install --frozen-lockfile --ignore-scripts/g;
-    // Regex for the db:generate command
-    const generateRegex = /pnpm --filter @workspace\/db db:generate/g;
-    // Regex for the turbo build command
-    const buildRegex = /pnpm turbo build/g;
-
-    if (pm === "npm") {
-      // Replace pnpm install block with npm version
-      updated = updated.replace(
-        pnpmBlock,
-        "# ✅ Install turbo globally\nRUN npm install -g turbo\n",
-      );
-      // Remove pnpm cache mount
-      updated = updated.replace(cacheMount, "");
-      // Replace install command
-      updated = updated.replace(installRegex, "npm install --ignore-scripts");
-      // Replace db:generate command
-      updated = updated.replace(
-        generateRegex,
-        "cd packages/db && npm run db:generate",
-      );
-      // Replace turbo build command
-      updated = updated.replace(buildRegex, "turbo build");
-    } else if (pm === "bun") {
-      // Replace pnpm install block with bun version
-      updated = updated.replace(
-        pnpmBlock,
-        '# ✅ Install bun and add to PATH\nENV PATH="/root/.bun/bin:$PATH"\nRUN apk add --no-cache curl bash \\\n  && curl -fsSL https://bun.sh/install | bash \\\n  && /root/.bun/bin/bun install -g turbo\n\n',
-      );
-      // Remove pnpm cache mount
-      updated = updated.replace(cacheMount, "");
-      // Replace install command
-      updated = updated.replace(installRegex, "bun install");
-      // Replace db:generate command
-      updated = updated.replace(
-        generateRegex,
-        "cd packages/db && bun run db:generate",
-      );
-      // Replace turbo build command
-      updated = updated.replace(buildRegex, "turbo build");
-    }
-    return updated;
-  };
   for (const dockerfile of dockerfiles) {
     try {
       const content = await readFile(dockerfile, "utf8");
-      const updated = replaceCommands(content, packageManager);
+      const updated = applyDockerfilesPackageManagerCleanup(
+        content,
+        packageManager,
+      );
       if (updated !== content) {
         await writeFile(dockerfile, updated);
       }
@@ -667,36 +611,8 @@ const buildWorkspacePackages = async (selectedManager: string) => {
 const cleanupPackageJson = async (template: string) => {
   const packageJsonPath = "package.json";
   const content = await readFile(packageJsonPath, "utf8");
-  const packageJson = JSON.parse(content);
-
-  // Remove CLI-specific fields
-  delete packageJson.bin;
-  delete packageJson.files;
-  delete packageJson.homepage;
-  delete packageJson.repository;
-  delete packageJson.keywords;
-  delete packageJson.bugs;
-  delete packageJson.author;
-
-  // Remove CLI-specific scripts
-  if (packageJson.scripts) {
-    delete packageJson.scripts["build:cli"];
-    delete packageJson.scripts.prepublish;
-  }
-
-  // Remove all dependencies
-  delete packageJson.dependencies;
-
-  // Remove CLI-specific devDependencies
-  if (packageJson.devDependencies) {
-    delete packageJson.devDependencies["@types/degit"];
-    delete packageJson.devDependencies.tsup;
-  }
-
-  packageJson.description = getDescription(template);
-  packageJson.version = "1.0.0";
-
-  await writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2) + "\n");
+  const updated = applyPackageJsonCleanup(content, template);
+  await writeFile(packageJsonPath, updated);
 };
 
 const updateLicense = async (projectName: string) => {
@@ -717,28 +633,7 @@ const updateLicense = async (projectName: string) => {
 const updatePnpmCatalog = async (template: string) => {
   const workspacePath = "pnpm-workspace.yaml";
   const workspaceFile = await readFile(workspacePath, "utf8");
-
-  let updatedContent = workspaceFile;
-
-  updatedContent = updatedContent.replace(
-    /\n  cli:[\s\S]*?(?=\n  \w+:|$)/s,
-    "",
-  );
-
-  if (template === "api") {
-    // Remove web catalog section
-    updatedContent = updatedContent.replace(
-      /\n  web:[\s\S]*?(?=\n  \w+:|$)/s,
-      "",
-    );
-  } else if (template === "web") {
-    // Remove server catalog section
-    updatedContent = updatedContent.replace(
-      /\n  server:[\s\S]*?(?=\n  \w+:|$)/s,
-      "",
-    );
-  }
-
+  const updatedContent = applyPnpmCatalogCleanup(workspaceFile, template);
   await writeFile(workspacePath, updatedContent);
 };
 

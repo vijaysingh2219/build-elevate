@@ -15,6 +15,8 @@ import {
   applyAuthIndexCleanup,
   applyAuthPackageJsonCleanup,
   applyAuthKeysCleanup,
+  applyDockerComposeCleanup,
+  applyDockerfilesPackageManagerCleanup,
 } from "./update.js";
 import { applyProjectName } from "./utils.js";
 
@@ -190,6 +192,7 @@ const applyInitTransforms = (
   content: string,
   template: string,
   projectName: string,
+  packageManager: string = "pnpm",
 ): string => {
   // 1. Apply project name replacement first (all case formats)
   let result = applyProjectName(content, projectName);
@@ -201,6 +204,13 @@ const applyInitTransforms = (
     result = applyPackageJsonCleanup(result, template);
   } else if (filePath === "pnpm-workspace.yaml") {
     result = applyPnpmCatalogCleanup(result, template);
+  } else if (filePath === "docker-compose.prod.yml") {
+    result = applyDockerComposeCleanup(result, template);
+  } else if (
+    filePath === "apps/api/Dockerfile.prod" ||
+    filePath === "apps/web/Dockerfile.prod"
+  ) {
+    result = applyDockerfilesPackageManagerCleanup(result, packageManager);
   } else if (filePath === "packages/auth/src/index.ts" && template === "api") {
     result = applyAuthIndexCleanup(result);
   } else if (filePath === "packages/auth/package.json" && template === "api") {

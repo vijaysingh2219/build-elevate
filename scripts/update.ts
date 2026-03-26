@@ -171,3 +171,90 @@ export const applyAuthKeysCleanup = (content: string): string => {
   );
   return updated;
 };
+
+/**
+ * Mirrors updateDockerComposeForTemplate() — removes services not relevant to the template.
+ */
+export const applyDockerComposeCleanup = (
+  content: string,
+  template: string,
+): string => {
+  let updated = content;
+
+  if (template === "web") {
+    // Remove API service and its Dockerfile
+    updated = updated.replace(/\n  api:[\s\S]*?(?=\n  \w+:|$)/, "");
+    // Remove API dependency from web service
+    updated = updated.replace(
+      /\n      api:\n        condition: service_started/,
+      "",
+    );
+  } else if (template === "api") {
+    // Remove web service and its Dockerfile
+    updated = updated.replace(/\n  web:[\s\S]*?(?=\n  \w+:|$)/, "");
+  }
+
+  return updated;
+};
+
+/**
+ * Mirrors updateDockerfilesForPackageManager() — replaces pnpm commands with npm or bun.
+ */
+export const applyDockerfilesPackageManagerCleanup = (
+  content: string,
+  packageManager: string,
+): string => {
+  if (packageManager === "pnpm") return content;
+
+  let updated = content;
+  // Regex to match the pnpm install block with flexible whitespace
+  const pnpmBlock =
+    /# ✅ Install pnpm and manually configure PNPM_HOME\s*\nENV PNPM_HOME="[^"]*"\s*\nENV PATH="[^"]*"\s*\nRUN npm install -g pnpm\s*\\\s*\n\s*&&\s*pnpm config set global-bin-dir "\$PNPM_HOME"\s*\\\s*\n\s*&&\s*pnpm add -g turbo\s*\n?/g;
+  // Regex to match the pnpm cache mount with flexible whitespace
+  const cacheMount =
+    /--mount=type=cache,id=pnpm,target=\/root\/\.local\/share\/pnpm\/store\s*\\\s*\n\s*/g;
+  // Regex for the install command
+  const installRegex = /pnpm install --frozen-lockfile --ignore-scripts/g;
+  // Regex for the db:generate command
+  const generateRegex = /pnpm --filter @workspace\/db db:generate/g;
+  // Regex for the turbo build command
+  const buildRegex = /pnpm turbo build/g;
+
+  if (packageManager === "npm") {
+    // Replace pnpm install block with npm version
+    updated = updated.replace(
+      pnpmBlock,
+      "# ✅ Install turbo globally\nRUN npm install -g turbo\n",
+    );
+    // Remove pnpm cache mount
+    updated = updated.replace(cacheMount, "");
+    // Replace install command
+    updated = updated.replace(installRegex, "npm install --ignore-scripts");
+    // Replace db:generate command
+    updated = updated.replace(
+      generateRegex,
+      "cd packages/db && npm run db:generate",
+    );
+    // Replace turbo build command
+    updated = updated.replace(buildRegex, "turbo build");
+  } else if (packageManager === "bun") {
+    // Replace pnpm install block with bun version
+    updated = updated.replace(
+      pnpmBlock,
+      '# ✅ Install bun and add to PATH\nENV PATH="/root/.bun/bin:$PATH"\nRUN apk add --no-cache curl bash \\\n  && curl -fsSL https://bun.sh/install | bash \\\n  && /root/.bun/bin/bun install -g turbo\n\n',
+    );
+    // Remove pnpm cache mount
+    updated = updated.replace(cacheMount, "");
+    // Replace install command
+    updated = updated.replace(installRegex, "bun install");
+    // Replace db:generate command
+    updated = updated.replace(
+      generateRegex,
+      "cd packages/db && bun run db:generate",
+    );
+    // Replace turbo build command
+    updated = updated.replace(buildRegex, "turbo build");
+  }
+
+  return updated;
+};
