@@ -11,5 +11,6 @@ export function baseOptions(): BaseLayoutProps {
         </div>
       ),
     },
+    githubUrl: "https://github.com/vijaysingh2219/build-elevate",
   };
 }

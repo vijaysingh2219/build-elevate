@@ -80,9 +80,31 @@ export type ReleaseTag =
  */
 export const changelog: ChangelogEntry[] = [
   {
+    version: "1.2.1",
+    date: "2026-03-26",
+    tag: "latest",
+    title: "CLI Template Transformations Refactoring",
+    summary:
+      "Refactors the scaffolding CLI by extracting and composing template transformations into modular, reusable units for improved maintainability and easier future enhancements.",
+    changes: [
+      {
+        category: "changed",
+        text: "Extracted template transformation logic into separate, composable modules for better code organization",
+      },
+      {
+        category: "changed",
+        text: "Refactored scaffold initialization, readme generation, and upgrade workflows to use composed transformations",
+      },
+      {
+        category: "changed",
+        text: "Added `lint:fix` script and turbo task for automated code style corrections across the monorepo",
+      },
+    ],
+  },
+  {
     version: "1.2.0",
     date: "2026-03-23",
-    tag: "latest",
+    tag: "minor",
     title: "Upgrade Command & Template Diffing",
     summary:
       "Adds an upgrade workflow that keeps scaffolded projects in sync with the latest build-elevate template. Files that haven't been modified locally are updated automatically, while modified files are flagged as conflicts and can be inspected with a built-in diff command.",
