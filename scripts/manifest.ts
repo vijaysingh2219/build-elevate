@@ -65,7 +65,7 @@ const SKIP_DIRS = new Set([
   ".cache",
   "coverage",
   ".react-email",
-  "generated/prisma",
+  "packages/db/generated",
   "scripts", // internal CLI — deleted by deleteInternalContent() anyway
   "assets", // internal — also deleted
   "apps/docs", // internal — also deleted

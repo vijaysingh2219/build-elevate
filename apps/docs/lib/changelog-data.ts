@@ -80,9 +80,23 @@ export type ReleaseTag =
  */
 export const changelog: ChangelogEntry[] = [
   {
+    version: "1.2.2",
+    date: "2026-04-02",
+    tag: "latest",
+    title: "Manifest Path Fix for Generated Prisma Client",
+    summary:
+      "Fixes manifest generation by correcting the skipped generated Prisma client directory path so internal generated artifacts are excluded consistently during hashing.",
+    changes: [
+      {
+        category: "fixed",
+        text: "Updated manifest skip directory from `generated/prisma` to `packages/db/generated` to correctly exclude generated Prisma client files",
+      },
+    ],
+  },
+  {
     version: "1.2.1",
     date: "2026-03-26",
-    tag: "latest",
+    tag: "minor",
     title: "CLI Template Transformations Refactoring",
     summary:
       "Refactors the scaffolding CLI by extracting and composing template transformations into modular, reusable units for improved maintainability and easier future enhancements.",
