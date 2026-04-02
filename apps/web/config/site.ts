@@ -1,47 +1,36 @@
 import { Home } from 'lucide-react';
 import { Metadata } from 'next';
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://build-elevate.vercel.app';
-
-const DOMAIN = process.env.NEXT_PUBLIC_DOMAIN ?? 'turborepo.org';
-
-const DESCRIPTION = 'A starter template for building applications with Turborepo.';
+import {
+  BASE_URL,
+  DEFAULT_OG_IMAGE,
+  DOMAIN,
+  SITE_DESCRIPTION,
+  SITE_KEYWORDS,
+  SITE_NAME,
+  toAbsoluteUrl,
+} from './site-shared';
 
 export const siteConfig: Metadata = {
-  title: 'Build Elevate',
-  description: DESCRIPTION,
+  title: SITE_NAME,
+  description: SITE_DESCRIPTION,
   icons: {
     icon: [{ url: '/favicon.ico' }],
     apple: '/apple-touch-icon.png',
     shortcut: '/favicon.ico',
   },
   metadataBase: new URL(BASE_URL),
-  keywords: [
-    'turborepo',
-    'starter',
-    'template',
-    'react',
-    'typescript',
-    'nextjs',
-    'tailwindcss',
-    'prisma',
-    'postgresql',
-    'shadcn/ui',
-    'better-auth',
-    'resend',
-    'react-email',
-  ],
+  keywords: SITE_KEYWORDS,
   openGraph: {
-    title: 'Build Elevate',
-    description: 'A starter template for building applications with Turborepo.',
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
     url: BASE_URL,
-    siteName: 'Build Elevate',
+    siteName: SITE_NAME,
     images: [
       {
-        url: `${BASE_URL}/og-image.png`,
+        url: toAbsoluteUrl(DEFAULT_OG_IMAGE),
         width: 1200,
         height: 630,
-        alt: 'Build Elevate',
+        alt: SITE_NAME,
       },
     ],
     locale: 'en_US',
@@ -49,15 +38,15 @@ export const siteConfig: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Build Elevate',
-    description: 'A starter template for building applications with Turborepo.',
-    images: [`${BASE_URL}/og-image.png`],
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    images: [toAbsoluteUrl(DEFAULT_OG_IMAGE)],
   },
 };
 
 export const config = {
-  name: 'Build Elevate',
-  description: DESCRIPTION,
+  name: SITE_NAME,
+  description: SITE_DESCRIPTION,
   baseUrl: BASE_URL,
   domain: DOMAIN,
   providers: [

@@ -1,4 +1,12 @@
 import { Metadata } from 'next';
+import {
+  BASE_URL,
+  DEFAULT_OG_IMAGE,
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  formatSiteTitle,
+  toAbsoluteUrl,
+} from './site-shared';
 
 export const generatePageMetadata = (
   title: string,
@@ -8,9 +16,8 @@ export const generatePageMetadata = (
     noindex?: boolean;
   },
 ): Metadata => {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://build-elevate.vercel.app';
-  const ogImage = options?.ogImage || '/og-image.png';
-  const formattedTitle = `${title} | Build Elevate`;
+  const ogImage = toAbsoluteUrl(options?.ogImage ?? DEFAULT_OG_IMAGE);
+  const formattedTitle = formatSiteTitle(title);
 
   return {
     title: formattedTitle,
@@ -22,8 +29,8 @@ export const generatePageMetadata = (
     openGraph: {
       title: formattedTitle,
       description,
-      url: baseUrl,
-      siteName: 'Build Elevate',
+      url: BASE_URL,
+      siteName: SITE_NAME,
       images: [
         {
           url: ogImage,
@@ -47,8 +54,7 @@ export const generatePageMetadata = (
 export const pageMetadata = {
   home: {
     title: 'Build Elevate | Fullstack Turborepo Starter Template',
-    description:
-      'A modern fullstack starter template with Next.js, TypeScript, Prisma, Better Auth, and shadcn/ui. Build scalable applications with Turborepo.',
+    description: SITE_DESCRIPTION,
   },
   dashboard: {
     title: 'Dashboard',
