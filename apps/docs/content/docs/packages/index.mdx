@@ -25,7 +25,8 @@ These packages provide shared configuration for development tooling:
 - **[@workspace/eslint-config](./eslint-config)** - Unified ESLint rules for the monorepo
 - **[@workspace/prettier-config](./prettier-config)** - Consistent code formatting configuration
 - **[@workspace/typescript-config](./typescript-config)** - Shared TypeScript compiler options
-- **[@workspace/jest-presets](./jest-presets)** - Testing configuration for Node.js and React
+- **[@workspace/jest-presets](./jest-presets)** - Jest testing configuration for Node.js/API workspaces
+- **[@workspace/vitest-presets](./vitest-presets)** - Vitest testing configuration for web and node workspaces
 
 ## How Packages Work
 
@@ -33,7 +34,7 @@ Each package is self-contained with its own:
 
 - `package.json` - Dependencies and scripts
 - `tsconfig.json` - TypeScript configuration (extends base)
-- `jest.config.ts` - (if testing is included)
+- `jest.config.ts` or `vitest.config.ts` - (if testing is included)
 - `src/` - Source code and type definitions
 
 Packages are published internally and can be imported using `@workspace/package-name` in any app or package.

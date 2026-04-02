@@ -25,6 +25,7 @@ The Web app uses shared packages from the monorepo:
 - **[@workspace/ui](../packages/ui)** - Reusable React components and design system
 - **[@workspace/email](../packages/email)** - Email templates for notifications
 - **[@workspace/utils](../packages/utils)** - Shared utilities and type definitions
+- **[@workspace/vitest-presets](../packages/vitest-presets)** - Shared Vitest configuration for web testing
 
 ## Features
 
@@ -114,14 +115,17 @@ Visit `http://localhost:3000` to see the application.
 
 ## Key Scripts
 
-| Command           | Purpose                                  |
-| ----------------- | ---------------------------------------- |
-| `pnpm dev`        | Start development server with hot reload |
-| `pnpm build`      | Build for production                     |
-| `pnpm start`      | Start production server                  |
-| `pnpm lint`       | Check code quality with ESLint           |
-| `pnpm format`     | Format code with Prettier                |
-| `pnpm type-check` | Check TypeScript types                   |
+| Command              | Purpose                                  |
+| -------------------- | ---------------------------------------- |
+| `pnpm dev`           | Start development server with hot reload |
+| `pnpm build`         | Build for production                     |
+| `pnpm start`         | Start production server                  |
+| `pnpm lint`          | Check code quality with ESLint           |
+| `pnpm lint:fix`      | Auto-fix ESLint issues                   |
+| `pnpm check-types`   | Check TypeScript types                   |
+| `pnpm test`          | Run Vitest test suite                    |
+| `pnpm test:watch`    | Run tests in watch mode                  |
+| `pnpm test:coverage` | Generate test coverage report            |
 
 See [Development Workflow](../getting-started/first-steps#development-workflow) for more commands and options.
 
@@ -235,7 +239,7 @@ rm -rf .next
 pnpm build
 
 # Or check for TypeScript errors
-pnpm type-check
+pnpm check-types
 ```
 
 ## Related Documentation
@@ -243,6 +247,7 @@ pnpm type-check
 - [Authentication Package](../packages/auth) - Session and OAuth setup
 - [Database Package](../packages/db) - Prisma schema and migrations
 - [UI Components](../packages/ui) - Available components and usage
+- [Vitest Presets](../packages/vitest-presets) - Shared test configuration
 - [Environment Variables](../configuration/environment-variables) - Detailed config guide
 - [Code Quality](../configuration/formatting) - Linting and formatting
 

@@ -1,0 +1,88 @@
+---
+title: Vitest Presets
+description: Shared Vitest configuration presets for web and node workspaces with consistent test and coverage defaults
+---
+
+## Overview
+
+`@workspace/vitest-presets` provides unified Vitest configuration for workspaces in this monorepo. It centralizes common test defaults and exposes environment-specific presets.
+
+## Features
+
+- **Shared Presets** - Common defaults for multiple workspaces
+- **Web Preset** - React + jsdom testing via `@workspace/vitest-presets/web`
+- **Node Preset** - Server/package testing via `@workspace/vitest-presets/node`
+- **Coverage Defaults** - V8 provider with text/json/html reporters
+
+## Project Structure
+
+```txt
+packages/vitest-presets/
+├── node/
+│   └── vitest.config.mjs
+├── web/
+│   └── vitest.config.mjs
+├── package.json
+├── eslint.config.js
+└── README.md
+```
+
+## Available Presets
+
+### Web Preset
+
+Use for browser-oriented React workspaces (for example `apps/web`):
+
+```ts
+import webPreset from "@workspace/vitest-presets/web";
+import path from "path";
+import { mergeConfig } from "vitest/config";
+
+export default mergeConfig(webPreset, {
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./"),
+    },
+  },
+});
+```
+
+### Node Preset
+
+Use for package/server workspaces that run tests in a Node runtime:
+
+```ts
+import nodePreset from "@workspace/vitest-presets/node";
+import { mergeConfig } from "vitest/config";
+
+export default mergeConfig(nodePreset, {
+  // workspace-specific overrides
+});
+```
+
+## Usage
+
+Run tests from the workspace root:
+
+```bash
+pnpm test --filter=web
+```
+
+Or from inside a workspace:
+
+```bash
+pnpm test
+pnpm test:watch
+pnpm test:coverage
+```
+
+## Notes
+
+- The web preset expects a local `vitest.setup.ts` in the consuming workspace.
+- Keep workspace-specific aliases in that workspace `vitest.config.ts` using `mergeConfig`.
+- API currently uses Jest presets; Vitest presets are available for Vitest-based workspaces.
+
+<Callout type="info">
+  See [Jest Presets](./jest-presets) for the current API testing setup and [Web
+  Application](../applications/web) for app-specific testing commands.
+</Callout>

@@ -1,15 +1,15 @@
 ---
 title: Jest Presets
-description: Unified Jest testing configuration with presets for Node.js and React applications ensuring consistent test execution across the monorepo
+description: Unified Jest testing configuration for Node.js workspaces with consistent test execution across the monorepo
 ---
 
 ## Overview
 
-`@workspace/jest-presets` provides unified testing configuration for all packages in the monorepo. This ensures consistent test execution and coverage reporting across the entire project.
+`@workspace/jest-presets` provides unified Jest configuration for Node.js workspaces in the monorepo. This ensures consistent test execution and coverage reporting for API and server-oriented packages.
 
 ## Features
 
-- **Shared Presets** - Consistent testing configuration for different environments
+- **Shared Presets** - Consistent testing configuration for Node.js environments
 - **Node.js Preset** - For server-side, API, and package testing
 - **TypeScript Support** - Built-in TypeScript test support via ts-jest
 - **Coverage Reporting** - Integrated coverage tracking
@@ -46,6 +46,12 @@ Configuration includes:
 - Ignores test fixtures, node_modules, and dist directories
 
 ## Usage
+
+<Callout type="info">
+  Web workspaces use Vitest via [Vitest Presets](./vitest-presets). Keep Jest
+  presets for API/server workspaces unless you are intentionally migrating test
+  runners.
+</Callout>
 
 ### Running Tests
 

@@ -10,7 +10,10 @@
     "dev": "next dev --turbopack",
     "lint": "eslint . --max-warnings 0",
     "lint:fix": "eslint . --fix",
-    "start": "next start"
+    "start": "next start",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "prettier": "@workspace/prettier-config",
   "dependencies": {
@@ -23,9 +26,9 @@
     "@workspace/ui": "workspace:*",
     "@workspace/utils": "workspace:*",
     "lucide-react": "catalog:web",
-    "pg": "catalog:core",
     "next": "catalog:web",
     "next-themes": "catalog:web",
+    "pg": "catalog:core",
     "qrcode": "catalog:web",
     "react": "catalog:core",
     "react-dom": "catalog:core",
@@ -34,13 +37,20 @@
     "zod": "catalog:core"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "catalog:dev",
+    "@testing-library/react": "catalog:dev",
+    "@testing-library/user-event": "catalog:dev",
     "@types/node": "catalog:dev",
     "@types/react": "catalog:core",
     "@types/react-dom": "catalog:core",
+    "@vitejs/plugin-react": "catalog:dev",
     "@workspace/eslint-config": "workspace:^",
     "@workspace/prettier-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
+    "@workspace/vitest-presets": "workspace:*",
     "eslint": "catalog:eslint",
-    "typescript": "catalog:dev"
+    "jsdom": "catalog:dev",
+    "typescript": "catalog:dev",
+    "vitest": "catalog:dev"
   }
 }
