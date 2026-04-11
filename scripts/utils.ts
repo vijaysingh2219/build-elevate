@@ -180,6 +180,7 @@ export const getFilesToReplaceProjectName = (): string[] => {
     "apps/web/config/metadata.ts",
     "apps/web/config/site-shared.ts",
     "apps/web/config/site.ts",
+    "docker-compose.yml",
     "docker-compose.prod.yml",
     "packages/db/.env.example",
     "packages/auth/.env.example",
