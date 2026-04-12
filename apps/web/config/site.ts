@@ -44,11 +44,22 @@ export const siteConfig: Metadata = {
   },
 };
 
+export type SidebarCollapsibleMode = 'offcanvas' | 'icon' | 'none';
+
+export type LayoutConfig = {
+  showHeader: boolean;
+  sidebarCollapsible: SidebarCollapsibleMode;
+};
+
 export const config = {
   name: SITE_NAME,
   description: SITE_DESCRIPTION,
   baseUrl: BASE_URL,
   domain: DOMAIN,
+  layout: {
+    showHeader: true, // set --header-height in globals.css (custom or default: 3.5rem) when true, 0rem when false)
+    sidebarCollapsible: 'offcanvas',
+  } as LayoutConfig,
   providers: [
     {
       id: 'google',

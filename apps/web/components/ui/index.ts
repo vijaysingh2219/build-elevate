@@ -1,2 +1,3 @@
-export { default as Logo } from './logo';
-export { default as ThemeSwitcher } from './theme-switcher';
+export { Logo } from './logo';
+export { ThemeSwitch } from './theme-switch';
+export { ThemeSwitcher } from './theme-switcher';

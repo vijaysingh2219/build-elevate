@@ -54,6 +54,9 @@
   --shadow-2xl: 0px 4px 8px -1px hsl(0 0% 0% / 0.25);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
+
+  /* Custom properties for layout */
+  --header-height: 3.5rem;
 }
 
 .dark {

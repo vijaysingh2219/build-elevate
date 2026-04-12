@@ -13,6 +13,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@workspace/ui/components/card';
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@workspace/ui/components/empty';
 import { Separator } from '@workspace/ui/components/separator';
 import { Skeleton } from '@workspace/ui/components/skeleton';
 import { AlertTriangle, Link2, Unlink } from 'lucide-react';
@@ -98,10 +105,15 @@ export function ConnectedAccounts() {
       </CardHeader>
       <CardContent className="space-y-4">
         {isError && (
-          <div className="text-destructive flex items-center gap-2 text-sm">
-            <AlertTriangle className="h-4 w-4" />
-            Unable to load connected accounts. Please try again.
-          </div>
+          <Empty className="gap-3 border-0 p-0 md:p-0">
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <AlertTriangle className="text-destructive size-5" />
+              </EmptyMedia>
+              <EmptyTitle>Unable to load connected accounts</EmptyTitle>
+              <EmptyDescription>Please try again in a moment.</EmptyDescription>
+            </EmptyHeader>
+          </Empty>
         )}
 
         {isLoading ? (

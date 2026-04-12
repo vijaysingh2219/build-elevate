@@ -206,15 +206,19 @@ export function DeleteAccountForm() {
 
 export function DeleteAccountFormSkeleton() {
   return (
-    <div className="border-destructive/50 bg-destructive/5 space-y-6 rounded-lg border p-6">
-      <div className="flex items-center gap-4">
-        <div className="flex-1 space-y-1">
-          <Skeleton className="h-6 w-48" />
-          <Skeleton className="h-4 w-80" />
+    <Card className="border-destructive/50 bg-destructive/5">
+      <CardHeader>
+        <div className="flex items-center gap-4">
+          <div className="flex-1 space-y-1">
+            <Skeleton className="h-6 w-48" />
+            <Skeleton className="h-4 w-80" />
+          </div>
         </div>
-      </div>
-      <Skeleton className="h-20 w-full" />
-      <Skeleton className="h-10 w-32" />
-    </div>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <Skeleton className="h-20 w-full" />
+        <Skeleton className="h-10 w-32" />
+      </CardContent>
+    </Card>
   );
 }

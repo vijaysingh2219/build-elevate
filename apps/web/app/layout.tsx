@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import { Providers } from '@/components/auth/providers';
 import Header from '@/components/layout/header';
 import { generatePageMetadata, pageMetadata } from '@/config/metadata';
-import { siteConfig } from '@/config/site';
+import { config, siteConfig } from '@/config/site';
 import { viewportConfig } from '@/config/viewport';
 import '@workspace/ui/globals.css';
 import { Metadata, Viewport } from 'next';
@@ -35,7 +35,7 @@ export default function RootLayout({
       <body className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased`}>
         <Providers>
           <main className="flex h-screen w-screen flex-col">
-            <Header />
+            {(config.layout?.showHeader ?? true) ? <Header /> : null}
             {children}
           </main>
         </Providers>

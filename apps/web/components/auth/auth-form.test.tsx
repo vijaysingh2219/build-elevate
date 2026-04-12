@@ -43,7 +43,7 @@ vi.mock('next/link', () => ({
 }));
 
 vi.mock('@/components/ui/logo', () => ({
-  default: () => <div>Logo</div>,
+  Logo: () => <div>Logo</div>,
 }));
 
 vi.mock('@/components/auth', () => ({

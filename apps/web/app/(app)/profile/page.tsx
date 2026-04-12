@@ -142,51 +142,58 @@ export default function ProfilePage() {
         <CardContent>
           <div className="grid gap-4 sm:grid-cols-2">
             {/* Email Verification Status */}
-            <div className="flex items-start gap-3 rounded-lg border p-4">
-              <div
-                className={`rounded-full p-2 ${isEmailVerified ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'}`}
-              >
-                {isEmailVerified ? (
-                  <CheckCircle2 className="h-5 w-5" />
-                ) : (
-                  <ShieldAlert className="h-5 w-5" />
-                )}
-              </div>
-              <div className="flex-1 space-y-1">
-                <p className="font-medium">Email Verification</p>
-                <p className="text-muted-foreground text-sm">
-                  {isEmailVerified ? 'Your email is verified' : 'Email not verified'}
-                </p>
-                <Badge variant={isEmailVerified ? 'default' : 'secondary'} className="mt-1 text-xs">
-                  {isEmailVerified ? 'Verified' : 'Unverified'}
-                </Badge>
-              </div>
-            </div>
+            <Card>
+              <CardContent className="flex items-start gap-3">
+                <div
+                  className={`rounded-full p-2 ${isEmailVerified ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'}`}
+                >
+                  {isEmailVerified ? (
+                    <CheckCircle2 className="h-5 w-5" />
+                  ) : (
+                    <ShieldAlert className="h-5 w-5" />
+                  )}
+                </div>
+                <div className="flex-1 space-y-1">
+                  <p className="font-medium">Email Verification</p>
+                  <p className="text-muted-foreground text-sm">
+                    {isEmailVerified ? 'Your email is verified' : 'Email not verified'}
+                  </p>
+                  <Badge
+                    variant={isEmailVerified ? 'default' : 'secondary'}
+                    className="mt-1 text-xs"
+                  >
+                    {isEmailVerified ? 'Verified' : 'Unverified'}
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Two-Factor Authentication Status */}
-            <div className="flex items-start gap-3 rounded-lg border p-4">
-              <div
-                className={`rounded-full p-2 ${isTwoFactorEnabled ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'}`}
-              >
-                {isTwoFactorEnabled ? (
-                  <Shield className="h-5 w-5" />
-                ) : (
-                  <XCircle className="h-5 w-5" />
-                )}
-              </div>
-              <div className="flex-1 space-y-1">
-                <p className="font-medium">Two-Factor Authentication</p>
-                <p className="text-muted-foreground text-sm">
-                  {isTwoFactorEnabled ? 'Extra security layer enabled' : '2FA is not enabled'}
-                </p>
-                <Badge
-                  variant={isTwoFactorEnabled ? 'default' : 'secondary'}
-                  className="mt-1 text-xs"
+            <Card>
+              <CardContent className="flex items-start gap-3">
+                <div
+                  className={`rounded-full p-2 ${isTwoFactorEnabled ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'}`}
                 >
-                  {isTwoFactorEnabled ? 'Enabled' : 'Disabled'}
-                </Badge>
-              </div>
-            </div>
+                  {isTwoFactorEnabled ? (
+                    <Shield className="h-5 w-5" />
+                  ) : (
+                    <XCircle className="h-5 w-5" />
+                  )}
+                </div>
+                <div className="flex-1 space-y-1">
+                  <p className="font-medium">Two-Factor Authentication</p>
+                  <p className="text-muted-foreground text-sm">
+                    {isTwoFactorEnabled ? 'Extra security layer enabled' : '2FA is not enabled'}
+                  </p>
+                  <Badge
+                    variant={isTwoFactorEnabled ? 'default' : 'secondary'}
+                    className="mt-1 text-xs"
+                  >
+                    {isTwoFactorEnabled ? 'Enabled' : 'Disabled'}
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </CardContent>
       </Card>

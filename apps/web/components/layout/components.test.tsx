@@ -15,11 +15,18 @@ vi.mock('@/components/layout/nav-user', () => ({
 }));
 
 vi.mock('@/components/ui/theme-switcher', () => ({
+  __esModule: true,
   default: () => <div>Theme Switcher</div>,
 }));
 
 vi.mock('@/components/ui/logo', () => ({
-  default: () => <div>Logo</div>,
+  Logo: () => <div>Logo</div>,
+}));
+
+vi.mock('@/components/ui/theme-switch', () => ({
+  __esModule: true,
+  default: () => <div>Theme Switch</div>,
+  ThemeSwitch: () => <div>Theme Switch</div>,
 }));
 
 vi.mock('next/link', () => ({
@@ -88,12 +95,15 @@ describe('Layout Components (AppSidebar, Header)', () => {
     render(<Header />);
 
     expect(screen.getByRole('banner')).toHaveClass('flex');
+    expect(screen.getByText('Logo')).toBeInTheDocument();
+    expect(screen.getByText('Theme Switch')).toBeInTheDocument();
   });
 
-  it('hides header on desktop state', () => {
+  it('renders header on desktop state', () => {
     useSidebarMock.mockReturnValue({ state: 'expanded', isMobile: false });
     render(<Header />);
 
-    expect(screen.getByRole('banner')).toHaveClass('hidden');
+    expect(screen.getByRole('banner')).toHaveClass('flex');
+    expect(screen.getByText('Logo')).toBeInTheDocument();
   });
 });

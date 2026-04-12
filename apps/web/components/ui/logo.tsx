@@ -6,7 +6,7 @@ import { cn } from '@workspace/ui/lib/utils';
 import { Layers } from 'lucide-react';
 
 type LogoProps = {
-  variant: 'default' | 'header' | 'sidebar' | 'auth-form' | 'notFound';
+  variant: 'default' | 'home' | 'sidebar' | 'notFound' | 'error' | 'text-only';
   classes?: {
     container?: string;
     logo?: string;
@@ -15,57 +15,56 @@ type LogoProps = {
   };
 };
 
-export default function Logo({ variant, classes }: LogoProps) {
+export function Logo({ variant, classes }: LogoProps) {
   const { state } = useSidebar();
   const defaults = getDefaults(variant);
+  const showLogo = variant !== 'text-only';
   const showText =
-    variant === 'sidebar' ? state === 'expanded' : ['header', 'auth-form'].includes(variant);
+    ['default', 'text-only', 'home'].includes(variant) ||
+    (variant === 'sidebar' && state === 'expanded');
 
   return (
     <div className={cn(defaults.container, classes?.container ?? '')}>
-      <div className={cn(defaults.logo, classes?.logo ?? '')}>
-        <Layers className={cn(defaults.icon, classes?.icon ?? '')} />
-      </div>
+      {showLogo ? (
+        <div className={cn(defaults.logo, classes?.logo ?? '')}>
+          <Layers className={cn(defaults.icon, classes?.icon ?? '')} />
+        </div>
+      ) : null}
       {showText && <span className={cn(defaults.text, classes?.text ?? '')}>{config.name}</span>}
     </div>
   );
 }
 
 function getDefaults(variant: LogoProps['variant']) {
-  const containerBaseClass = 'flex items-center space-x-2';
+  const containerBaseClass = 'flex items-center gap-2';
   const logoBaseClass =
-    'from-primary via-primary/50 to-secondary drop-shadow-primary rounded-xl p-1 bg-gradient-to-br drop-shadow text-white flex items-center justify-center flex-shrink-0';
-  const iconBaseClass = 'size-8';
-  const textBaseClass = 'text-2xl sm:text-3xl font-semibold tracking-tight';
+    'flex aspect-square size-7 items-center justify-center rounded-lg bg-sidebar-primary text-white';
+  const iconBaseClass = 'size-5';
+  const textBaseClass = 'text-xl font-medium tracking-tight';
 
   switch (variant) {
     case 'sidebar':
       return {
         container: cn(containerBaseClass),
-        logo: cn(logoBaseClass, 'size-6'),
-        icon: cn(iconBaseClass, 'size-4 sm:size-5'),
+        logo: cn(logoBaseClass),
+        icon: cn(iconBaseClass),
         text: cn(textBaseClass, '!text-xl'),
       };
+    case 'home':
+    case 'error':
     case 'notFound':
       return {
         container: cn(containerBaseClass),
         logo: cn(logoBaseClass, 'size-16'),
-        icon: cn(iconBaseClass),
+        icon: cn(iconBaseClass, 'size-8'),
         text: cn(textBaseClass),
       };
-    case 'header':
+    case 'text-only':
       return {
         container: cn(containerBaseClass),
-        logo: cn(logoBaseClass, 'size-7 xs:size-8'),
-        icon: cn(iconBaseClass, 'size-5 xs:size-6 sm:size-8'),
-        text: cn(textBaseClass, 'text-lg sm:text-2xl'),
-      };
-    case 'auth-form':
-      return {
-        container: cn(containerBaseClass),
-        logo: cn(logoBaseClass, 'size-8 sm:size-10'),
-        icon: cn(iconBaseClass, 'size-6 sm:size-8'),
-        text: cn(textBaseClass),
+        logo: '',
+        icon: '',
+        text: cn(textBaseClass, 'text-lg sm:text-xl font-medium'),
       };
     default:
       return {
