@@ -65,17 +65,26 @@ ${scriptPrefix} dev
 
 const buildAvailableScriptsSection = ({
   scriptPrefix,
+  includeDocker,
 }: ReadmeContext): string => `\
 ## Available Scripts
 
 - \`${scriptPrefix} dev\` - Start development servers
 - \`${scriptPrefix} build\` - Build all packages
+- \`${scriptPrefix} check-types\` - Check TypeScript types
 - \`${scriptPrefix} lint\` - Run ESLint
+- \`${scriptPrefix} lint:fix\` - Fix ESLint issues
 - \`${scriptPrefix} format\` - Format code with Prettier
 - \`${scriptPrefix} format:path\` - Format specific files with Prettier (e.g. \`${scriptPrefix} format:path src/index.ts\`)
 - \`${scriptPrefix} format:check\` - Check code formatting with Prettier
 - \`${scriptPrefix} test\` - Run tests
 - \`${scriptPrefix} prepare\` - Prepare Husky git hooks
+${
+  includeDocker
+    ? `- \`${scriptPrefix} docker:dev\` - Run with Docker (development)
+- \`${scriptPrefix} docker:prod\` - Run with Docker (production)`
+    : ""
+}
 
 ### Database Commands (run from packages/db)
 
@@ -98,9 +107,13 @@ const buildStructureSection = ({
     "│   ├── auth/",
     "│   ├── db/",
     "│   ├── email/",
+    "│   ├── jest-presets/",
+    "│   ├── prettier-config/",
     "│   ├── rate-limit/",
+    "│   ├── typescript-config/",
     template !== "api" ? "│   ├── ui/" : "",
-    "│   └── utils/",
+    template !== "api" ? "│   ├── utils/" : "│   └── utils/",
+    template !== "api" ? "│   └── vitest-presets/" : "",
     "└── turbo.json",
   ]
     .filter(Boolean)
@@ -139,6 +152,7 @@ const buildBuiltWithSection = ({
     "[ESLint](https://eslint.org/)",
     "[Prettier](https://prettier.io/)",
     "[Jest](https://jestjs.io/)",
+    "[Vitest](https://vitest.dev/)",
     "[GitHub Actions](https://github.com/features/actions)",
   );
 
@@ -193,22 +207,30 @@ const buildDockerSection = ({
   template,
   scriptPrefix,
 }: ReadmeContext): string => {
-  const spins: string[] = [];
+  const services: string[] = [];
 
-  if (template !== "api") spins.push("- **Web app** → `localhost:3000`");
-  if (template !== "web") spins.push("- **API server** → `localhost:4000`");
-  spins.push("- **PostgreSQL** → `localhost:5432`");
+  if (template !== "api") services.push("- **Web app** → `localhost:3000`");
+  if (template !== "web") services.push("- **API server** → `localhost:4000`");
+  services.push("- **PostgreSQL** → `localhost:5432`");
 
   return `\
 ## Docker Deployment
 
 Production-ready Docker setup with docker-compose:
 
+Development:
+
+\`\`\`bash
+${scriptPrefix} docker:dev
+\`\`\`
+
+Production:
+
 \`\`\`bash
 ${scriptPrefix} docker:prod
 \`\`\`
 
-${spins.join("\n")}
+${services.join("\n")}
 
 Features:
 

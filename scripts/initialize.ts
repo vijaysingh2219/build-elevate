@@ -545,6 +545,16 @@ const installDependencies = async (packageManager: string) => {
   }
 };
 
+const formatTurboJson = async (packageManager: string) => {
+  if (packageManager === "pnpm") {
+    await exec("pnpm run format:path turbo.json", execSyncOpts);
+  } else if (packageManager === "bun") {
+    await exec("bun run format:path turbo.json", execSyncOpts);
+  } else {
+    await exec("npm run format:path -- turbo.json", execSyncOpts);
+  }
+};
+
 const initializeGit = async () => {
   await exec("git init", execSyncOpts);
   await exec("git branch -M main", execSyncOpts);
@@ -917,6 +927,14 @@ export const initialize = async (
       s.message("Installing dependencies...");
       await installDependencies(packageManager);
       if (options.verbose) log.info("✓ Installed dependencies");
+
+      s.message("Formatting turbo.json...");
+      try {
+        await formatTurboJson(packageManager);
+        if (options.verbose) log.info("✓ Formatted turbo.json");
+      } catch {
+        log.warn("Could not format turbo.json automatically.");
+      }
 
       // Build workspace packages
       try {

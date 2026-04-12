@@ -186,7 +186,7 @@ export const getFilesToReplaceProjectName = (): string[] => {
     "packages/auth/.env.example",
     "packages/auth/src/server.ts",
     "packages/email/src/branding.ts",
-    "packages/rate-limit/src/limiter.ts",
+    "packages/rate-limit/src/create.ts",
   ];
 };
 
@@ -244,6 +244,7 @@ export const envsByTemplate: Record<string, string[]> = {
     "GOOGLE_CLIENT_ID",
     "GOOGLE_CLIENT_SECRET",
     "NEXT_PUBLIC_BASE_URL",
+    "API_INTERNAL_URL",
     "NODE_ENV",
     "PORT",
     "ALLOWED_ORIGINS",
@@ -258,6 +259,7 @@ export const envsByTemplate: Record<string, string[]> = {
     "GOOGLE_CLIENT_ID",
     "GOOGLE_CLIENT_SECRET",
     "NEXT_PUBLIC_BASE_URL",
+    "API_INTERNAL_URL",
     "NODE_ENV",
     "BETTER_AUTH_URL",
     "RESEND_TOKEN",
