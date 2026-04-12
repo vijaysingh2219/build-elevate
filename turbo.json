@@ -37,6 +37,7 @@
         "BETTER_AUTH_URL",
         "BETTER_AUTH_SECRET",
         "NEXT_PUBLIC_BASE_URL",
+        "API_INTERNAL_URL",
         "NODE_ENV",
         "PORT",
         "ALLOWED_ORIGINS",
