@@ -41,6 +41,7 @@
     "prepublish": "pnpm build:cli",
     "clean": "turbo clean",
     "dev": "turbo dev",
+    "docker:dev": "docker-compose up --build",
     "docker:prod": "docker-compose -f docker-compose.prod.yml up --build",
     "lint": "turbo lint",
     "lint:fix": "turbo run lint:fix",

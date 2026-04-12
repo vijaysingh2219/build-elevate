@@ -10,8 +10,6 @@ services:
       - 5432:5432
     volumes:
       - build-elevate-app_postgres_data_dev:/var/lib/postgresql/data
-    networks:
-      - app_network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
