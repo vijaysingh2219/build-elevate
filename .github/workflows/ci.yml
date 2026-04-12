@@ -214,6 +214,7 @@ jobs:
         env:
           DATABASE_URL: "postgresql://user:pass@localhost:5432/test"
           BETTER_AUTH_SECRET: "ci-dummy-secret-do-not-use-in-production"
+          API_INTERNAL_URL: "http://api:4000"
           UPSTASH_REDIS_REST_URL: "https://placeholder.upstash.io"
           UPSTASH_REDIS_REST_TOKEN: "placeholder-token"
 
