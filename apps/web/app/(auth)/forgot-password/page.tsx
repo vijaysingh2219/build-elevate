@@ -4,6 +4,7 @@ import { EmailField } from '@/components/form/email';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { requestPasswordReset } from '@workspace/auth/client';
+import { ForgotPasswordFormValues, forgotPasswordSchema } from '@workspace/contracts';
 import { Button } from '@workspace/ui/components/button';
 import {
   Card,
@@ -22,8 +23,6 @@ import {
 } from '@workspace/ui/components/empty';
 import { Form } from '@workspace/ui/components/form';
 import { Spinner } from '@workspace/ui/components/spinner';
-import { forgotPasswordSchema } from '@workspace/utils/schemas';
-import { ForgotPasswordFormValues } from '@workspace/utils/types';
 import { ArrowLeft, Mail } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';

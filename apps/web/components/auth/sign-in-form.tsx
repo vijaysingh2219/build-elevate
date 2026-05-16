@@ -3,11 +3,10 @@
 import { EmailField, PasswordField } from '@/components/form';
 import { useSignIn } from '@/hooks/auth/use-sign-in';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { SignInFormValues, signInSchema } from '@workspace/contracts';
 import { Button } from '@workspace/ui/components/button';
 import { Form } from '@workspace/ui/components/form';
 import { Spinner } from '@workspace/ui/components/spinner';
-import { signInSchema } from '@workspace/utils/schemas';
-import { SignInFormValues } from '@workspace/utils/types';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';

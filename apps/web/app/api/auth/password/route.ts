@@ -1,7 +1,7 @@
 import { requireAuth } from '@/lib/auth-helpers';
 import { auth } from '@workspace/auth/server';
+import { passwordSchema } from '@workspace/contracts';
 import { prisma } from '@workspace/db';
-import { passwordSchema } from '@workspace/utils';
 import { NextResponse } from 'next/server';
 
 export async function GET(req: Request) {

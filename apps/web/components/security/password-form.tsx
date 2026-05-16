@@ -5,6 +5,12 @@ import { useHasPassword } from '@/hooks/use-has-password';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { changePassword } from '@workspace/auth/client';
+import {
+  ChangePasswordFormValues,
+  changePasswordSchema,
+  SetPasswordFormValues,
+  setPasswordSchema,
+} from '@workspace/contracts';
 import { Button } from '@workspace/ui/components/button';
 import {
   Card,
@@ -25,8 +31,6 @@ import {
 } from '@workspace/ui/components/form';
 import { Skeleton } from '@workspace/ui/components/skeleton';
 import { Spinner } from '@workspace/ui/components/spinner';
-import { changePasswordSchema, setPasswordSchema } from '@workspace/utils/schemas';
-import { ChangePasswordFormValues, SetPasswordFormValues } from '@workspace/utils/types';
 import { Lock } from 'lucide-react';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';

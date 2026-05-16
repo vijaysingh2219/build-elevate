@@ -3,11 +3,10 @@
 import { EmailField, NameField, PasswordField } from '@/components/form';
 import { useSignUp } from '@/hooks/auth/use-sign-up';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { SignUpFormValues, signUpSchema } from '@workspace/contracts';
 import { Button } from '@workspace/ui/components/button';
 import { Form } from '@workspace/ui/components/form';
 import { Spinner } from '@workspace/ui/components/spinner';
-import { signUpSchema } from '@workspace/utils/schemas';
-import { SignUpFormValues } from '@workspace/utils/types';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 

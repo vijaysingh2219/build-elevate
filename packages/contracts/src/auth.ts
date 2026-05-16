@@ -1,8 +1,10 @@
 import { z } from 'zod';
 
-export const emailSchema = z.string().email({
+export const emailSchema = z.email({
   message: 'Please enter a valid email address.',
 });
+
+export type EmailInput = z.infer<typeof emailSchema>;
 
 export const passwordSchema = z
   .string()
@@ -12,6 +14,8 @@ export const passwordSchema = z
   .max(100, {
     message: 'Password must be less than 100 characters.',
   });
+
+export type PasswordInput = z.infer<typeof passwordSchema>;
 
 export const nameSchema = z
   .string()
@@ -27,11 +31,15 @@ export const signInSchema = z.object({
   password: passwordSchema,
 });
 
+export type SignInFormValues = z.infer<typeof signInSchema>;
+
 export const signUpSchema = z.object({
   name: nameSchema,
   email: emailSchema,
   password: passwordSchema,
 });
+
+export type SignUpFormValues = z.infer<typeof signUpSchema>;
 
 export const setPasswordSchema = z
   .object({
@@ -42,6 +50,8 @@ export const setPasswordSchema = z
     message: "Passwords don't match",
     path: ['confirmPassword'],
   });
+
+export type SetPasswordFormValues = z.infer<typeof setPasswordSchema>;
 
 export const changePasswordSchema = z
   .object({
@@ -59,10 +69,14 @@ export const changePasswordSchema = z
     path: ['password'],
   });
 
+export type ChangePasswordFormValues = z.infer<typeof changePasswordSchema>;
+
 export const updateProfileSchema = z.object({
   name: nameSchema,
   email: emailSchema,
 });
+
+export type UpdateProfileFormValues = z.infer<typeof updateProfileSchema>;
 
 export const deleteAccountSchema = z
   .object({
@@ -74,9 +88,13 @@ export const deleteAccountSchema = z
     path: ['confirmation'],
   });
 
+export type DeleteAccountFormValues = z.infer<typeof deleteAccountSchema>;
+
 export const forgotPasswordSchema = z.object({
   email: emailSchema,
 });
+
+export type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
 
 export const resetPasswordSchema = z
   .object({
@@ -87,3 +105,5 @@ export const resetPasswordSchema = z
     message: "Passwords don't match",
     path: ['confirmPassword'],
   });
+
+export type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;

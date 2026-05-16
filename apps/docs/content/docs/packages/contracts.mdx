@@ -1,0 +1,94 @@
+---
+title: Contracts
+description: Shared Zod schemas and TypeScript types for request/response validation used across the monorepo.
+---
+
+# Contracts Package
+
+The `@workspace/contracts` package provides shared Zod schemas and TypeScript types for request/response validation across the monorepo. It ensures frontend and backend validation rules are aligned and type-safe.
+
+## Overview
+
+- **Package:** `@workspace/contracts`
+- **Location:** `packages/contracts`
+- **Purpose:** Centralized validation schemas (Zod) and inferred TypeScript types
+
+## Architecture
+
+The contracts package is intentionally small and focused. It exposes reusable schemas and types that other packages and apps import directly.
+
+- Shared validation for authentication flows and form inputs
+- Type-safe data contracts inferred from Zod schemas
+- Tree-shakable exports so consumers import only what they need
+
+## Project Structure
+
+```
+packages/contracts/
+├── src/
+│   ├── auth.ts         # Zod schemas and inferred types for auth flows
+│   └── index.ts        # Package exports
+├── package.json
+└── README.md
+```
+
+## Exports
+
+The package currently exports the following schemas and types (defined in `packages/contracts/src/auth.ts`):
+
+| Schema / Type          | Purpose                                        |
+| ---------------------- | ---------------------------------------------- |
+| `emailSchema`          | Validate email addresses                       |
+| `passwordSchema`       | Password requirements (min/max)                |
+| `nameSchema`           | Validate user display names                    |
+| `signInSchema`         | Sign-in form payload (email, password)         |
+| `signUpSchema`         | Sign-up payload (name, email, password)        |
+| `setPasswordSchema`    | Set password with confirmation                 |
+| `changePasswordSchema` | Change password flow (current + new + confirm) |
+| `updateProfileSchema`  | Update user profile (name, email)              |
+| `deleteAccountSchema`  | Confirm account deletion (confirmation token)  |
+| `forgotPasswordSchema` | Request password reset (email)                 |
+| `resetPasswordSchema`  | Reset password (password + confirm)            |
+
+Types are inferred from the schemas (examples):
+
+- `EmailInput`, `PasswordInput`
+- `SignInFormValues`, `SignUpFormValues`, `SetPasswordFormValues`, `ChangePasswordFormValues`, `UpdateProfileFormValues`, `DeleteAccountFormValues`, `ForgotPasswordFormValues`, `ResetPasswordFormValues`
+
+## Usage
+
+Import schemas or types where you need validation or strong typing:
+
+```ts
+import { signInSchema, emailSchema } from "@workspace/contracts";
+import type { SignInFormValues } from "@workspace/contracts";
+
+// Validate input
+const result = signInSchema.safeParse({
+  email: "user@example.com",
+  password: "secret123",
+});
+if (result.success) {
+  const values: SignInFormValues = result.data;
+}
+```
+
+Use the same schemas on the client (form validation) and server (API validation) to avoid mismatches.
+
+### Example: Email validation
+
+```ts
+const emailResult = emailSchema.safeParse("user@example.com");
+if (!emailResult.success) {
+  // handle validation errors
+}
+```
+
+## Related Documentation
+
+- [Zod Documentation](https://zod.dev/) - Schema validation library
+
+<Callout type="info">
+  The source is in `packages/contracts/src`. To request new schemas or changes,
+  update the source and open a PR.
+</Callout>

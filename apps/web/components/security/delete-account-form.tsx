@@ -5,6 +5,7 @@ import { useHasPassword } from '@/hooks/use-has-password';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { deleteUser } from '@workspace/auth/client';
+import { DeleteAccountFormValues, deleteAccountSchema } from '@workspace/contracts';
 import { Alert, AlertDescription, AlertTitle } from '@workspace/ui/components/alert';
 import { Button } from '@workspace/ui/components/button';
 import {
@@ -26,8 +27,6 @@ import {
 import { Form } from '@workspace/ui/components/form';
 import { Skeleton } from '@workspace/ui/components/skeleton';
 import { Spinner } from '@workspace/ui/components/spinner';
-import { deleteAccountSchema } from '@workspace/utils/schemas';
-import { DeleteAccountFormValues } from '@workspace/utils/types';
 import { AlertCircle, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';

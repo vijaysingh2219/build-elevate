@@ -1,29 +1,26 @@
 ---
 title: Utilities
-description: Zod validation schemas and TypeScript types for authentication and form validation across the monorepo
+description: Utility helpers, date helpers, and TypeScript utilities used across the monorepo
 ---
 
 # Utilities Package
 
-The `@workspace/utils` package provides Zod validation schemas and TypeScript types used across all applications and packages in the monorepo. It's focused on authentication workflows and form validation.
+The `@workspace/utils` package provides small, reusable helper functions and TypeScript utilities used across all applications and packages in the monorepo. It's focused on string/number helpers, date utilities, and lightweight helpers that keep application code concise.
 
 ## Overview
 
 - **Package:** `@workspace/utils`
 - **Location:** `packages/utils`
-- **Type Safety:** Full TypeScript support
-- **Validation:** Zod schemas for runtime type checking
+- **Purpose:** Shared utility functions and TypeScript types for common tasks across apps
 - **Date Handling:** date-fns for formatting and calculations
 
 ## Architecture
 
 The utilities package:
 
-- **Centralizes Validation** - Single source of truth for auth validation schemas
-- **Provides Type Definitions** - Type-safe form values inferred from schemas
+- **Provides Small Helpers** - String, number, and date helpers used widely across apps
 - **Date Handling** - Re-exports from date-fns for formatting and calculations
-- **Enables Code Reuse** - Modular, composable validation logic
-- **Maintains Consistency** - Shared validation across all applications
+- **Enables Code Reuse** - Modular, composable helper functions
 
 ## Project Structure
 
@@ -35,12 +32,6 @@ packages/utils/
 │   │   ├── number.ts         # Number operations (clamp, round)
 │   │   ├── date.ts           # Date helpers (re-exports from date-fns)
 │   │   └── index.ts          # Helper exports
-│   ├── schemas/              # Zod validation schemas
-│   │   ├── auth.ts           # Authentication schemas (email, password, signup, signin, etc.)
-│   │   └── index.ts          # Schema exports
-│   ├── types/                # TypeScript type definitions
-│   │   ├── auth.ts           # Authentication types (inferred from schemas)
-│   │   └── index.ts          # Type exports
 │   └── index.ts              # Package entry point
 ├── package.json              # Dependencies and scripts
 └── tsconfig.json             # TypeScript configuration
@@ -54,26 +45,15 @@ Import specific utilities by category:
 
 ```ts
 // Date helpers (re-exported from date-fns)
-import { formatDate, formatDistanceToNow } from "@workspace/utils";
+import { formatDate, formatDistanceToNow } from "@workspace/utils/helpers";
 
-// Validation schemas
-import {
-  emailSchema,
-  passwordSchema,
-  signUpSchema,
-  signInSchema,
-} from "@workspace/utils/schemas";
-
-// Types
-import type {
-  SignUpFormValues,
-  SignInFormValues,
-} from "@workspace/utils/types";
+// Helper functions
+import { capitalize, isEmpty } from "@workspace/utils/helpers";
 ```
 
 ### Helper Functions
 
-The package includes basic helper functions for string manipulation and number operations (capitalize, truncate, isEmpty, clamp, round). For most use cases, the validation schemas below are the primary focus.
+The package includes helper functions for string manipulation and number operations (capitalize, truncate, isEmpty, clamp, round). These are lightweight utilities intended for common app tasks.
 
 ### Date Helpers
 
@@ -102,124 +82,16 @@ formatDuration({ hours: 2, minutes: 30 }); // "2h 30m"
 intervalToDuration({ start: date1, end: date2 });
 ```
 
-## Validation Schemas
-
-All validation schemas are defined in `packages/utils/src/schemas/auth.ts` and focused on authentication workflows.
-
-### Available Schemas
-
-The following schemas are available for common authentication flows:
-
-| Schema                 | Purpose                                            |
-| ---------------------- | -------------------------------------------------- |
-| `emailSchema`          | Validate email addresses                           |
-| `passwordSchema`       | Validate password strength (minimum 8 characters)  |
-| `nameSchema`           | Validate user names (3-100 characters)             |
-| `signUpSchema`         | Complete sign-up form (email, password, name)      |
-| `signInSchema`         | Login form (email, password)                       |
-| `setPasswordSchema`    | Set new password with confirmation                 |
-| `changePasswordSchema` | Change password with current password verification |
-| `updateProfileSchema`  | Update user profile information                    |
-| `deleteAccountSchema`  | Confirm account deletion                           |
-| `forgotPasswordSchema` | Request password reset                             |
-| `resetPasswordSchema`  | Reset password with token                          |
-
-### Usage Examples
-
-```ts
-import { signUpSchema, signInSchema } from "@workspace/utils/schemas";
-
-// Sign up validation
-const signUpResult = signUpSchema.safeParse({
-  email: "user@example.com",
-  password: "SecurePass123!",
-  name: "John Doe",
-});
-
-if (!signUpResult.success) {
-  console.error("Validation errors:", signUpResult.error.flatten());
-}
-
-// Sign in validation
-const signInResult = signInSchema.safeParse({
-  email: "user@example.com",
-  password: "MyPassword123!",
-});
-
-if (signInResult.success) {
-  const { email, password } = signInResult.data;
-}
-```
-
-## Common Patterns
-
-### TypeScript Types
-
-All types are inferred from Zod schemas using `z.infer<typeof schema>`:
-
-```ts
-import { signUpSchema } from "@workspace/utils/schemas";
-import type { SignUpFormValues } from "@workspace/utils/types";
-
-// Type-safe form handling
-function handleSignUp(data: SignUpFormValues) {
-  // data is guaranteed to match schema
-  // TypeScript knows: data.name, data.email, data.password all exist
-  console.log(data.name, data.email, data.password);
-}
-
-// Use the schema to validate and get typed data
-const result = signUpSchema.safeParse(userInput);
-if (result.success) {
-  handleSignUp(result.data); // result.data is typed as SignUpFormValues
-}
-```
-
-Available types match their corresponding schemas: `SignUpFormValues`, `SignInFormValues`, `SetPasswordFormValues`, `ChangePasswordFormValues`, etc.
-
-### Use Type-Safe Parsing
-
-Always use `safeParse` for user input:
-
-```ts
-// ✓ Good - Handle errors gracefully
-import { emailSchema } from "@workspace/utils/schemas";
-
-const result = emailSchema.safeParse(userInput);
-if (!result.success) {
-  return { error: result.error.flatten() };
-}
-
-// ✗ Bad - parse() throws on invalid data
-const email = emailSchema.parse(userInput);
-```
-
 ### Leverage Tree-Shaking
 
 Import from subpaths when possible:
 
 ```ts
-// ✓ Good - Only imported if used
-import { signUpSchema } from "@workspace/utils/schemas";
-import type { SignUpFormValues } from "@workspace/utils/types";
+// ✓ Good - Only import helpers you need
+import { capitalize } from "@workspace/utils/helpers";
 
 // ✗ Bad - Imports entire utils package
 import * as utils from "@workspace/utils";
-```
-
-### Compose Schemas
-
-Build complex schemas from simpler ones:
-
-```ts
-import { z } from "zod";
-import { emailSchema, passwordSchema } from "@workspace/utils/schemas";
-
-const authSchema = z.object({
-  email: emailSchema,
-  password: passwordSchema,
-  rememberMe: z.boolean().optional(),
-});
 ```
 
 ### Create Custom Helpers
@@ -227,7 +99,7 @@ const authSchema = z.object({
 Extend package with domain-specific helpers:
 
 ```ts
-import { capitalize } from "@workspace/utils";
+import { capitalize } from "@workspace/utils/helpers";
 
 // App-specific helper
 export function formatUserName(first: string, last: string) {
@@ -244,20 +116,6 @@ If TypeScript can't find types, ensure `@workspace/utils` is installed:
 ```bash
 pnpm install
 pnpm check-types
-```
-
-### Schema Validation Failures
-
-Check schema requirements carefully:
-
-```ts
-import { emailSchema, passwordSchema } from "@workspace/utils/schemas";
-
-// Email must be valid format
-const emailResult = emailSchema.safeParse("invalid-email");
-
-// Password has minimum requirements
-const pwdResult = passwordSchema.safeParse("short");
 ```
 
 ### Missing Utilities
@@ -278,10 +136,9 @@ ls packages/utils/src/helpers/
 
 ## Related Documentation
 
-- [Authentication Package](./auth) - Uses util schemas for validation
+- [Authentication Package](./auth) - Integrates helper utilities
 - [API Application](../applications/api) - Uses helpers and validators
-- [Web Application](../applications/web) - Uses schemas and types
-- [Zod Documentation](https://zod.dev/) - Schema validation library
+- [Web Application](../applications/web) - Uses helpers and types
 - [date-fns Documentation](https://date-fns.org/) - Date handling library
 
 <Callout type="info">

@@ -4,6 +4,7 @@ import { PasswordField } from '@/components/form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { resetPassword } from '@workspace/auth/client';
+import { ResetPasswordFormValues, resetPasswordSchema } from '@workspace/contracts';
 import { Button } from '@workspace/ui/components/button';
 import {
   Card,
@@ -22,8 +23,6 @@ import {
 } from '@workspace/ui/components/empty';
 import { Form } from '@workspace/ui/components/form';
 import { Spinner } from '@workspace/ui/components/spinner';
-import { resetPasswordSchema } from '@workspace/utils/schemas';
-import { ResetPasswordFormValues } from '@workspace/utils/types';
 import { CheckCircle2, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';

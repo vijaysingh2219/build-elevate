@@ -6,6 +6,7 @@ import { useRequiredAuthUser } from '@/hooks/use-auth-user';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { changeEmail, updateUser } from '@workspace/auth/client';
+import { UpdateProfileFormValues, updateProfileSchema } from '@workspace/contracts';
 import { Button } from '@workspace/ui/components/button';
 import {
   Card,
@@ -18,8 +19,6 @@ import {
 import { Form } from '@workspace/ui/components/form';
 import { Skeleton } from '@workspace/ui/components/skeleton';
 import { Spinner } from '@workspace/ui/components/spinner';
-import { updateProfileSchema } from '@workspace/utils/schemas';
-import { UpdateProfileFormValues } from '@workspace/utils/types';
 import { User } from 'lucide-react';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';

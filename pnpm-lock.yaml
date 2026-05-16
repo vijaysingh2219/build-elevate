@@ -510,6 +510,9 @@ importers:
       '@workspace/auth':
         specifier: workspace:*
         version: link:../../packages/auth
+      '@workspace/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
       '@workspace/db':
         specifier: workspace:*
         version: link:../../packages/db
@@ -623,6 +626,28 @@ importers:
       '@types/node':
         specifier: catalog:dev
         version: 20.19.9
+      '@workspace/eslint-config':
+        specifier: workspace:^
+        version: link:../eslint-config
+      '@workspace/prettier-config':
+        specifier: workspace:*
+        version: link:../prettier-config
+      '@workspace/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      typescript:
+        specifier: catalog:dev
+        version: 5.9.3
+
+  packages/contracts:
+    dependencies:
+      '@workspace/utils':
+        specifier: workspace:*
+        version: link:../utils
+      zod:
+        specifier: catalog:core
+        version: 4.3.6
+    devDependencies:
       '@workspace/eslint-config':
         specifier: workspace:^
         version: link:../eslint-config

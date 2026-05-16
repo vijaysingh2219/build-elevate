@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { signUp } from '@workspace/auth/client';
-import { SignUpFormValues } from '@workspace/utils/types';
+import { SignUpFormValues } from '@workspace/contracts';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
