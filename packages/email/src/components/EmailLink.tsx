@@ -1,5 +1,5 @@
-import { Link } from '@react-email/components';
 import { ReactNode } from 'react';
+import { Link } from 'react-email';
 
 interface EmailLinkProps {
   href: string;

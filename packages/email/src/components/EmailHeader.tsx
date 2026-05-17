@@ -1,5 +1,5 @@
-import { Text } from '@react-email/components';
 import { ReactNode } from 'react';
+import { Text } from 'react-email';
 import { APP_TITLE } from '../branding';
 
 interface EmailHeaderProps {

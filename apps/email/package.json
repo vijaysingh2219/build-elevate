@@ -8,9 +8,9 @@
     "dev": "email dev --port 3002 --dir ../../packages/email/src/templates"
   },
   "dependencies": {
-    "@react-email/preview-server": "catalog:web",
+    "@react-email/ui": "catalog:core",
     "react": "catalog:core",
-    "react-email": "catalog:web"
+    "react-email": "catalog:core"
   },
   "devDependencies": {
     "@types/node": "catalog:dev",

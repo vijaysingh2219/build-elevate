@@ -1,5 +1,5 @@
-import { Container } from '@react-email/components';
 import { ReactNode } from 'react';
+import { Container } from 'react-email';
 
 interface EmailContainerProps {
   children: ReactNode;

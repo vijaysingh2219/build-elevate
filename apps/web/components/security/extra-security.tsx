@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation } from '@tanstack/react-query';
-import { authClient } from '@workspace/auth/client';
+import { revokeOtherSessions } from '@workspace/auth/client';
 import { Alert, AlertDescription, AlertTitle } from '@workspace/ui/components/alert';
 import { Button } from '@workspace/ui/components/button';
 import {
@@ -30,7 +30,7 @@ export function ExtraSecurity() {
   const [showDialog, setShowDialog] = useState(false);
 
   const revokeAllMutation = useMutation({
-    mutationFn: async () => authClient.revokeOtherSessions(),
+    mutationFn: async () => revokeOtherSessions(),
     onSuccess: () => {
       toast.success('Logged out from all other devices');
       setShowDialog(false);

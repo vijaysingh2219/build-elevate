@@ -1,13 +1,16 @@
-'use client';
+import { auth } from '@workspace/auth/server';
+import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
+import type { ReactElement } from 'react';
 
-import { useRequiredAuthUser } from '@/hooks/use-auth-user';
-import DashboardLoading from './loading';
+export default async function DashboardPage(): Promise<ReactElement> {
+  const session = await auth.api.getSession({ headers: await headers() });
 
-export default function DashboardPage() {
-  const { user, isLoading } = useRequiredAuthUser();
-  if (isLoading) {
-    return <DashboardLoading />;
+  if (!session?.user) {
+    redirect('/sign-in');
   }
+
+  const user = session.user;
 
   return (
     <section className="max-w-2xl p-12">

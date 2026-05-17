@@ -20,9 +20,10 @@
   },
   "prettier": "@workspace/prettier-config",
   "dependencies": {
-    "@react-email/components": "catalog:core",
+    "@react-email/ui": "catalog:core",
     "@t3-oss/env-nextjs": "catalog:core",
     "react": "catalog:core",
+    "react-email": "catalog:core",
     "resend": "catalog:core",
     "zod": "catalog:core"
   },
