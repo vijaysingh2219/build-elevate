@@ -107,13 +107,12 @@ const buildStructureSection = ({
     "│   ├── auth/",
     "│   ├── db/",
     "│   ├── email/",
-    "│   ├── jest-presets/",
+    "│   ├── vitest-presets/",
     "│   ├── prettier-config/",
     "│   ├── rate-limit/",
     "│   ├── typescript-config/",
     template !== "api" ? "│   ├── ui/" : "",
     template !== "api" ? "│   ├── utils/" : "│   └── utils/",
-    template !== "api" ? "│   └── vitest-presets/" : "",
     "└── turbo.json",
   ]
     .filter(Boolean)
@@ -151,7 +150,6 @@ const buildBuiltWithSection = ({
     "[pnpm](https://pnpm.io/)",
     "[ESLint](https://eslint.org/)",
     "[Prettier](https://prettier.io/)",
-    "[Jest](https://jestjs.io/)",
     "[Vitest](https://vitest.dev/)",
     "[GitHub Actions](https://github.com/features/actions)",
   );

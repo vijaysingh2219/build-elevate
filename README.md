@@ -67,7 +67,7 @@ Built with **Turborepo**, **Next.js 16**, **Express**, **Better Auth**, **Prisma
 </td>
 <td width="50%" valign="top">
 <h3>⚡ Developer Experience</h3>
-<p>Full TypeScript, hot reload, Jest testing, ESLint, Prettier, Docker, and a Turborepo monorepo that actually makes sense. Ship faster with better tools.</p>
+<p>Full TypeScript, hot reload, Vitest testing, ESLint, Prettier, Docker, and a Turborepo monorepo that actually makes sense. Ship faster with better tools.</p>
 </td>
 </tr>
 <tr>
@@ -167,7 +167,7 @@ build-elevate/
 │   ├── eslint-config/    # Unified ESLint configuration
 │   ├── prettier-config/  # Code formatting configuration
 │   ├── typescript-config/# Shared TypeScript compiler options
-│   └── jest-presets/     # Testing presets for Node.js & React
+│   └── vitest-presets/   # Testing presets for Node.js & React
 ├── package.json          # Root package configuration
 ├── pnpm-workspace.yaml   # Monorepo workspace configuration
 ├── turbo.json            # Turborepo pipeline configuration
@@ -199,7 +199,7 @@ build-elevate/
 - **[@workspace/eslint-config](packages/eslint-config/)** - Unified ESLint rules and linting setup
 - **[@workspace/prettier-config](packages/prettier-config/)** - Consistent code formatting configuration
 - **[@workspace/typescript-config](packages/typescript-config/)** - Shared TypeScript compiler options
-- **[@workspace/jest-presets](packages/jest-presets/)** - Testing configuration for Node.js and React
+- **[@workspace/vitest-presets](packages/vitest-presets/)** - Testing configuration for Node.js and React
 
 ## 🛠️ Technology Stack
 
@@ -214,7 +214,7 @@ build-elevate/
 | **Styling**          | [Tailwind CSS](https://tailwindcss.com)                            | Utility-first CSS framework                   |
 | **Email**            | [React Email](https://react.email) + [Resend](https://resend.com)  | Email template development & delivery         |
 | **Rate Limiting**    | [Upstash Redis](https://upstash.com)                               | Serverless Redis for rate limiting            |
-| **Testing**          | [Jest](https://jestjs.io)                                          | JavaScript testing framework                  |
+| **Testing**          | [Vitest](https://vitest.dev)                                       | JavaScript testing framework                  |
 | **Linting**          | [ESLint](https://eslint.org)                                       | JavaScript linting and code quality           |
 | **Formatting**       | [Prettier](https://prettier.io)                                    | Code formatter                                |
 | **Language**         | [TypeScript](https://www.typescriptlang.org)                       | JavaScript with static typing                 |

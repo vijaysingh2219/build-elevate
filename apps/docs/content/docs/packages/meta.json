@@ -12,7 +12,6 @@
     "eslint-config",
     "prettier-config",
     "typescript-config",
-    "jest-presets",
     "vitest-presets"
   ],
   "defaultOpen": false

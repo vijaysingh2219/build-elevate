@@ -4,12 +4,14 @@
   "private": true,
   "type": "module",
   "files": [
+    "web/vitest.config.ts",
     "web/vitest.config.mjs",
+    "node/vitest.config.ts",
     "node/vitest.config.mjs"
   ],
   "exports": {
     "./web": "./web/vitest.config.mjs",
-    "./node": "./node/vitest.config.mjs"
+    "./node": "./node/vitest.config.ts"
   },
   "scripts": {
     "clean": "rm -rf node_modules",

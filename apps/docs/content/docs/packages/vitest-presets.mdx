@@ -19,9 +19,9 @@ description: Shared Vitest configuration presets for web and node workspaces wit
 ```txt
 packages/vitest-presets/
 ├── node/
-│   └── vitest.config.mjs
+│   └── vitest.config.ts
 ├── web/
-│   └── vitest.config.mjs
+│   └── vitest.config.ts
 ├── package.json
 ├── eslint.config.js
 └── README.md
@@ -80,9 +80,9 @@ pnpm test:coverage
 
 - The web preset expects a local `vitest.setup.ts` in the consuming workspace.
 - Keep workspace-specific aliases in that workspace `vitest.config.ts` using `mergeConfig`.
-- API currently uses Jest presets; Vitest presets are available for Vitest-based workspaces.
+- API uses Vitest presets for Node workspaces.
 
 <Callout type="info">
-  See [Jest Presets](./jest-presets) for the current API testing setup and [Web
-  Application](../applications/web) for app-specific testing commands.
+  See [API Application](../applications/api) for app-specific testing commands
+  and [Web Application](../applications/web) for browser testing setup.
 </Callout>

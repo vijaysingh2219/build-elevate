@@ -1,53 +1,28 @@
-import { afterAll, beforeAll, describe, expect, it, jest } from '@jest/globals';
-import type { NextFunction, Request, Response } from 'express';
+import { Express } from 'express';
 import { Server } from 'http';
 import supertest from 'supertest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import { createAuthMiddlewareMock } from '../utils/auth-mocks';
+import { createRateLimitPackageMock } from '../utils/rate-limit-mocks';
 
-jest.mock('@workspace/auth', () => ({
+vi.mock('@workspace/auth', () => ({
   authClient: {},
   auth: {},
 }));
 
-jest.mock('@workspace/rate-limit', () => ({
-  createRateLimiter: jest.fn(() => ({
-    limit: jest.fn(() =>
-      Promise.resolve({
-        success: true,
-        limit: 100,
-        remaining: 99,
-        reset: Date.now() + 60000,
-      }),
-    ),
-  })),
-  slidingWindow: jest.fn((requests: number, window: string) => ({
-    requests,
-    window,
-  })),
-}));
+vi.mock('@workspace/rate-limit', () => createRateLimitPackageMock());
 
-jest.mock('../../middleware/auth', () => ({
-  requireAuth: jest.fn((req: Request, res: Response, next: NextFunction) => {
-    Object.assign(req, {
-      user: { id: 'test-user-123', email: 'test@example.com' },
-      session: { id: 'session-123' },
-    });
-    next();
-  }),
-}));
-
-process.env.ALLOWED_ORIGINS = 'https://example.com';
-delete process.env.CORS_ALLOW_MISSING_ORIGIN;
-
-import { createServer } from '../../server';
+vi.mock('../../middleware/auth', () => createAuthMiddlewareMock());
 
 describe('API Server', () => {
-  let app: ReturnType<typeof createServer>;
+  let app: Express;
   let server: Server;
 
-  beforeAll(() => {
+  beforeAll(async () => {
+    const { createServer } = await import('../../server.js');
     app = createServer();
     server = app.listen(0);
-  });
+  }, 30_000);
 
   afterAll(() => {
     server.close();
@@ -82,8 +57,8 @@ describe('API Server', () => {
   });
 
   describe('CORS', () => {
-    beforeAll(async () => jest.spyOn(console, 'error').mockImplementation(() => {}));
-    afterAll(async () => jest.restoreAllMocks());
+    beforeAll(async () => vi.spyOn(console, 'error').mockImplementation(() => {}));
+    afterAll(async () => vi.restoreAllMocks());
 
     it('should set CORS headers for allowed origin', async () => {
       const response = await supertest(app)

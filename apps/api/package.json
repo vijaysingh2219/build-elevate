@@ -10,12 +10,9 @@
     "lint:fix": "eslint \"src/**/*.ts*\" --fix",
     "check-types": "tsc --noEmit",
     "start": "node dist/index.js",
-    "test": "jest --detectOpenHandles --coverage"
+    "test": "vitest run --coverage"
   },
   "prettier": "@workspace/prettier-config",
-  "jest": {
-    "preset": "@workspace/jest-presets/node"
-  },
   "dependencies": {
     "@workspace/auth": "workspace:*",
     "@workspace/rate-limit": "workspace:*",
@@ -27,20 +24,19 @@
     "morgan": "catalog:server"
   },
   "devDependencies": {
-    "@jest/globals": "catalog:dev",
     "@types/cors": "catalog:server",
     "@types/express": "catalog:server",
     "@types/morgan": "catalog:server",
     "@types/node": "catalog:dev",
     "@types/supertest": "catalog:dev",
+    "@vitest/coverage-v8": "catalog:dev",
     "@workspace/eslint-config": "workspace:*",
-    "@workspace/jest-presets": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
+    "@workspace/vitest-presets": "workspace:*",
     "eslint": "catalog:eslint",
-    "jest": "catalog:dev",
     "supertest": "catalog:dev",
-    "ts-jest": "catalog:dev",
     "tsx": "catalog:dev",
-    "typescript": "catalog:dev"
+    "typescript": "catalog:dev",
+    "vitest": "catalog:dev"
   }
 }
