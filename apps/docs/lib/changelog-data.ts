@@ -80,9 +80,83 @@ export type ReleaseTag =
  */
 export const changelog: ChangelogEntry[] = [
   {
+    version: "1.2.5",
+    date: "2026-05-25",
+    tag: "latest",
+    title: "Contracts Package Split & Workspace Config Updates",
+    summary:
+      "Adds a new shared contracts package for validation schemas and refreshes workspace package configuration to match the updated monorepo layout.",
+    changes: [
+      {
+        category: "changed",
+        text: "Introduced `@workspace/contracts` for shared Zod schemas and moved auth validation out of `@workspace/utils`",
+      },
+      {
+        category: "changed",
+        text: "Updated web auth and security flows to import schemas from `@workspace/contracts`",
+      },
+      {
+        category: "changed",
+        text: "Refreshed workspace package configs, dependencies, and lockfile entries.",
+      },
+      {
+        category: "changed",
+        text: "Updated docs content for the utils and contracts packages to describe the new split",
+      },
+    ],
+  },
+  {
+    version: "1.2.4",
+    date: "2026-05-16",
+    tag: "minor",
+    title: "Web Shell Refresh & API Rewrite Support",
+    summary:
+      "Adds reusable empty states, refreshes the web shell, and introduces API rewrite support alongside supporting workspace and tooling fixes.",
+    changes: [
+      {
+        category: "added",
+        text: "Added reusable empty state components and refreshed the web shell experience",
+      },
+      {
+        category: "added",
+        text: "Introduced API rewrite support with a shared web API client",
+      },
+      {
+        category: "changed",
+        text: "Simplified URL schemas across auth, database, and rate limit packages",
+      },
+      {
+        category: "changed",
+        text: "Updated the docs collections alias and related configuration to match the current content layout",
+      },
+      {
+        category: "changed",
+        text: "Added a dev Docker script, updated CI environment wiring, and refreshed package metadata for the workspace",
+      },
+      {
+        category: "fixed",
+        text: "Added Node types to the rate-limit tsconfig so type checking works consistently",
+      },
+    ],
+  },
+  {
+    version: "1.2.3",
+    date: "2026-04-11",
+    tag: "patch",
+    title: "Docker Compose Project Name Replacement Fix",
+    summary:
+      "Ensures scaffolded project name replacement also updates the Docker compose file so generated projects stay consistent.",
+    changes: [
+      {
+        category: "fixed",
+        text: "Included `docker-compose.yml` in project name replacement files so scaffolded project names update everywhere",
+      },
+    ],
+  },
+  {
     version: "1.2.2",
     date: "2026-04-02",
-    tag: "latest",
+    tag: "patch",
     title: "Manifest Path Fix for Generated Prisma Client",
     summary:
       "Fixes manifest generation by correcting the skipped generated Prisma client directory path so internal generated artifacts are excluded consistently during hashing.",

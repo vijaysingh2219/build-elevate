@@ -489,11 +489,11 @@ const configurePackageManager = async (packageManager: string) => {
 
   if (packageManager === "bun") {
     if (packageJson) {
-      packageJson.packageManager = "bun@1.3.5";
+      packageJson.packageManager = "bun@1.3.14";
       // Add @tailwindcss/postcss to dependencies if not present
       if (!packageJson.dependencies) packageJson.dependencies = {};
       if (!packageJson.dependencies["@tailwindcss/postcss"]) {
-        packageJson.dependencies["@tailwindcss/postcss"] = "^4.1.18";
+        packageJson.dependencies["@tailwindcss/postcss"] = "^4.3.0";
       }
       await writeFile(
         packageJsonPath,
@@ -595,6 +595,7 @@ const setupEnvironmentVariables = async (includeDocker: boolean) => {
     const prodFiles = [
       { source: join("apps", "api"), target: ".env.production" },
       { source: join("apps", "web"), target: ".env.production" },
+      { source: join("packages", "auth"), target: ".env.production" },
       { source: join("packages", "db"), target: ".env.production" },
       { source: join("packages", "rate-limit"), target: ".env.production" },
       { source: join("packages", "email"), target: ".env.production" },
