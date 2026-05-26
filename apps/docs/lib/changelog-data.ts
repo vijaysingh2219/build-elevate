@@ -80,6 +80,28 @@ export type ReleaseTag =
  */
 export const changelog: ChangelogEntry[] = [
   {
+    version: "1.2.6",
+    date: "2026-05-26",
+    tag: "latest",
+    title: "Vitest Migration Complete & Jest Removal",
+    summary:
+      "Completes the monorepo migration to Vitest, removes Jest dependencies and presets, and updates docs and workspace configuration to match the new test stack.",
+    changes: [
+      {
+        category: "changed",
+        text: "Migrated the API app from Jest to Vitest and aligned test scripts, config, and setup with the shared workspace preset",
+      },
+      {
+        category: "removed",
+        text: "Removed Jest dependencies, presets, and config files now that the workspace test suite runs on Vitest",
+      },
+      {
+        category: "changed",
+        text: "Updated docs, package metadata, and workspace configuration to remove Jest references and reflect the Vitest-based test setup",
+      },
+    ],
+  },
+  {
     version: "1.2.5",
     date: "2026-05-25",
     tag: "latest",
