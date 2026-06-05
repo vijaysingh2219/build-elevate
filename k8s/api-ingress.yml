@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: build-elevate-api-ingress
+  namespace: build-elevate
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    # Strips /api/v1/ prefix: /api/v1/users → /api/users on the API service
+    nginx.ingress.kubernetes.io/rewrite-target: /api/$2
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    # Uncomment to enable TLS via cert-manager:
+    # cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  ingressClassName: nginx
+  # tls:
+  #   - hosts:
+  #       - yourdomain.com
+  #     secretName: build-elevate-tls
+  rules:
+    - http:
+        paths:
+          - path: /api/v1(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: build-elevate-api-service
+                port:
+                  number: 4000

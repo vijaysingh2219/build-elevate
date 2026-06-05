@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: build-elevate-api-deployment
+  namespace: build-elevate
+  labels:
+    app: build-elevate-api
+spec:
+  # replicas is intentionally omitted: the HorizontalPodAutoscaler
+  # (k8s/api-hpa.yml) owns this value. Setting it here would reset the
+  # pod count on every `kubectl apply`, fighting the autoscaler.
+  selector:
+    matchLabels:
+      app: build-elevate-api
+  template:
+    metadata:
+      labels:
+        app: build-elevate-api
+    spec:
+      containers:
+        - name: build-elevate-api
+          image: vijaysingh2219/build-elevate-api:latest
+          ports:
+            - containerPort: 4000
+          envFrom:
+            - secretRef:
+                name: build-elevate-api-env
+            - configMapRef:
+                name: build-elevate-config
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 4000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 4000
+            initialDelaySeconds: 10
+            periodSeconds: 20

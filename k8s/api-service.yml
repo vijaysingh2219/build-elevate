@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: build-elevate-api-service
+  namespace: build-elevate
+  labels:
+    app: build-elevate-api
+spec:
+  selector:
+    app: build-elevate-api
+  ports:
+    - protocol: TCP
+      port: 4000
+      targetPort: 4000
+  type: ClusterIP

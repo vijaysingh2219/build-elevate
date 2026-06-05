@@ -43,6 +43,7 @@
         "PORT",
         "ALLOWED_ORIGINS",
         "CORS_ALLOW_MISSING_ORIGIN",
+        "POD_NAME",
         "RESEND_TOKEN",
         "RESEND_EMAIL_FROM",
         "UPSTASH_REDIS_REST_URL",

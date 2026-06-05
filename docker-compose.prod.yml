@@ -4,6 +4,8 @@ services:
     build:
       context: .
       dockerfile: ./apps/web/Dockerfile.prod
+      args:
+        API_INTERNAL_URL: http://build-elevate-api-service.build-elevate.svc.cluster.local:4000
     env_file:
       - ./apps/web/.env.production
     ports:

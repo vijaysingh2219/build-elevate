@@ -51,7 +51,9 @@
     "check-types": "turbo check-types",
     "start": "turbo start",
     "test": "turbo test",
-    "prepare": "husky"
+    "prepare": "husky",
+    "k8s:deploy": "sh deploy.sh",
+    "k8s:verify": "sh k8s/verify.sh"
   },
   "dependencies": {
     "@clack/prompts": "catalog:cli",

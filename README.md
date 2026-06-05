@@ -223,6 +223,7 @@ build-elevate/
 | **Formatting**       | [Prettier](https://prettier.io)                                    | Code formatter                                |
 | **Language**         | [TypeScript](https://www.typescriptlang.org)                       | JavaScript with static typing                 |
 | **Containerization** | [Docker](https://docker.com)                                       | Container-based deployment                    |
+| **Orchestration**    | [Kubernetes](https://kubernetes.io)                                | Container orchestration                       |
 
 ## 🚀 Development
 
@@ -328,6 +329,111 @@ Services include:
 - Health checks and restart policies configured
 
 See [Docker Documentation](https://build-elevate.vercel.app/docs/configuration/docker) for more details.
+
+## Kubernetes
+
+Deploy both the Next.js frontend and Express API to any Kubernetes cluster using the manifests in the `k8s/` directory.
+
+### What's included
+
+| Manifest                 | Purpose                                                                                |
+| ------------------------ | -------------------------------------------------------------------------------------- |
+| `k8s/namespace.yml`      | Dedicated `build-elevate` namespace                                                    |
+| `k8s/configmap.yml`      | Non-secret config (e.g. cluster-internal `API_INTERNAL_URL`)                           |
+| `k8s/api-deployment.yml` | API Deployment — replicas owned by the HPA, resource limits, liveness/readiness probes |
+| `k8s/api-service.yml`    | ClusterIP Service for the API                                                          |
+| `k8s/web-deployment.yml` | Web (Next.js) Deployment — replicas owned by the HPA, resource limits, probes          |
+| `k8s/web-service.yml`    | ClusterIP Service for the web app                                                      |
+| `k8s/api-ingress.yml`    | nginx Ingress — `/api/v1/*` → API (prefix rewritten to `/api`)                         |
+| `k8s/web-ingress.yml`    | nginx Ingress — everything else → web                                                  |
+| `k8s/api-hpa.yml`        | HorizontalPodAutoscaler for the API (scales 2 → 10 pods)                               |
+| `k8s/web-hpa.yml`        | HorizontalPodAutoscaler for the web app (scales 2 → 10 pods)                           |
+| `k8s/verify.sh`          | Post-deploy health check (pods, endpoints, in-cluster HTTP, ingress, HPA)              |
+
+### Cluster Requirements
+
+Before deploying, ensure the following are available on your cluster.
+
+**1. A running Kubernetes cluster** (EKS, GKE, AKS, k3s, etc.)
+
+**2. nginx Ingress controller:**
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.10.1/deploy/static/provider/cloud/deploy.yaml
+```
+
+**3. Metrics Server** (required for HPA — without it the HPAs read `<unknown>` and cannot scale):
+
+```bash
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+```
+
+On minikube, enable the bundled addon instead:
+
+```bash
+minikube addons enable metrics-server
+```
+
+**4.** Create `.env.production` files at `apps/api/.env.production` and `apps/web/.env.production`
+
+**5.** (Optional) For a real domain, add a `host:` to each rule in the ingress files (`k8s/api-ingress.yml`, `k8s/web-ingress.yml`) and uncomment the `tls:` block plus the `cert-manager.io/cluster-issuer` annotation. The manifests ship hostless (catch-all) so they work as-is against the ingress controller's IP.
+
+### Deploy
+
+```bash
+pnpm k8s:deploy
+```
+
+This script will:
+
+1. Build and push Docker images for both API and web to Docker Hub
+2. Create the namespace and apply the ConfigMap
+3. Create K8s Secrets from your `.env.production` files
+4. Apply all manifests (Deployments, Services, Ingress, HPA)
+5. Wait for both rollouts to complete
+
+### Verify
+
+```bash
+pnpm k8s:verify
+```
+
+Checks pods, service endpoints, in-cluster HTTP to the apps, the ingress, and that the HPAs are reading metrics. Exits non-zero (CI-friendly) if anything is unhealthy.
+
+### Traffic flow
+
+```txt
+Internet → nginx Ingress (:80/:443)
+         ├─ /api/v1/*  → rewrite /api/v1/* → /api/* → build-elevate-api-service (:4000) → Express API
+         └─ /*         → build-elevate-web-service (:3000) → Next.js pages
+
+Next.js server-side fetches (SSR) reach the API in-cluster via
+API_INTERNAL_URL → build-elevate-api-service (:4000), bypassing the ingress.
+```
+
+### TLS (HTTPS)
+
+The Ingress includes commented-out cert-manager annotations. To enable TLS:
+
+1. Install [cert-manager](https://cert-manager.io/docs/installation/)
+2. Uncomment the `cert-manager.io/cluster-issuer` annotation and `tls` block in the ingress files (`k8s/api-ingress.yml`, `k8s/web-ingress.yml`)
+
+### Useful commands
+
+```bash
+kubectl get pods -n build-elevate
+kubectl get services -n build-elevate
+kubectl get ingress -n build-elevate
+kubectl get hpa -n build-elevate
+kubectl logs -n build-elevate -l app=build-elevate-api
+kubectl logs -n build-elevate -l app=build-elevate-web
+
+# Inspect an app in your browser (Ctrl+C to stop the tunnel).
+# The API health endpoints (/health, /healthz, /readyz) live at the API root and
+# are not exposed via the ingress, so port-forward is how you reach them locally.
+kubectl port-forward -n build-elevate svc/build-elevate-api-service 4000:4000  # → http://localhost:4000/health
+kubectl port-forward -n build-elevate svc/build-elevate-web-service 3000:3000  # → http://localhost:3000
+```
 
 ## 📖 Documentation
 

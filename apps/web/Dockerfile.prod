@@ -45,6 +45,12 @@ COPY --from=builder /app/out/full/ .
 # Generate Prisma client
 RUN pnpm --filter @workspace/db db:generate
 
+# Next.js bakes rewrites() into routes-manifest.json at build time, so
+# API_INTERNAL_URL must be provided here — runtime env injection is too late.
+# docker-compose.prod.yml sets the cluster-internal URL via build.args.
+ARG API_INTERNAL_URL=http://localhost:4000
+ENV API_INTERNAL_URL=$API_INTERNAL_URL
+
 # Uncomment and use build args to enable remote caching
 # ARG TURBO_TEAM
 # ENV TURBO_TEAM=$TURBO_TEAM

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: build-elevate-web-service
+  namespace: build-elevate
+  labels:
+    app: build-elevate-web
+spec:
+  selector:
+    app: build-elevate-web
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+  type: ClusterIP

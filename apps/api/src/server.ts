@@ -33,6 +33,23 @@ export const createServer = (): Express => {
   // CORS
   app.use(cors(corsOptions));
 
+  app.get('/', (req, res) => {
+    res.json({
+      message: 'Welcome to the Build Elevate API!',
+      service: 'build-elevate-api',
+      pod: process.env.POD_NAME || 'unknown',
+      time: new Date().toISOString(),
+    });
+  });
+
+  app.get('/readyz', (req, res) => {
+    res.status(200).send('ready');
+  });
+
+  app.get('/healthz', (req, res) => {
+    res.status(200).send('ok');
+  });
+
   // Health check route
   app.get('/health', (_, res) => {
     const uptimeInSeconds = process.uptime();
