@@ -36,11 +36,16 @@ import {
   applyPnpmCatalogCleanup,
   applyDockerComposeCleanup,
   applyDockerfilesPackageManagerCleanup,
+  applyDockerHubUsernameCleanup,
+  applyConfigMapCleanup,
+  K8S_DOCKERHUB_FILES,
 } from "./update.js";
+
+const branch = process.env.BUILD_ELEVATE_BRANCH ?? "main";
 
 const getLatestCommit = async (): Promise<string> => {
   const res = await fetch(
-    "https://api.github.com/repos/vijaysingh2219/build-elevate/commits/main",
+    `https://api.github.com/repos/vijaysingh2219/build-elevate/commits/${branch}`,
     { headers: { Accept: "application/vnd.github.sha" } },
   );
   if (!res.ok) throw new Error("Failed to resolve latest commit SHA");
@@ -50,7 +55,7 @@ const getLatestCommit = async (): Promise<string> => {
 const cloneBuildElevate = async (name: string): Promise<string> => {
   const commitHash = await getLatestCommit();
 
-  const emitter = degit(url, {
+  const emitter = degit(`${url}#${branch}`, {
     cache: false,
     force: true,
     verbose: false,
@@ -118,6 +123,62 @@ const removeDockerFiles = async () => {
 
   if (errors.length > 0) {
     log.warn(`Some Docker files could not be deleted:\n${errors.join("\n")}`);
+  }
+};
+
+const removeKubernetesFiles = async () => {
+  try {
+    await Promise.all([
+      rm("k8s", { recursive: true, force: true }),
+      rm("deploy.sh", { force: true }),
+    ]);
+  } catch (error) {
+    log.warn(
+      `Some Kubernetes files could not be deleted: ${error instanceof Error ? error.message : String(error)}`,
+    );
+  }
+};
+
+const replaceDockerHubUsername = async () => {
+  await Promise.all(
+    K8S_DOCKERHUB_FILES.map(async (file) => {
+      try {
+        const content = await readFile(file, "utf8");
+        const updated = applyDockerHubUsernameCleanup(content);
+        if (updated !== content) {
+          await writeFile(file, updated);
+        }
+      } catch {
+        // file doesn't exist - already removed by template pruning
+      }
+    }),
+  );
+};
+
+const updateK8sForTemplate = async (template: string) => {
+  if (template !== "web" && template !== "api") return;
+
+  const dropRole = template === "web" ? "api" : "web";
+  const dropFiles = [
+    `k8s/${dropRole}-deployment.yml`,
+    `k8s/${dropRole}-service.yml`,
+    `k8s/${dropRole}-ingress.yml`,
+    `k8s/${dropRole}-hpa.yml`,
+  ];
+
+  try {
+    await Promise.all(dropFiles.map((file) => rm(file, { force: true })));
+
+    const configMapPath = "k8s/configmap.yml";
+    const content = await readFile(configMapPath, "utf8");
+    const updated = applyConfigMapCleanup(content, template);
+    if (updated !== content) {
+      await writeFile(configMapPath, updated);
+    }
+  } catch (error) {
+    log.warn(
+      `Failed to update Kubernetes manifests for ${template} template: ${error instanceof Error ? error.message : String(error)}`,
+    );
   }
 };
 
@@ -619,10 +680,19 @@ const buildWorkspacePackages = async (selectedManager: string) => {
   await exec(`${selectedManager} run build`, execSyncOpts);
 };
 
-const cleanupPackageJson = async (template: string) => {
+const cleanupPackageJson = async (
+  template: string,
+  includeDocker: boolean,
+  includeKubernetes: boolean,
+) => {
   const packageJsonPath = "package.json";
   const content = await readFile(packageJsonPath, "utf8");
-  const updated = applyPackageJsonCleanup(content, template);
+  const updated = applyPackageJsonCleanup(
+    content,
+    template,
+    includeDocker,
+    includeKubernetes,
+  );
   await writeFile(packageJsonPath, updated);
 };
 
@@ -714,6 +784,32 @@ const getDockerChoice = async () => {
       { value: false, label: "No", hint: "Skip Docker setup" },
     ],
     initialValue: true,
+  });
+
+  if (isCancel(value)) {
+    cancel("Operation cancelled.");
+    process.exit(0);
+  }
+
+  return value as boolean;
+};
+
+const getKubernetesChoice = async () => {
+  const value = await select({
+    message: "Include Kubernetes manifests?",
+    options: [
+      {
+        value: false,
+        label: "No",
+        hint: "Skip Kubernetes setup",
+      },
+      {
+        value: true,
+        label: "Yes",
+        hint: "Deployment manifests, deploy & verify scripts",
+      },
+    ],
+    initialValue: false,
   });
 
   if (isCancel(value)) {
@@ -841,6 +937,11 @@ export const initialize = async (
 
     const includeDocker = options.yes ? true : await getDockerChoice();
 
+    // Kubernetes runs the Docker images, so it's only offered when Docker is
+    // included. It's opt-in (default No) and skipped entirely under --yes.
+    const includeKubernetes =
+      includeDocker && !options.yes ? await getKubernetesChoice() : false;
+
     const includeStudio = options.yes ? true : await getStudioChoice();
 
     const s = spinner();
@@ -883,7 +984,7 @@ export const initialize = async (
     if (options.verbose) log.info("✓ Replaced project name in all files");
 
     s.message("Cleaning up package.json...");
-    await cleanupPackageJson(template);
+    await cleanupPackageJson(template, includeDocker, includeKubernetes);
     if (options.verbose) log.info("✓ Cleaned up package.json");
 
     s.message("Updating LICENSE...");
@@ -923,6 +1024,19 @@ export const initialize = async (
         log.info(`✓ Updated Docker configuration for ${template} template`);
     }
 
+    if (!includeKubernetes) {
+      s.message("Removing Kubernetes files...");
+      await removeKubernetesFiles();
+      if (options.verbose) log.info("✓ Removed Kubernetes files");
+    } else {
+      s.message("Configuring Kubernetes manifests...");
+      await replaceDockerHubUsername();
+      if (template !== "fullstack") {
+        await updateK8sForTemplate(template);
+      }
+      if (options.verbose) log.info("✓ Configured Kubernetes manifests");
+    }
+
     // Handle --skip-install flag
     if (!options.skipInstall) {
       s.message("Installing dependencies...");
@@ -952,6 +1066,7 @@ export const initialize = async (
       template,
       includeDocker,
       packageManager as "npm" | "pnpm" | "bun",
+      includeKubernetes,
     );
 
     s.message("Writing upgrade manifest...");

@@ -7,6 +7,7 @@ interface ReadmeContext {
   projectName: string;
   template: Template;
   includeDocker: boolean;
+  includeKubernetes: boolean;
   packageManager: "pnpm" | "npm" | "bun";
   scriptPrefix: string;
 }
@@ -66,6 +67,7 @@ ${scriptPrefix} dev
 const buildAvailableScriptsSection = ({
   scriptPrefix,
   includeDocker,
+  includeKubernetes,
 }: ReadmeContext): string => `\
 ## Available Scripts
 
@@ -83,6 +85,12 @@ ${
   includeDocker
     ? `- \`${scriptPrefix} docker:dev\` - Run with Docker (development)
 - \`${scriptPrefix} docker:prod\` - Run with Docker (production)`
+    : ""
+}
+${
+  includeKubernetes
+    ? `- \`${scriptPrefix} k8s:deploy\` - Build, push, and deploy to Kubernetes
+- \`${scriptPrefix} k8s:verify\` - Verify the Kubernetes deployment`
     : ""
 }
 
@@ -238,6 +246,25 @@ Features:
 `;
 };
 
+const buildKubernetesSection = ({ scriptPrefix }: ReadmeContext): string => `\
+## Kubernetes Deployment
+
+Deploy to any Kubernetes cluster using the manifests in \`k8s/\` and the deploy script:
+
+\`\`\`bash
+# Set your Docker Hub username in deploy.sh and k8s/*-deployment.yml, then:
+${scriptPrefix} k8s:deploy
+\`\`\`
+
+After deploying, verify the rollout:
+
+\`\`\`bash
+${scriptPrefix} k8s:verify
+\`\`\`
+
+See [Kubernetes docs](https://build-elevate.vercel.app/docs/deployment/kubernetes) for the full guide.
+`;
+
 /**
  * Scaffold a fresh README for the project from context.
  * No file reading or regex patching — pure construction.
@@ -247,11 +274,13 @@ export const createProjectReadme = async (
   template: string,
   includeDocker: boolean,
   packageManager: "pnpm" | "npm" | "bun" = "pnpm",
+  includeKubernetes: boolean = false,
 ) => {
   const ctx: ReadmeContext = {
     projectName,
     template: template as Template,
     includeDocker,
+    includeKubernetes,
     packageManager,
     scriptPrefix:
       packageManager === "pnpm" ? packageManager : `${packageManager} run`,
@@ -264,6 +293,7 @@ export const createProjectReadme = async (
     buildAvailableScriptsSection(ctx),
     buildStructureSection(ctx),
     ...(includeDocker ? [buildDockerSection(ctx)] : []),
+    ...(includeKubernetes ? [buildKubernetesSection(ctx)] : []),
     buildDocumentationSection(ctx),
   ];
 

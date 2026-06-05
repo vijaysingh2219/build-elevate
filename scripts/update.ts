@@ -74,6 +74,8 @@ export const applyTurboLintEnv = (
 export const applyPackageJsonCleanup = (
   content: string,
   template: string,
+  includeDocker: boolean = true,
+  includeKubernetes: boolean = true,
 ): string => {
   let pkg: any;
   try {
@@ -93,6 +95,14 @@ export const applyPackageJsonCleanup = (
   if (pkg.scripts) {
     delete pkg.scripts["build:cli"];
     delete pkg.scripts.prepublish;
+    if (!includeDocker) {
+      delete pkg.scripts["docker:dev"];
+      delete pkg.scripts["docker:prod"];
+    }
+    if (!includeKubernetes) {
+      delete pkg.scripts["k8s:deploy"];
+      delete pkg.scripts["k8s:verify"];
+    }
   }
 
   delete pkg.dependencies;
@@ -195,6 +205,31 @@ export const applyDockerComposeCleanup = (
   }
 
   return updated;
+};
+
+export const TEMPLATE_DOCKERHUB_USERNAME = "vijaysingh2219";
+export const DOCKERHUB_USERNAME_PLACEHOLDER = "your-dockerhub-username";
+
+// Files that embed the registry username (image: field or shell variable).
+export const K8S_DOCKERHUB_FILES = [
+  "deploy.sh",
+  "k8s/api-deployment.yml",
+  "k8s/web-deployment.yml",
+];
+
+export const applyDockerHubUsernameCleanup = (content: string): string =>
+  content.replaceAll(
+    TEMPLATE_DOCKERHUB_USERNAME,
+    DOCKERHUB_USERNAME_PLACEHOLDER,
+  );
+
+export const applyConfigMapCleanup = (
+  content: string,
+  template: string,
+): string => {
+  if (template !== "web") return content;
+  // Drop the API_INTERNAL_URL line and its preceding comment.
+  return content.replace(/\n\s*#[^\n]*\n\s*API_INTERNAL_URL:[^\n]*/, "");
 };
 
 /**

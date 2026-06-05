@@ -1,0 +1,130 @@
+---
+title: Deploying to Kubernetes
+description: Deploy the web and API applications to any Kubernetes cluster using the included manifests, deploy script, and verification script
+---
+
+## Overview
+
+build-elevate ships a complete set of Kubernetes manifests in the `k8s/` directory, plus a `deploy.sh` script that builds and pushes your Docker images and applies the manifests, and a `verify.sh` script that checks the rollout afterward.
+
+The manifests are template-aware: a **full-stack** project gets both web and API resources, while **web-only** and **api-only** projects ship only the manifests for the app they include.
+
+### What's included
+
+| File                     | Purpose                                                           |
+| ------------------------ | ----------------------------------------------------------------- |
+| `k8s/namespace.yml`      | Dedicated `build-elevate` namespace                               |
+| `k8s/configmap.yml`      | Non-secret config (`NODE_ENV`; `API_INTERNAL_URL` for fullstack)  |
+| `k8s/api-deployment.yml` | API Deployment with resource limits and readiness/liveness probes |
+| `k8s/api-service.yml`    | ClusterIP Service for the API on port 4000                        |
+| `k8s/web-deployment.yml` | Web Deployment with resource limits and probes                    |
+| `k8s/web-service.yml`    | ClusterIP Service for the web app on port 3000                    |
+| `k8s/api-ingress.yml`    | nginx Ingress routing `/api/v1/*` → API (with prefix rewrite)     |
+| `k8s/web-ingress.yml`    | nginx Ingress routing `/` → web                                   |
+| `k8s/api-hpa.yml`        | HorizontalPodAutoscaler (CPU/memory) for the API                  |
+| `k8s/web-hpa.yml`        | HorizontalPodAutoscaler (CPU/memory) for the web app              |
+| `deploy.sh`              | Build → push → apply pipeline (`pnpm k8s:deploy`)                 |
+| `k8s/verify.sh`          | Post-deploy health/rollout checks (`pnpm k8s:verify`)             |
+
+<Callout type="info">
+  Kubernetes support is opt-in. The scaffolder asks **"Include Kubernetes
+  manifests?"** (only when Docker is enabled, since the manifests run the Docker
+  images). If you decline — or opt out of Docker — the `k8s/` directory and
+  `deploy.sh` are not generated.
+</Callout>
+
+## Prerequisites
+
+- A running Kubernetes cluster (cloud-managed, or local via [minikube](https://minikube.sigs.k8s.io/) / [kind](https://kind.sigs.k8s.io/))
+- [`kubectl`](https://kubernetes.io/docs/tasks/tools/) configured to talk to your cluster
+- A container registry account (the scripts assume [Docker Hub](https://hub.docker.com/))
+- An [ingress-nginx controller](https://kubernetes.github.io/ingress-nginx/) installed in the cluster
+- [metrics-server](https://github.com/kubernetes-sigs/metrics-server) installed (required for the HPAs to scale; on minikube: `minikube addons enable metrics-server`)
+
+## Step 1: Set your registry username
+
+The deploy script and deployment manifests use the placeholder `your-dockerhub-username`. Replace it with your own Docker Hub username in:
+
+- `deploy.sh` — the `USERNAME` variable
+- `k8s/api-deployment.yml` — the `image:` field
+- `k8s/web-deployment.yml` — the `image:` field
+
+```bash title="deploy.sh"
+USERNAME="your-dockerhub-username"
+```
+
+```yaml title="k8s/api-deployment.yml"
+image: your-dockerhub-username/your-project-api:latest
+```
+
+Make sure you are logged in to your registry locally so the script can push:
+
+```bash
+docker login
+```
+
+## Step 2: Create production environment files
+
+Secrets are created from per-app `.env.production` files. If you scaffolded with Docker, these were generated for you — fill them in with real production values:
+
+- `apps/api/.env.production`
+- `apps/web/.env.production`
+
+`deploy.sh` turns each into a Kubernetes Secret (`[your-project]-api-env`, `[your-project]-web-env`) that the deployments load via `envFrom`.
+
+<Callout type="warn">
+  Never commit `.env.production` files. They contain database credentials, auth
+  secrets, and API keys.
+</Callout>
+
+## Step 3: Deploy
+
+Run the deploy script from the project root:
+
+```bash
+pnpm k8s:deploy
+```
+
+This will:
+
+1. Build the Docker image(s) from `docker-compose.prod.yml`
+2. Tag and push them to your registry
+3. Apply the namespace and ConfigMap
+4. Create/update the Secrets from your `.env.production` files
+5. Apply the Deployments, Services, Ingress, and HPAs
+6. Wait for each rollout to complete
+
+## Step 4: Verify
+
+After deploying, run the verification script:
+
+```bash
+pnpm k8s:verify
+```
+
+It works outward — pods → deployments → services/endpoints → in-cluster HTTP → ingress → HPA — and exits non-zero if any hard check fails, so it can be used in CI.
+
+## How it works
+
+### Autoscaling owns replica count
+
+The Deployments intentionally **omit** `replicas`. The per-app `HorizontalPodAutoscaler` (`k8s/api-hpa.yml`, `k8s/web-hpa.yml`) owns that value (min 2, max 10, scaling on CPU/memory). Setting `replicas` on the Deployment would reset the pod count on every `kubectl apply` and fight the autoscaler.
+
+### Ingress routing
+
+The ingress mirrors the local dev rewrite: requests to `/api/v1/*` are stripped to `/api/*` and routed to the API service (`k8s/api-ingress.yml`), while everything else goes to the web app (`k8s/web-ingress.yml`). To enable TLS, install [cert-manager](https://cert-manager.io/), then uncomment the `tls:` block and `cert-manager.io/cluster-issuer` annotation in those ingress files.
+
+### Health probes
+
+The API uses `/readyz` (readiness) and `/healthz` (liveness); the web app probes `/`. These match the endpoints exposed by the Express API (`/healthz`, `/readyz`, `/health`).
+
+## Troubleshooting
+
+- **HPA `TARGETS` shows `<unknown>`** — metrics-server isn't serving metrics. Install it (on minikube: `minikube addons enable metrics-server`).
+- **`ImagePullBackOff`** — the image wasn't pushed or the registry username in the manifests doesn't match what you pushed. Re-check Step 1 and `docker login`.
+- **Service has no endpoints** — the pods aren't ready; inspect them with `kubectl get pods -n [your-project]` and `kubectl logs`.
+
+<Callout type="info">
+  Need help? Check the [Troubleshooting Guide](/docs/troubleshooting) or open an
+  issue on [GitHub](https://github.com/vijaysingh2219/build-elevate/issues).
+</Callout>

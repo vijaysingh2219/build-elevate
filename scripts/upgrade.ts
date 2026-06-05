@@ -17,6 +17,9 @@ import {
   applyAuthKeysCleanup,
   applyDockerComposeCleanup,
   applyDockerfilesPackageManagerCleanup,
+  applyDockerHubUsernameCleanup,
+  applyConfigMapCleanup,
+  K8S_DOCKERHUB_FILES,
 } from "./update.js";
 import { applyProjectName } from "./utils.js";
 
@@ -107,13 +110,24 @@ const shouldSkip = (filePath: string): boolean => {
 const getTemplateExcludedPrefixes = (template: string): string[] => {
   switch (template) {
     case "web":
-      return ["apps/api", "apps/email"];
+      return [
+        "apps/api",
+        "apps/email",
+        "k8s/api-deployment.yml",
+        "k8s/api-service.yml",
+        "k8s/api-ingress.yml",
+        "k8s/api-hpa.yml",
+      ];
     case "api":
       return [
         "apps/web",
         "apps/email",
         "packages/ui",
         "packages/auth/src/client.ts",
+        "k8s/web-deployment.yml",
+        "k8s/web-service.yml",
+        "k8s/web-ingress.yml",
+        "k8s/web-hpa.yml",
       ];
     case "fullstack":
     default:
@@ -197,6 +211,10 @@ const applyInitTransforms = (
   // 1. Apply project name replacement first (all case formats)
   let result = applyProjectName(content, projectName);
 
+  if (K8S_DOCKERHUB_FILES.includes(filePath)) {
+    result = applyDockerHubUsernameCleanup(result);
+  }
+
   // 2. Apply per-file init-time transformations
   if (filePath === "turbo.json") {
     result = applyTurboLintEnv(result, template);
@@ -211,6 +229,8 @@ const applyInitTransforms = (
     filePath === "apps/web/Dockerfile.prod"
   ) {
     result = applyDockerfilesPackageManagerCleanup(result, packageManager);
+  } else if (filePath === "k8s/configmap.yml") {
+    result = applyConfigMapCleanup(result, template);
   } else if (filePath === "packages/auth/src/index.ts" && template === "api") {
     result = applyAuthIndexCleanup(result);
   } else if (filePath === "packages/auth/package.json" && template === "api") {

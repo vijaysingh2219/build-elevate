@@ -1,6 +1,6 @@
 {
   "title": "Deployment",
   "icon": "CloudUpload",
-  "pages": ["vercel"],
+  "pages": ["vercel", "kubernetes"],
   "defaultOpen": false
 }

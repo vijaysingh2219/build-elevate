@@ -3,7 +3,7 @@ title: Deployment
 description: Production deployment strategies, best practices, security considerations, and environment setup guides for deploying applications to Vercel and other platforms
 ---
 
-import { Cloud, Package, Shield, Zap } from "lucide-react";
+import { Cloud, Package, Shield, Ship, Zap } from "lucide-react";
 
 # Deployment
 
@@ -20,8 +20,11 @@ Choose the deployment platform that best fits your needs:
   <Card icon={<Package />} title="Docker" href="../configuration/docker">
     Package your entire stack with Docker Compose for any cloud provider
   </Card>
+  <Card icon={<Ship />} title="Kubernetes" href="./kubernetes">
+    Deploy to any Kubernetes cluster with the included manifests and scripts
+  </Card>
   <Card icon={<Shield />} title="Self-Hosted">
-    Deploy to your own VPS or cloud instance using Docker Compose
+    Deploy to your own VPS or cloud instance using Docker Compose or Kubernetes
   </Card>
 </Cards>
 
@@ -78,6 +81,7 @@ Before deploying to production:
 
 - **[Vercel](/docs/deployment/vercel)** - Best for Next.js frontend and serverless API
 - **[Docker](/docs/configuration/docker)** - Self-hosted or any cloud provider
+- **[Kubernetes](/docs/deployment/kubernetes)** - Scalable, self-healing deployments on any cluster
 
 <Callout type="info">
   Need help? Check the [Troubleshooting Guide](/docs/troubleshooting) or open an
