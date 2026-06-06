@@ -1,26 +1,38 @@
 import {
   ArrowRight,
+  BookOpen,
   Box,
   Code2,
+  Component,
+  Database,
   FileCode,
+  FlaskConical,
+  Gauge,
   GitBranch,
   Layers,
-  Lock,
+  Mail,
   Package,
+  ShieldCheck,
+  Ship,
   StarIcon,
   Terminal,
   Zap,
 } from "lucide-react";
+import { SiGithub } from "react-icons/si";
 import Link from "next/link";
 import { Button } from "@workspace/ui/components/button";
 import { Card } from "@workspace/ui/components/card";
 import { Badge } from "@workspace/ui/components/badge";
+import { CopyButton } from "./_components/copy-button";
+
+const GITHUB_URL = "https://github.com/vijaysingh2219/build-elevate";
+const INSTALL_COMMAND = "pnpm dlx build-elevate@latest init my-project";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen mx-auto ">
       {/* Hero Section */}
-      <section className="container max-w-screen-2xl px-4 py-20 md:py-24">
+      <section className="mx-auto max-w-screen-2xl px-4 py-20 md:py-24">
         <div className="mx-auto max-w-3xl text-center">
           <Badge variant="outline" className="mb-4">
             <StarIcon className="mr-1 inline-block size-3" />
@@ -34,11 +46,26 @@ export default function HomePage() {
             infrastructure, and best practices built in. Stop configuring. Start
             building.
           </p>
-          <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center">
-            <Button size="lg" variant="outline" asChild>
+          <div className="mx-auto mt-8 w-full max-w-md rounded-lg border border-border/60 bg-muted/40 p-1.5 pl-4">
+            <div className="flex items-center justify-between gap-3 font-mono text-sm">
+              <span className="truncate">
+                <span className="select-none text-muted-foreground">$ </span>
+                {INSTALL_COMMAND}
+              </span>
+              <CopyButton value={INSTALL_COMMAND} />
+            </div>
+          </div>
+          <div className="mt-6 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <Button size="lg" asChild>
               <Link href="/docs">
                 Get Started
                 <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+            <Button size="lg" variant="outline" asChild>
+              <Link href={GITHUB_URL} target="_blank" rel="noreferrer noopener">
+                <SiGithub className="mr-2 size-4" />
+                GitHub
               </Link>
             </Button>
           </div>
@@ -46,7 +73,7 @@ export default function HomePage() {
       </section>
 
       {/* Code Snippet Section */}
-      <section className="container max-w-screen-2xl px-4 pb-24">
+      <section className="mx-auto max-w-screen-2xl px-4 pb-24">
         <div className="mx-auto max-w-3xl">
           <Card className="border-border/40 bg-muted/30 p-6">
             <div className="space-y-4">
@@ -57,7 +84,7 @@ export default function HomePage() {
               <div className="space-y-2 font-mono text-sm">
                 <div className="flex items-start gap-3">
                   <span className="text-muted-foreground">$</span>
-                  <span>pnpm dlx build-elevate init my-app</span>
+                  <span>{INSTALL_COMMAND}</span>
                 </div>
                 <div className="ml-6 space-y-1 text-muted-foreground">
                   <div>✓ Initializing project structure...</div>
@@ -65,7 +92,7 @@ export default function HomePage() {
                   <div>✓ Installing dependencies...</div>
                   <div>✓ Configuring project settings...</div>
                   <div className="text-foreground">
-                    🎉 Project ready! Run cd my-app && pnpm dev
+                    🎉 Project ready! Run cd my-project && pnpm dev
                   </div>
                 </div>
               </div>
@@ -76,8 +103,8 @@ export default function HomePage() {
 
       {/* Why Build-Elevate Section */}
       <section className="border-t border-border/40 bg-muted/20 py-24">
-        <div className="container max-w-screen-2xl px-4">
-          <div className="mx-auto max-w-3xl">
+        <div className="mx-auto max-w-5xl px-4">
+          <div>
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
               Why build-elevate?
             </h2>
@@ -85,7 +112,7 @@ export default function HomePage() {
               Stop wasting time on boilerplate. Get a production-ready
               foundation in minutes.
             </p>
-            <div className="mt-12 grid gap-6 sm:grid-cols-2">
+            <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               <FeatureCard
                 icon={<Terminal className="h-5 w-5" />}
                 title="CLI-first approach"
@@ -123,44 +150,69 @@ export default function HomePage() {
 
       {/* What You Get Section */}
       <section className="py-24">
-        <div className="container max-w-screen-2xl px-4">
-          <div className="mx-auto max-w-3xl">
+        <div className="mx-auto max-w-5xl px-4">
+          <div>
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
               What you get
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
               Everything you need to build and ship production applications.
             </p>
-            <div className="mt-12 space-y-6">
+            <div className="mt-12 grid gap-x-10 gap-y-8 sm:grid-cols-2">
               <IncludedItem
                 icon={<Package className="h-5 w-5" />}
                 title="Turborepo monorepo"
                 description="Optimized build system with caching, parallel execution, and task pipelining. Share code across apps and packages."
               />
               <IncludedItem
-                icon={<Lock className="h-5 w-5" />}
-                title="Authentication scaffold"
-                description="Better Auth integration with user management, session handling, and protected routes."
+                icon={<ShieldCheck className="h-5 w-5" />}
+                title="Authentication & security"
+                description="Better Auth with Google OAuth, email verification, TOTP two-factor, and database-backed sessions with protected routes."
+              />
+              <IncludedItem
+                icon={<Database className="h-5 w-5" />}
+                title="Prisma + PostgreSQL"
+                description="A type-safe database layer with an auto-generated client, migrations, and Prisma Studio for browsing your data."
+              />
+              <IncludedItem
+                icon={<Mail className="h-5 w-5" />}
+                title="Transactional email"
+                description="React Email templates delivered through Resend, with a local preview server for designing emails."
+              />
+              <IncludedItem
+                icon={<Gauge className="h-5 w-5" />}
+                title="Rate limiting"
+                description="Per-IP sliding-window rate limiting backed by Upstash Redis, wired into the API middleware."
+              />
+              <IncludedItem
+                icon={<Component className="h-5 w-5" />}
+                title="UI component library"
+                description="A shared shadcn/ui and Tailwind CSS component package used consistently across every app."
               />
               <IncludedItem
                 icon={<FileCode className="h-5 w-5" />}
-                title="Environment management"
-                description="Type-safe environment variables with validation. Local and production configs."
+                title="Type-safe environments"
+                description="Validated environment variables with fail-fast startup, and separate local and production configs."
               />
               <IncludedItem
-                icon={<Code2 className="h-5 w-5" />}
-                title="Linting & formatting"
-                description="ESLint, Prettier, and TypeScript strict mode. Catch errors before they ship."
+                icon={<FlaskConical className="h-5 w-5" />}
+                title="Testing, linting & formatting"
+                description="Vitest, ESLint, Prettier, and TypeScript strict mode. Catch errors before they ship."
               />
               <IncludedItem
-                icon={<Terminal className="h-5 w-5" />}
-                title="Package manager aware"
-                description="Uses your preferred package manager: npm, pnpm or bun"
+                icon={<Ship className="h-5 w-5" />}
+                title="Docker & Kubernetes"
+                description="Compose files for local and production, plus Kubernetes manifests with autoscaling (HPA) and one-command deploy and verify."
               />
               <IncludedItem
                 icon={<GitBranch className="h-5 w-5" />}
-                title="GitHub Actions workflows"
-                description="Pre-configured CI/CD pipelines for automated testing, type checking, and format enforcement."
+                title="GitHub Actions CI"
+                description="Pre-configured pipelines for linting, type checking, testing, and build on every push and pull request."
+              />
+              <IncludedItem
+                icon={<BookOpen className="h-5 w-5" />}
+                title="Documentation site"
+                description="A Fumadocs-powered docs app, ready for your own content out of the box."
               />
             </div>
           </div>
@@ -169,7 +221,7 @@ export default function HomePage() {
 
       {/* How It Works Section */}
       <section className="border-t border-border/40 bg-muted/20 py-24">
-        <div className="container max-w-screen-2xl px-4">
+        <div className="mx-auto max-w-screen-2xl px-4">
           <div className="mx-auto max-w-3xl">
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
               How it works
@@ -181,12 +233,12 @@ export default function HomePage() {
               <StepItem
                 number="01"
                 title="Install and initialize"
-                description="Run a single command to create your project. The CLI walks you through configuration options."
+                description="Run a single command to create your project. The CLI walks you through your package manager and optional Docker, Kubernetes, and Prisma Studio."
               />
               <StepItem
                 number="02"
-                title="Select your stack"
-                description="Choose the apps and features. Everything is pre-configured."
+                title="Pick a template"
+                description="Choose fullstack, web-only, or api-only. Everything is pre-configured and only the files your template needs are scaffolded."
               />
               <StepItem
                 number="03"
@@ -200,7 +252,7 @@ export default function HomePage() {
 
       {/* CTA Section */}
       <section className="py-24">
-        <div className="container max-w-screen-2xl px-4">
+        <div className="mx-auto max-w-screen-2xl px-4">
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
               Ready to elevate your workflow?
@@ -209,11 +261,32 @@ export default function HomePage() {
               Stop configuring and start shipping. Join developers who are
               building faster.
             </p>
-            <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center">
-              <Button size="lg" variant="outline" asChild>
+            <div className="mt-8 flex justify-center">
+              <div className="w-full max-w-md rounded-xl border border-border/40 bg-muted/30 p-2 pl-4">
+                <div className="flex items-center justify-between gap-3 font-mono text-sm">
+                  <span className="truncate">
+                    <span className="text-muted-foreground">$ </span>
+                    {INSTALL_COMMAND}
+                  </span>
+                  <CopyButton value={INSTALL_COMMAND} />
+                </div>
+              </div>
+            </div>
+            <div className="mt-6 flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <Button size="lg" asChild>
                 <Link href="/docs">
                   Get Started
                   <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+              <Button size="lg" variant="outline" asChild>
+                <Link
+                  href={GITHUB_URL}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  <SiGithub className="mr-2 size-4" />
+                  Star on GitHub
                 </Link>
               </Button>
             </div>

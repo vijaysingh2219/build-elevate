@@ -1,5 +1,6 @@
+import { NPM } from "@/components/icons/npm";
 import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
-import { Layers } from "lucide-react";
+import { BookIcon, HistoryIcon, Layers } from "lucide-react";
 
 export function baseOptions(): BaseLayoutProps {
   return {
@@ -11,6 +12,27 @@ export function baseOptions(): BaseLayoutProps {
         </div>
       ),
     },
+    links: [
+      {
+        icon: <BookIcon />,
+        text: "Documentation",
+        url: "/docs",
+        secondary: false,
+      },
+      {
+        icon: <HistoryIcon />,
+        text: "Changelog",
+        url: "/changelog",
+        secondary: false,
+      },
+      {
+        type: "icon",
+        icon: <NPM />,
+        text: "NPM",
+        url: "https://www.npmjs.com/package/build-elevate",
+        external: true,
+      },
+    ],
     githubUrl: "https://github.com/vijaysingh2219/build-elevate",
   };
 }

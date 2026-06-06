@@ -24,48 +24,73 @@ export interface ChangelogEntry {
 
 export const categoryMeta: Record<
   ChangeCategory,
-  { label: string; color: string; icon: string }
+  { label: string; text: string; dot: string }
 > = {
   added: {
     label: "Added",
-    color:
-      "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
-    icon: "plus",
+    text: "text-emerald-600 dark:text-emerald-400",
+    dot: "bg-emerald-500 dark:bg-emerald-400",
   },
   changed: {
     label: "Changed",
-    color: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
-    icon: "pencil",
+    text: "text-blue-600 dark:text-blue-400",
+    dot: "bg-blue-500 dark:bg-blue-400",
   },
   fixed: {
     label: "Fixed",
-    color:
-      "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
-    icon: "bug",
+    text: "text-amber-600 dark:text-amber-400",
+    dot: "bg-amber-500 dark:bg-amber-400",
   },
   deprecated: {
     label: "Deprecated",
-    color:
-      "bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20",
-    icon: "alert-triangle",
+    text: "text-yellow-600 dark:text-yellow-400",
+    dot: "bg-yellow-500 dark:bg-yellow-400",
   },
   removed: {
     label: "Removed",
-    color: "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20",
-    icon: "trash",
+    text: "text-red-600 dark:text-red-400",
+    dot: "bg-red-500 dark:bg-red-400",
   },
   security: {
     label: "Security",
-    color:
-      "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20",
-    icon: "shield",
+    text: "text-orange-600 dark:text-orange-400",
+    dot: "bg-orange-500 dark:bg-orange-400",
   },
   performance: {
     label: "Performance",
-    color: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20",
-    icon: "trending-up",
+    text: "text-cyan-600 dark:text-cyan-400",
+    dot: "bg-cyan-500 dark:bg-cyan-400",
   },
 };
+
+/** Categories in the order they should be displayed within a release. */
+export const CATEGORY_ORDER: ChangeCategory[] = [
+  "added",
+  "changed",
+  "fixed",
+  "removed",
+  "deprecated",
+  "security",
+  "performance",
+];
+
+/** Canonical site origin, used for changelog metadata and the RSS feed. */
+export const SITE_URL = "https://build-elevate.vercel.app";
+
+/** Stable anchor id for a release version (e.g. "1.3.0" → "v1-3-0"). */
+export function versionAnchor(version: string): string {
+  return `v${version.replace(/\./g, "-")}`;
+}
+
+/** Formats an ISO date string as a human-readable date (e.g. "June 6, 2026"). */
+export function formatDate(date: string): string {
+  return new Date(date).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    timeZone: "UTC",
+  });
+}
 
 export type ReleaseTag =
   | "latest"
@@ -80,9 +105,64 @@ export type ReleaseTag =
  */
 export const changelog: ChangelogEntry[] = [
   {
+    version: "1.3.0",
+    date: "2026-06-06",
+    tag: "latest",
+    title: "Kubernetes Deployments & CI Upgrades",
+    summary:
+      "Adds first-class Kubernetes support with deployment manifests, deploy/verify scripts, and an opt-in scaffolding flow, plus health probe endpoints. Also upgrades the GitHub Actions workflow and adds Turborepo caching across CI jobs.",
+    changes: [
+      {
+        category: "added",
+        group: "Kubernetes",
+        text: "Kubernetes deployment manifests for the API and web apps — Namespace, ConfigMap, Deployments, ClusterIP Services, nginx Ingress with `/api/v1/*` rewrite, and HPAs (2–10 replicas)",
+      },
+      {
+        category: "added",
+        group: "Kubernetes",
+        text: "`deploy.sh` to build/push images and apply all manifests, plus a CI-friendly `k8s/verify.sh` that health-checks pods, endpoints, in-cluster HTTP, ingress, and HPA metrics — exposed as `k8s:deploy` and `k8s:verify` pnpm scripts",
+      },
+      {
+        category: "added",
+        group: "Kubernetes",
+        text: "`/readyz` and `/healthz` probe endpoints on the API server for Kubernetes liveness and readiness checks",
+      },
+      {
+        category: "added",
+        group: "Kubernetes",
+        text: "Opt-in Kubernetes prompt during scaffolding (Docker-gated, defaults to No) with per-template manifest pruning and full upgrader integration",
+      },
+      {
+        category: "added",
+        group: "Kubernetes",
+        text: "Kubernetes deployment guide added to the documentation site",
+      },
+      {
+        category: "changed",
+        group: "Kubernetes",
+        text: "Bake `API_INTERNAL_URL` into the web Docker image at build time so server-side rendering can reach the API in-cluster",
+      },
+      {
+        category: "changed",
+        group: "CI & Tooling",
+        text: "Upgraded the GitHub Actions workflow — actions/checkout, setup-node, and pnpm/action-setup to v6, Node.js 20 → 24, pnpm 10 → 11.1.1, and switched to the native setup-node pnpm cache",
+      },
+      {
+        category: "performance",
+        group: "CI & Tooling",
+        text: "Added Turborepo cache restoration to the lint, type-check, test, and build CI jobs for faster pipeline runs",
+      },
+      {
+        category: "fixed",
+        group: "CI & Tooling",
+        text: "Stripped unnecessary quotes from `DATABASE_URL` values in `.env.example` files",
+      },
+    ],
+  },
+  {
     version: "1.2.6",
     date: "2026-05-26",
-    tag: "latest",
+    tag: "minor",
     title: "Vitest Migration Complete & Jest Removal",
     summary:
       "Completes the monorepo migration to Vitest, removes Jest dependencies and presets, and updates docs and workspace configuration to match the new test stack.",

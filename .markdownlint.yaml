@@ -1,0 +1,8 @@
+# Allow the same section heading (### Added, ### Changed, …) to repeat across
+# different releases, while still flagging duplicates within one release.
+# Required by the Keep a Changelog format.
+MD024:
+  siblings_only: true
+
+# Changelog entries are prose and intentionally exceed 80 columns.
+MD013: false
