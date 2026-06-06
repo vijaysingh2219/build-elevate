@@ -15,18 +15,18 @@
   "prettier": "@workspace/prettier-config",
   "dependencies": {
     "@workspace/auth": "workspace:*",
+    "@workspace/logger": "workspace:*",
     "@workspace/rate-limit": "workspace:*",
     "@workspace/utils": "workspace:*",
     "cors": "catalog:server",
     "dotenv": "catalog:core",
     "express": "catalog:server",
     "helmet": "catalog:server",
-    "morgan": "catalog:server"
+    "pino-http": "catalog:server"
   },
   "devDependencies": {
     "@types/cors": "catalog:server",
     "@types/express": "catalog:server",
-    "@types/morgan": "catalog:server",
     "@types/node": "catalog:dev",
     "@types/supertest": "catalog:dev",
     "@vitest/coverage-v8": "catalog:dev",

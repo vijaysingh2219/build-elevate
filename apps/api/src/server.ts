@@ -1,8 +1,9 @@
+import { logger } from '@workspace/logger';
 import { formatDuration } from '@workspace/utils/helpers';
 import cors from 'cors';
-import express, { type Express, json, urlencoded } from 'express';
+import express, { type Express, type Request, json, urlencoded } from 'express';
 import helmet from 'helmet';
-import morgan from 'morgan';
+import pinoHttp from 'pino-http';
 import corsOptions from './config/corsOptions';
 import credentials from './middleware/credentials';
 import { errorHandler } from './middleware/error';
@@ -10,8 +11,18 @@ import routes from './routes';
 
 const isProd = process.env.NODE_ENV === 'production';
 
+// Liveness/readiness probes are hit constantly (K8s) and add only noise.
+const HEALTH_ROUTES = new Set(['/', '/health', '/healthz', '/readyz']);
+
 export const createServer = (): Express => {
   const app = express();
+
+  // In production the app sits behind the K8s ingress / a reverse proxy, so
+  // trust X-Forwarded-* to recover the real client IP (req.ip) for logs and
+  // rate limiting. `1` = one proxy hop; raise it to match your proxy chain.
+  if (isProd) {
+    app.set('trust proxy', 1);
+  }
 
   // Security headers
   app.use(
@@ -20,8 +31,26 @@ export const createServer = (): Express => {
     }),
   );
 
-  // Logging
-  app.use(morgan(isProd ? 'combined' : 'dev'));
+  // Request logging via pino-http: one line per request, and a per-request
+  // child logger on `req.log` (carries the request id) for handlers to use.
+  app.use(
+    pinoHttp({
+      logger,
+      autoLogging: {
+        ignore: (req) => HEALTH_ROUTES.has(req.url ?? ''),
+      },
+      customSuccessMessage: (req, res, responseTime) =>
+        `${req.method} ${req.url} ${res.statusCode} (${Math.round(responseTime)}ms)`,
+      customErrorMessage: (req, res) => `${req.method} ${req.url} ${res.statusCode}`,
+      // Add the real client IP (req.ip, resolved via trust proxy) and the
+      // authenticated user to each request log. Other access-log fields (status,
+      // size, referrer, user-agent) already live in the serialized req/res.
+      customProps: (req) => {
+        const { ip, user } = req as Request;
+        return { ip, userId: user?.id };
+      },
+    }),
+  );
 
   // Body parsing
   app.use(json());

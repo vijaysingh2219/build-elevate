@@ -112,6 +112,21 @@ Add to `apps/api/.env.local` and `packages/rate-limit/.env.local`:
   free database and get the `REST_URL` and `TOKEN`.
 </Callout>
 
+## Optional Variables
+
+These are not required to run locally - sensible defaults apply.
+
+**Logging** (`apps/api/.env.local`)
+
+- `LOG_LEVEL` — minimum log level to emit. Defaults to `info` in production and `debug` in development. Accepts `trace`, `debug`, `info`, `warn`, `error`, `fatal`, or `silent`.
+
+```bash
+# Quiet a noisy environment, or raise verbosity when debugging
+LOG_LEVEL=warn
+```
+
+See the [Logger Package](../packages/logger) for output formats and usage.
+
 ## Environment Variable Files
 
 build-elevate uses the following `.env` files:

@@ -9,6 +9,7 @@
     "ui",
     "contracts",
     "utils",
+    "logger",
     "eslint-config",
     "prettier-config",
     "typescript-config",

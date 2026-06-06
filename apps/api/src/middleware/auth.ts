@@ -25,7 +25,7 @@ export const getSession = async (
 
     next();
   } catch (error) {
-    console.error('Error getting session:', error);
+    req.log.error({ err: error }, 'Error getting session');
     req.session = null;
     req.user = null;
     next();

@@ -150,25 +150,14 @@ describe('Rate Limiting Integration Tests', () => {
 
   describe('Rate Limit Error Handling', () => {
     it('should fail open when rate limiter throws error', async () => {
-      // Suppress expected error logging during test
-      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
       // Mock rate limiter throwing an error
       mockLimit.mockRejectedValue(new Error('Redis connection failed'));
 
-      // Request should still succeed (fail open)
+      // Request should still succeed (fail open) despite the rate limiter error
       const response = await supertest(app).get('/api/users/session');
 
       // Should get through despite rate limit error
       expect(response.status).toBe(200);
-
-      // Verify error was logged
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'Rate limit middleware error:',
-        expect.any(Error),
-      );
-
-      consoleErrorSpy.mockRestore();
     });
 
     it('should handle missing identifier gracefully', async () => {

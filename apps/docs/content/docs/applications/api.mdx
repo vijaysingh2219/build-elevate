@@ -23,6 +23,7 @@ The API uses shared packages from the monorepo:
 - **[@workspace/auth](../packages/auth)** - Session verification and authentication middleware
 - **[@workspace/db](../packages/db)** - Prisma ORM and database client
 - **[@workspace/rate-limit](../packages/rate-limit)** - Rate limiting with Upstash Redis
+- **[@workspace/logger](../packages/logger)** - Structured request and application logging with Pino
 - **[@workspace/utils](../packages/utils)** - Shared utilities and type definitions
 
 ## Features
@@ -37,8 +38,10 @@ The API uses shared packages from the monorepo:
 
 ### Performance & Observability
 
-- **Morgan** - HTTP request logging for debugging
-- **Health Checks** - Readiness and liveness endpoints
+- **Structured Logging** - Request and application logging with Pino via `@workspace/logger` (structured JSON in production, pretty output in dev)
+- **Per-request Logger** - `pino-http` attaches a request-scoped logger (`req.log`) with a request id for correlated logs
+- **Real Client IP** - `trust proxy` resolves `req.ip` behind the ingress; the IP and authenticated user are attached to each request log
+- **Health Checks** - Readiness and liveness endpoints (excluded from request logs to reduce noise)
 - **Error Handling** - Centralized error handling with proper HTTP status codes
 
 ### Database Integration
@@ -235,7 +238,7 @@ curl http://localhost:4000/api/users/session \
 Middleware is applied in this order:
 
 1. Security headers (Helmet)
-2. Logging (Morgan)
+2. Request logging (pino-http)
 3. Body parsing
 4. CORS
 5. Rate limiting

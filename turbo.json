@@ -47,7 +47,8 @@
         "RESEND_TOKEN",
         "RESEND_EMAIL_FROM",
         "UPSTASH_REDIS_REST_URL",
-        "UPSTASH_REDIS_REST_TOKEN"
+        "UPSTASH_REDIS_REST_TOKEN",
+        "LOG_LEVEL"
       ]
     },
     "lint:fix": {

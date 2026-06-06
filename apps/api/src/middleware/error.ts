@@ -9,7 +9,9 @@ export const errorHandler = (
 ) => {
   const isProd = process.env.NODE_ENV === 'production';
 
-  console.error(err.stack);
+  // `req.log` is the per-request child logger attached by pino-http; it carries
+  // the request id and method/url so the error line is correlated to its request.
+  req.log.error({ err }, 'Unhandled request error');
 
   if (isProd) {
     res.status(500).json({

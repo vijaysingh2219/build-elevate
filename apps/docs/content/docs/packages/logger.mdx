@@ -1,0 +1,180 @@
+---
+title: Logging
+description: Structured, high-performance logging with Pino for the API and other Node services
+---
+
+# Logger Package
+
+The `@workspace/logger` package provides a shared, structured logger built on [Pino](https://getpino.io). It emits machine-readable JSON in production (for log collectors on Kubernetes) and pretty, colorized output in local development — all from a single configured instance imported across Node apps.
+
+## Overview
+
+- **Package:** `@workspace/logger`
+- **Location:** `packages/logger`
+- **Engine:** [Pino](https://getpino.io) — fast, low-overhead JSON logging
+- **Dev output:** [pino-pretty](https://github.com/pinojs/pino-pretty) (colorized, single-line)
+- **Request logging:** [pino-http](https://github.com/pinojs/pino-http) (wired into the API)
+- **Type Safety:** Full TypeScript support
+
+## Why Pino
+
+The logger follows the [twelve-factor](https://12factor.net/logs) principle: the app writes a single JSON stream to `stdout` and lets the platform (Kubernetes, Docker) collect and route it. Pino is built for exactly this — structured JSON by default, very low overhead, and per-request child loggers. A single logger handles both request logs and application/error logs, instead of running separate systems.
+
+## Architecture
+
+The logger package:
+
+- **Emits structured JSON** - Queryable fields (level, time, request, status) instead of flat text
+- **Redacts sensitive data** - Strips auth headers, cookies, passwords, and tokens from every log
+- **Pretty-prints in dev** - Human-readable, colorized, single-line output locally
+- **Raw JSON in prod/test** - No transport overhead; the platform collects `stdout`
+- **Level controlled by env** - `LOG_LEVEL` overrides the default per environment
+
+## Features
+
+### Structured JSON Logging
+
+Every log is a JSON object with consistent fields, so backends like Loki, Datadog, or the ELK stack can filter and aggregate (e.g. `status >= 500`) instead of regex-matching text.
+
+### Automatic Redaction
+
+Sensitive keys are stripped from every log object — including the `req`/`res` objects serialized by `pino-http`:
+
+- `req.headers.authorization`
+- `req.headers.cookie`
+- `res.headers["set-cookie"]`
+- `*.password`, `*.token`, `*.secret`
+
+### Environment-aware Output
+
+- **Development** - `pino-pretty` renders a colorized, single-line log; bulky request fields are hidden for readability.
+- **Production / Test** - Raw JSON to `stdout` with the full `req`/`res` objects intact for querying.
+
+### Per-request Child Loggers
+
+When used with `pino-http` (see the [API application](../applications/api)), each request gets a child logger on `req.log` carrying a request id, so every line within a request is correlated.
+
+## Project Structure
+
+```
+packages/logger/
+├── src/
+│   └── index.ts                 # Configured Pino instance + exports
+├── package.json                 # Dependencies and scripts
+├── tsconfig.json                # TypeScript configuration
+└── eslint.config.js             # ESLint configuration
+```
+
+## Environment Variables
+
+| Variable    | Default                       | Purpose                                             |
+| ----------- | ----------------------------- | --------------------------------------------------- |
+| `LOG_LEVEL` | `info` (prod) / `debug` (dev) | Minimum level to emit (`trace`…`fatal`, `silent`)   |
+| `NODE_ENV`  | —                             | `production`/`test` → JSON; otherwise pretty output |
+
+```bash
+# Quiet a noisy environment
+LOG_LEVEL=warn
+
+# Verbose debugging
+LOG_LEVEL=debug
+```
+
+## Usage
+
+### Basic Logging
+
+```ts
+import { logger } from "@workspace/logger";
+
+logger.info("Server started");
+logger.warn({ retries: 3 }, "Retrying request");
+logger.error({ err }, "Failed to process job");
+```
+
+Pass an object as the first argument to attach structured fields; the message is the second argument.
+
+### Child Loggers
+
+Attach persistent context to a scope so every line from it carries the same fields:
+
+```ts
+import { logger } from "@workspace/logger";
+
+const jobLogger = logger.child({ module: "billing", jobId });
+
+jobLogger.info("starting"); // includes module + jobId
+jobLogger.error({ err }, "failed");
+```
+
+### In Request Handlers (API)
+
+The API wires `pino-http`, so handlers and middleware should log through `req.log` to inherit the request id:
+
+```ts
+app.get("/api/users/:id", async (req, res) => {
+  req.log.info({ userId: req.params.id }, "fetching user");
+  // ...
+});
+```
+
+## Log Levels
+
+| Level   | When to use                                 |
+| ------- | ------------------------------------------- |
+| `fatal` | The process is about to exit                |
+| `error` | A request or operation failed               |
+| `warn`  | Unexpected but recoverable (e.g. fail-open) |
+| `info`  | Normal lifecycle events (startup, requests) |
+| `debug` | Detailed diagnostics for development        |
+| `trace` | Very fine-grained tracing                   |
+
+## Example Output
+
+**Development** (`pino-pretty`, single line):
+
+```
+[2026-06-06 13:47:25.410 +0530] INFO: API server running on http://localhost:4000
+[2026-06-06 13:47:25.595 +0530] INFO: GET /api/users/me 200 (4ms) ip=::1 userId=usr_abc
+```
+
+**Production** (raw JSON to `stdout` — emitted as a single line, shown formatted here):
+
+```json
+{
+  "level": 30,
+  "time": 1780729721693,
+  "req": {
+    "method": "GET",
+    "url": "/api/users/me"
+  },
+  "res": {
+    "statusCode": 200
+  },
+  "responseTime": 40,
+  "ip": "204.0.113.10",
+  "userId": "usr_abc",
+  "msg": "GET /api/users/me 200 (40ms)"
+}
+```
+
+## Key Scripts
+
+| Command            | Purpose                        |
+| ------------------ | ------------------------------ |
+| `pnpm dev`         | Watch mode for development     |
+| `pnpm build`       | Build package for production   |
+| `pnpm check-types` | Check TypeScript types         |
+| `pnpm lint`        | Check code quality with ESLint |
+
+<Callout type="info">
+  Pino is a Node.js logger and must not be imported into browser/client code
+  (e.g. React Client Components). Use it in the API, server-side handlers, and
+  other Node services only.
+</Callout>
+
+## Related Documentation
+
+- [API Application](../applications/api) - Wires `pino-http` for request logging
+- [Rate Limiting Package](./rate-limit) - Logs rate-limiter errors (fail-open path) via `req.log`
+- [Pino Documentation](https://getpino.io) - Official Pino docs

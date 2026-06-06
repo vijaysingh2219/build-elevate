@@ -37,6 +37,9 @@ catalogs:
     helmet: ^8.1.0
     morgan: ^1.10.1
     "@types/morgan": ^1.9.10
+    pino: ^9.5.0
+    pino-http: ^10.3.0
+    pino-pretty: ^13.0.0
 
   core:
     turbo: ^2.9.14
