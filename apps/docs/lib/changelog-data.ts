@@ -10,7 +10,6 @@ export type ChangeCategory =
 export interface ChangeEntry {
   category: ChangeCategory;
   text: string;
-  group?: string; // Optional group for categorizing releases (e.g., "Auth", "API", "UI")
 }
 
 export interface ChangelogEntry {
@@ -105,56 +104,81 @@ export type ReleaseTag =
  */
 export const changelog: ChangelogEntry[] = [
   {
+    version: "1.4.0",
+    date: "2026-06-07",
+    tag: "latest",
+    title: "Structured Logging, RSC Pages & Changelog Site",
+    summary:
+      "Adds a shared structured logging package adopted across the API, converts the authenticated web pages to React Server Components for a faster first paint, and rebuilds the documentation changelog with an RSS feed and refreshed navigation.",
+    changes: [
+      {
+        category: "added",
+        text: "New `@workspace/logger` package wrapping pino with env-based log level (`LOG_LEVEL`), sensitive-key redaction, and pino-pretty for local development — adopted across the API with pino-http per-request logging (health-check routes skipped, child logger on `req.log`) replacing morgan and ad-hoc console calls",
+      },
+      {
+        category: "added",
+        text: "Rebuilt changelog page with color-coded entries grouped by change type, a `/changelog/rss.xml` feed, a reusable `CopyButton` and NPM brand icon, and Documentation/Changelog/NPM links in the shared nav",
+      },
+      {
+        category: "added",
+        text: "`.markdownlint.yaml` config for linting Markdown content",
+      },
+      {
+        category: "changed",
+        text: "Converted the profile, dashboard, and settings (general/security/activity) pages to React Server Components that fetch the session server-side and pass data into client children — eliminating skeleton flash, `useEffect` form resets, and the activity data waterfall; added route-level loading/error boundaries and a shared `requireUser()` server guard",
+      },
+      {
+        category: "changed",
+        text: "Trust the first proxy hop in production so the real client IP is resolved for request logs",
+      },
+      {
+        category: "removed",
+        text: "Dropped the now-unused `/api/sessions` route; sessions are fetched server-side via `auth.api.listSessions`",
+      },
+    ],
+  },
+  {
     version: "1.3.0",
     date: "2026-06-06",
-    tag: "latest",
+    tag: "minor",
     title: "Kubernetes Deployments & CI Upgrades",
     summary:
       "Adds first-class Kubernetes support with deployment manifests, deploy/verify scripts, and an opt-in scaffolding flow, plus health probe endpoints. Also upgrades the GitHub Actions workflow and adds Turborepo caching across CI jobs.",
     changes: [
       {
         category: "added",
-        group: "Kubernetes",
         text: "Kubernetes deployment manifests for the API and web apps — Namespace, ConfigMap, Deployments, ClusterIP Services, nginx Ingress with `/api/v1/*` rewrite, and HPAs (2–10 replicas)",
       },
       {
         category: "added",
-        group: "Kubernetes",
         text: "`deploy.sh` to build/push images and apply all manifests, plus a CI-friendly `k8s/verify.sh` that health-checks pods, endpoints, in-cluster HTTP, ingress, and HPA metrics — exposed as `k8s:deploy` and `k8s:verify` pnpm scripts",
       },
       {
         category: "added",
-        group: "Kubernetes",
         text: "`/readyz` and `/healthz` probe endpoints on the API server for Kubernetes liveness and readiness checks",
       },
       {
         category: "added",
-        group: "Kubernetes",
         text: "Opt-in Kubernetes prompt during scaffolding (Docker-gated, defaults to No) with per-template manifest pruning and full upgrader integration",
       },
       {
         category: "added",
-        group: "Kubernetes",
         text: "Kubernetes deployment guide added to the documentation site",
       },
       {
         category: "changed",
-        group: "Kubernetes",
         text: "Bake `API_INTERNAL_URL` into the web Docker image at build time so server-side rendering can reach the API in-cluster",
       },
       {
         category: "changed",
-        group: "CI & Tooling",
         text: "Upgraded the GitHub Actions workflow — actions/checkout, setup-node, and pnpm/action-setup to v6, Node.js 20 → 24, pnpm 10 → 11.1.1, and switched to the native setup-node pnpm cache",
       },
       {
         category: "performance",
-        group: "CI & Tooling",
         text: "Added Turborepo cache restoration to the lint, type-check, test, and build CI jobs for faster pipeline runs",
       },
       {
         category: "fixed",
-        group: "CI & Tooling",
         text: "Stripped unnecessary quotes from `DATABASE_URL` values in `.env.example` files",
       },
     ],
@@ -557,160 +581,130 @@ export const changelog: ChangelogEntry[] = [
       // Monorepo & Infrastructure
       {
         category: "added",
-        group: "Monorepo & Infrastructure",
         text: "Turborepo monorepo with apps/ and packages/ structure",
       },
       {
         category: "added",
-        group: "Monorepo & Infrastructure",
         text: "Next.js web app with App Router, Tailwind CSS, and shadcn/ui",
       },
       {
         category: "added",
-        group: "Monorepo & Infrastructure",
         text: "Express API server with TypeScript, structured routing, and a 404 catch-all",
       },
       {
         category: "added",
-        group: "Monorepo & Infrastructure",
         text: "Shared packages: ui, utils, auth, db, email, eslint-config, typescript-config",
       },
       {
         category: "added",
-        group: "Monorepo & Infrastructure",
         text: "Docker Compose setup for local development and production deployments",
       },
       {
         category: "added",
-        group: "Monorepo & Infrastructure",
         text: "GitHub Actions CI with lint, type-check, and test jobs",
       },
       {
         category: "added",
-        group: "Monorepo & Infrastructure",
         text: "Jest testing setup with shared workspace presets",
       },
 
       // Authentication
       {
         category: "added",
-        group: "Authentication",
         text: "Better-Auth with email/password sign-in and sign-up flows",
       },
       {
         category: "added",
-        group: "Authentication",
         text: "Dedicated @workspace/auth package with centralized auth logic and TypeScript support",
       },
       {
         category: "added",
-        group: "Authentication",
         text: "Authentication middleware for the Express API with protected route support",
       },
       {
         category: "added",
-        group: "Authentication",
         text: "Rate limiting for API calls and verification email requests with configurable strategies",
       },
       {
         category: "added",
-        group: "Authentication",
         text: "Email verification on sign-up",
       },
       {
         category: "added",
-        group: "Authentication",
         text: "Two-factor authentication (2FA) with TOTP support, including setup flow for OAuth users",
       },
       {
         category: "added",
-        group: "Authentication",
         text: "Forgot/reset password flow with secure token-based email links",
       },
       {
         category: "added",
-        group: "Authentication",
         text: "Email change flow with a verification step",
       },
       {
         category: "added",
-        group: "Authentication",
         text: "Social login connect/disconnect cards in account settings",
       },
 
       // Account & UI
       {
         category: "added",
-        group: "Account & UI",
         text: "Session activity UI and API — view and manage active sessions across devices",
       },
       {
         category: "added",
-        group: "Account & UI",
         text: "Revoke all sessions from the security settings page",
       },
       {
         category: "added",
-        group: "Account & UI",
         text: "User profile, account settings, and security settings pages",
       },
       {
         category: "added",
-        group: "Account & UI",
         text: "Account deletion with a post-deletion goodbye page",
       },
       {
         category: "added",
-        group: "Account & UI",
         text: "Light/dark/system theme switcher",
       },
       {
         category: "added",
-        group: "Account & UI",
         text: "React Email + Resend email package with in-app preview",
       },
       {
         category: "added",
-        group: "Account & UI",
         text: "Refreshed email templates with a modern design",
       },
       {
         category: "added",
-        group: "Account & UI",
         text: "Responsive layout across auth and settings pages",
       },
 
       // Database & Config
       {
         category: "added",
-        group: "Database & Config",
         text: "Prisma ORM with PostgreSQL support and auto-generated client",
       },
       {
         category: "added",
-        group: "Database & Config",
         text: "Prisma Studio as a standalone app in the monorepo",
       },
       {
         category: "added",
-        group: "Database & Config",
         text: "Environment validation using @t3-oss/env for fail-fast startup errors",
       },
       {
         category: "added",
-        group: "Database & Config",
         text: "Husky git hooks for pre-commit linting and formatting enforcement",
       },
 
       // Bug Fixes
       {
         category: "fixed",
-        group: "Bug Fixes",
         text: "Fixed hydration error on authentication pages",
       },
       {
         category: "security",
-        group: "Bug Fixes",
         text: "Prevented client-side access to server-only environment variables",
       },
     ],

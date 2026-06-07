@@ -42,18 +42,6 @@ const TAG_CONFIG: Record<ReleaseTag, { label: string; cls: string }> = {
   },
 };
 
-const GROUP_CONFIG: Record<string, string> = {
-  "Monorepo & Infrastructure": "text-emerald-600 dark:text-emerald-400",
-  Authentication: "text-blue-600 dark:text-blue-400",
-  "Account & UI": "text-sky-600 dark:text-sky-400",
-  "Database & Config": "text-purple-600 dark:text-purple-400",
-  Kubernetes: "text-cyan-600 dark:text-cyan-400",
-  "CI & Tooling": "text-indigo-600 dark:text-indigo-400",
-  "Bug Fixes": "text-amber-600 dark:text-amber-400",
-};
-
-const GROUP_ORDER = Object.keys(GROUP_CONFIG);
-
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -63,14 +51,6 @@ function groupBy<T>(items: T[], key: (item: T) => string): Record<string, T[]> {
     (acc[key(item)] ??= []).push(item);
     return acc;
   }, {});
-}
-
-/** Converts a text-* color class to the matching bg-* class for dot indicators. */
-function textToDot(colorClass: string): string {
-  return colorClass
-    .split(" ")
-    .map((cls) => cls.replace(/^text-/, "bg-"))
-    .join(" ");
 }
 
 /**
@@ -139,7 +119,7 @@ function SectionHeader({
   );
 }
 
-function FlatChanges({ changes }: { changes: ChangelogEntry["changes"] }) {
+function Changes({ changes }: { changes: ChangelogEntry["changes"] }) {
   const grouped = groupBy(changes, (c) => c.category);
   return (
     <div className="space-y-4">
@@ -156,30 +136,12 @@ function FlatChanges({ changes }: { changes: ChangelogEntry["changes"] }) {
   );
 }
 
-function GroupedChanges({ changes }: { changes: ChangelogEntry["changes"] }) {
-  const grouped = groupBy(changes, (c) => c.group ?? "Other");
-  return (
-    <div className="space-y-5">
-      {orderedKeys(Object.keys(grouped), GROUP_ORDER).map((g) => {
-        const text = GROUP_CONFIG[g] ?? "text-fd-muted-foreground";
-        return (
-          <div key={g}>
-            <SectionHeader label={g} text={text} dot={textToDot(text)} />
-            <ChangeList items={grouped[g].map((c) => c.text)} />
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
 // ---------------------------------------------------------------------------
 // Entry — Linear-style two-column row: sticky version/date rail + content
 // ---------------------------------------------------------------------------
 
 export function Entry({ entry }: { entry: ChangelogEntry }) {
   const hasChanges = entry.changes.length > 0;
-  const isGrouped = entry.changes.some((c) => c.group);
   const anchor = versionAnchor(entry.version);
 
   return (
@@ -225,11 +187,7 @@ export function Entry({ entry }: { entry: ChangelogEntry }) {
 
         {hasChanges && (
           <div className="mt-6">
-            {isGrouped ? (
-              <GroupedChanges changes={entry.changes} />
-            ) : (
-              <FlatChanges changes={entry.changes} />
-            )}
+            <Changes changes={entry.changes} />
           </div>
         )}
       </div>

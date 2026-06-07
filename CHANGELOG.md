@@ -9,6 +9,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com).
 
 Nothing yet.
 
+## [1.4.0] - 2026-06-07 [Minor] - Structured Logging, RSC Pages & Changelog Site
+
+Adds a shared structured logging package adopted across the API, converts the authenticated web pages to React Server Components for a faster first paint, and rebuilds the documentation changelog with an RSS feed and refreshed navigation.
+
+### Added
+
+- **Logger:** New `@workspace/logger` package wrapping pino with env-based log level (`LOG_LEVEL`), sensitive-key redaction, and pino-pretty for local development — adopted across the API with pino-http per-request logging (health-check routes skipped, child logger on `req.log`) replacing morgan and ad-hoc console calls
+- **Docs:** Rebuilt changelog page with color-coded entries grouped by change type, a `/changelog/rss.xml` feed, a reusable `CopyButton` and NPM brand icon, and Documentation/Changelog/NPM links in the shared nav
+- **Tooling:** `.markdownlint.yaml` config for linting Markdown content
+
+### Changed
+
+- **Web:** Converted the profile, dashboard, and settings (general/security/activity) pages to React Server Components that fetch the session server-side and pass data into client children — eliminating skeleton flash, `useEffect` form resets, and the activity data waterfall; added route-level loading/error boundaries and a shared `requireUser()` server guard
+- **Logger:** Trust the first proxy hop in production so the real client IP is resolved for request logs
+
+### Removed
+
+- **Web:** Dropped the now-unused `/api/sessions` route; sessions are fetched server-side via `auth.api.listSessions`
+
 ## [1.3.0] - 2026-06-06 [Minor] - Kubernetes Deployments & CI Upgrades
 
 Adds first-class Kubernetes support with deployment manifests, deploy/verify scripts, and an opt-in scaffolding flow, plus health probe endpoints. Also upgrades the GitHub Actions workflow and adds Turborepo caching across CI jobs.
