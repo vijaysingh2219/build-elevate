@@ -1,3 +1,4 @@
+import { generatePageMetadata, pageMetadata } from '@/config/metadata';
 import { Button } from '@workspace/ui/components/button';
 import {
   Empty,
@@ -10,9 +11,14 @@ import {
 import { CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 
+export const metadata = generatePageMetadata(
+  pageMetadata.goodbye.title,
+  pageMetadata.goodbye.description,
+);
+
 export default function GoodbyePage() {
   return (
-    <div className="from-background to-muted/20 flex min-h-[calc(100vh-var(--header-height))] items-center justify-center bg-gradient-to-b px-4">
+    <div className="from-background to-muted/20 flex min-h-[calc(100vh-var(--header-height))] items-center justify-center bg-linear-to-b px-4">
       <Empty className="bg-card w-full max-w-md border">
         <EmptyHeader>
           <EmptyMedia variant="default">

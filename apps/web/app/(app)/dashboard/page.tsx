@@ -1,16 +1,15 @@
-import { auth } from '@workspace/auth/server';
-import { headers } from 'next/headers';
-import { redirect } from 'next/navigation';
+import { generatePageMetadata, pageMetadata } from '@/config/metadata';
+import { requireUser } from '@/lib/auth-helpers';
 import type { ReactElement } from 'react';
 
+export const metadata = generatePageMetadata(
+  pageMetadata.dashboard.title,
+  pageMetadata.dashboard.description,
+  { noindex: true },
+);
+
 export default async function DashboardPage(): Promise<ReactElement> {
-  const session = await auth.api.getSession({ headers: await headers() });
-
-  if (!session?.user) {
-    redirect('/sign-in');
-  }
-
-  const user = session.user;
+  const { user } = await requireUser();
 
   return (
     <section className="max-w-2xl p-12">

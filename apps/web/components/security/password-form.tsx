@@ -117,13 +117,7 @@ export function PasswordForm({ onSuccess }: PasswordFormProps) {
   const isSubmitting = setPasswordMutation.isPending || changePasswordMutation.isPending;
 
   if (isCheckingPassword) {
-    return (
-      <Card id="set-password" className="scroll-mt-6">
-        <CardContent className="flex items-center justify-center py-12">
-          <Spinner />
-        </CardContent>
-      </Card>
-    );
+    return <PasswordFormSkeleton />;
   }
 
   return (
