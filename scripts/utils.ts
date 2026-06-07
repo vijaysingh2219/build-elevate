@@ -17,6 +17,8 @@ export const internalContentFiles = [
   "tsup.config.ts",
   "tsconfig.scripts.json",
   ".npmignore",
+  "CHANGELOG.md",
+  ".markdownlint.yaml",
 ];
 
 export const allInternalContent = [
