@@ -9,6 +9,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com).
 
 Nothing yet.
 
+## [1.5.0] - 2026-06-22 [Minor] - Force Upgrade Past Conflicts
+
+Adds a `--force` flag to the `upgrade` command so you can advance a project to the latest template commit even when files conflict, without losing your local edits.
+
+### Added
+
+- **CLI:** `upgrade --force` advances the manifest to the latest commit while keeping your local edits — for each conflicting file it records the template's latest hash as the new base (the template content is never written to disk) so the conflict clears, your file is left untouched, and it only re-flags if the template changes that same file in a future release
+
 ## [1.4.0] - 2026-06-07 [Minor] - Structured Logging, RSC Pages & Changelog Site
 
 Adds a shared structured logging package adopted across the API, converts the authenticated web pages to React Server Components for a faster first paint, and rebuilds the documentation changelog with an RSS feed and refreshed navigation.

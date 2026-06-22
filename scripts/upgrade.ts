@@ -244,7 +244,7 @@ const applyInitTransforms = (
 
 // Main upgrade function — compares manifest commit to latest template commit, identifies which files can be auto-updated, which have conflicts, and which are already in sync. Applies safe updates and reports the rest to the user.
 export const upgrade = async (
-  options: { yes?: boolean; dry?: boolean } = {},
+  options: { yes?: boolean; dry?: boolean; force?: boolean } = {},
 ) => {
   try {
     intro("build-elevate upgrade");
@@ -304,6 +304,7 @@ export const upgrade = async (
     const autoUpdated: string[] = [];
     const alreadySynced: string[] = [];
     const conflicts: Array<{ file: string; templateDiff: string }> = [];
+    const forced: string[] = [];
     const newFiles: string[] = [];
 
     s.start("Comparing files against latest commit...");
@@ -367,7 +368,16 @@ export const upgrade = async (
         continue;
       }
 
-      // Both user AND template changed this file — genuine conflict
+      // Both user AND template changed this file — genuine conflict.
+      // With --force, record the template's hash as the new base (file left
+      // untouched on disk) so the conflict clears but the user's edits survive
+      // and are never auto-overwritten on later runs.
+      if (options.force) {
+        forced.push(filePath);
+        if (!options.dry) manifest.files[filePath] = newHash;
+        continue;
+      }
+
       // Fetch old template version and apply same transforms for an accurate diff
       const rawOldContent = await getFileAtCommit(baseCommit, filePath);
       const oldContent =
@@ -406,6 +416,12 @@ export const upgrade = async (
       );
     }
 
+    if (forced.length > 0) {
+      log.success(
+        `Advanced ${forced.length} file(s) to latest, keeping your local edits:\n${forced.map((f) => `  ↷ ${f}`).join("\n")}`,
+      );
+    }
+
     if (conflicts.length > 0) {
       log.warn(
         `${conflicts.length} file(s) were modified by you and could not be upgraded automatically:\n\n` +
@@ -427,8 +443,12 @@ export const upgrade = async (
 
     // 6. Done
     if (conflicts.length === 0) {
+      const forcedNote =
+        forced.length > 0
+          ? `\n${forced.length} file(s) were force-advanced — your local edits were kept; review them with \`git diff\`.`
+          : "";
       outro(
-        `✓ Upgraded to ${latestCommit.slice(0, 7)} successfully!\nRun your package manager install to apply any dependency changes.`,
+        `✓ Upgraded to ${latestCommit.slice(0, 7)} successfully!${forcedNote}\nRun your package manager install to apply any dependency changes.`,
       );
     } else {
       outro(

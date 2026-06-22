@@ -47,10 +47,15 @@ program
     "--dry-run",
     "Preview what would be changed without writing any files",
   )
+  .option(
+    "--force",
+    "Advance to the latest commit, keeping your local edits and clearing current conflicts",
+  )
   .action((options) =>
     upgrade({
       yes: options.yes,
       dry: options.dryRun,
+      force: options.force,
     }),
   );
 

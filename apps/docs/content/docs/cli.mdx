@@ -108,10 +108,11 @@ pnpm dlx build-elevate@latest upgrade [options]
 
 #### Options
 
-| Flag        | Description                                          |
-| ----------- | ---------------------------------------------------- |
-| `--dry-run` | Preview what would change without writing any files. |
-| `-y, --yes` | Skip confirmation prompts.                           |
+| Flag        | Description                                                                            |
+| ----------- | -------------------------------------------------------------------------------------- |
+| `--dry-run` | Preview what would change without writing any files.                                   |
+| `--force`   | Advance to the latest commit, keeping your local edits and clearing current conflicts. |
+| `-y, --yes` | Skip confirmation prompts.                                                             |
 
 #### How upgrade works
 
@@ -179,17 +180,36 @@ The `.build-elevate.json` manifest commit pointer is **only advanced when all co
 
 Once you manually resolve all conflicts and re-run `upgrade` with no new conflicts, the commit pointer advances to the latest.
 
+#### Forcing past conflicts with `--force`
+
+If you've customized files that the template also changes, those files stay conflicts on every run and the commit pointer never advances. `--force` breaks out of that loop **without losing your edits**:
+
+- Your conflicting files on disk are **left untouched**, `--force` never overwrites them.
+- For each conflict, the manifest base hash is set to the template's latest `newHash` (the template content is _not_ written to disk), and the commit pointer advances to the latest.
+- The current conflicts stop being reported. Because the recorded base now differs from your file (`currentHash !== savedHash`), the file is treated as edited-by-you and is protected from auto-update. It only re-appears as a conflict if the template changes that same file in a _future_ release.
+
+Crucially, the base is set to the template's hash, **not** a re-hash of your file. Recording your file's hash would make the next upgrade see the file as "untouched since scaffold" and silently auto-overwrite your edits, `--force` deliberately avoids that.
+
+<Callout type="info">
+  `--force` is non-destructive: it changes the manifest, never your files.
+  Review what was force-advanced with `git diff` and re-apply any template
+  changes you want by hand. Combine with `--dry-run` to preview first.
+</Callout>
+
 #### Examples
 
 ```bash
 # Preview changes without writing
-pnpm dlx build-elevate upgrade --dry-run
+pnpm dlx build-elevate upgrade  --dry-run
 
 # Apply upgrade
 pnpm dlx build-elevate upgrade
 
 # Apply upgrade, skip prompts
-pnpm dlx build-elevate upgrade --yes
+pnpm dlx build-elevate upgrade  --yes
+
+# Advance to latest past conflicts, keeping your local edits
+pnpm dlx build-elevate upgrade  --force
 ```
 
 #### Example output
@@ -322,7 +342,7 @@ The recommended flow for keeping your project up to date:
 
 ```bash
 # 1. Check what would change
-pnpm dlx build-elevate upgrade --dry-run
+pnpm dlx build-elevate upgrade  --dry-run
 
 # 2. Apply the upgrade
 pnpm dlx build-elevate upgrade
