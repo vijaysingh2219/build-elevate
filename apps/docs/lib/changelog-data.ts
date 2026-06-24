@@ -104,9 +104,27 @@ export type ReleaseTag =
  */
 export const changelog: ChangelogEntry[] = [
   {
+    version: "1.5.1",
+    date: "2026-06-25",
+    tag: "latest",
+    title: "Respect Opted-Out Features on Upgrade",
+    summary:
+      "Fixes the `upgrade` command re-adding files for optional features that were declined when the project was created, and stops repo-only contributor guides from leaking into scaffolded projects.",
+    changes: [
+      {
+        category: "fixed",
+        text: "`upgrade` no longer re-adds files for optional features (Docker, Kubernetes, Prisma Studio) that were declined at scaffold time — the manifest now records the chosen features (new `version` and `features` fields) and upgrade skips files for any opted-out feature; projects scaffolded before this change have their features inferred from disk and the manifest is self-healed on the next upgrade",
+      },
+      {
+        category: "fixed",
+        text: "Scaffolding now removes the repo-only `CONTRIBUTING.md` and `SECURITY.md` guides instead of shipping them into generated projects, and `upgrade` sources its skip list from the canonical internal-files list so the two can no longer drift",
+      },
+    ],
+  },
+  {
     version: "1.5.0",
     date: "2026-06-22",
-    tag: "latest",
+    tag: "minor",
     title: "Force Upgrade Past Conflicts",
     summary:
       "Adds a `--force` flag to the `upgrade` command so you can advance a project to the latest template commit even when files conflict, without losing your local edits.",

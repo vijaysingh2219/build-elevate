@@ -5,13 +5,54 @@ import { toKebabCase } from "./utils.js";
 
 export const MANIFEST_FILE = ".build-elevate.json";
 
+// Increase this number whenever we change the shape of the manifest, so the
+// upgrade and diff commands can tell which version of the file they're reading.
+export const MANIFEST_VERSION = 1;
+
+export interface ManifestFeatures {
+  docker: boolean;
+  kubernetes: boolean;
+  studio: boolean;
+}
+
 export interface BuildElevateManifest {
+  version: number; // which version of the manifest format this file uses (see MANIFEST_VERSION)
   commit: string; // exact git SHA cloned from main — source of truth for upgrade comparisons
   template: string;
   projectName: string;
   scaffoldedAt: string;
+  features: ManifestFeatures; // the optional features the user chose to include when the project was created
   files: Record<string, string>; // filePath -> sha256 hash (first 12 chars)
 }
+
+/**
+ * Works out which optional features a project includes.
+ *
+ * Newer manifests record this directly in the `features` field. Older manifests
+ * were written before that field existed, so for those we figure it out by
+ * looking at the project on disk: when a feature is turned down at setup time
+ * its files are deleted, so a missing folder or file tells us it was left out.
+ */
+export const resolveFeatures = async (
+  manifest: BuildElevateManifest,
+): Promise<ManifestFeatures> => {
+  if (manifest.features) return manifest.features;
+
+  const exists = async (p: string): Promise<boolean> => {
+    try {
+      await access(p);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  return {
+    docker: await exists("docker-compose.prod.yml"),
+    kubernetes: await exists("k8s"),
+    studio: await exists("apps/studio"),
+  };
+};
 
 export const hashContent = (content: string): string => {
   const normalized = content.replace(/\r\n/g, "\n");
@@ -164,6 +205,7 @@ export const buildManifest = async (
   commit: string,
   template: string,
   projectName: string,
+  features: ManifestFeatures,
   projectRoot: string = process.cwd(),
 ): Promise<BuildElevateManifest> => {
   const allFiles = await walkDir(projectRoot, projectRoot);
@@ -179,10 +221,12 @@ export const buildManifest = async (
   );
 
   return {
+    version: MANIFEST_VERSION,
     commit,
     template,
     projectName: toKebabCase(projectName),
     scaffoldedAt: new Date().toISOString(),
+    features,
     files,
   };
 };

@@ -1,7 +1,6 @@
 import { type ExecSyncOptions, exec as execRaw } from "node:child_process";
 import { randomBytes } from "node:crypto";
 import { access, readFile, writeFile } from "node:fs/promises";
-import { join } from "node:path";
 import { promisify } from "node:util";
 
 export const url = "vijaysingh2219/build-elevate";
@@ -12,7 +11,8 @@ export const execOpts = { stdio: "ignore" as const };
 export const internalContentDirs = ["scripts", "apps/docs", "assets"];
 
 export const internalContentFiles = [
-  join(".github", "CONTRIBUTING.md"),
+  "CONTRIBUTING.md",
+  "SECURITY.md",
   "SCREENSHOTS.md",
   "tsup.config.ts",
   "tsconfig.scripts.json",

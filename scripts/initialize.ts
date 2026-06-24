@@ -1070,7 +1070,11 @@ export const initialize = async (
     );
 
     s.message("Writing upgrade manifest...");
-    const manifest = await buildManifest(commitHash, template, name);
+    const manifest = await buildManifest(commitHash, template, name, {
+      docker: includeDocker,
+      kubernetes: includeKubernetes,
+      studio: includeStudio,
+    });
     await writeManifest(manifest);
     if (options.verbose) log.info("✓ Written .build-elevate.json manifest");
 

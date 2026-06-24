@@ -9,6 +9,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com).
 
 Nothing yet.
 
+## [1.5.1] - 2026-06-25 [Patch] - Respect Opted-Out Features on Upgrade
+
+Fixes the `upgrade` command re-adding files for optional features that were declined when the project was created, and stops repo-only contributor guides from leaking into scaffolded projects.
+
+### Fixed
+
+- **CLI:** `upgrade` no longer re-adds files for optional features (Docker, Kubernetes, Prisma Studio) that were declined at scaffold time — the manifest now records the chosen features (new `version` and `features` fields), and upgrade skips files belonging to any feature that was opted out. Projects scaffolded before this change have their features inferred from what's on disk and the manifest is self-healed on the next upgrade
+- **CLI:** Scaffolding now removes the new repo-only `CONTRIBUTING.md` and `SECURITY.md` guides instead of shipping them into generated projects, and `upgrade` sources its skip list from the canonical internal-files list so the two can no longer drift
+
 ## [1.5.0] - 2026-06-22 [Minor] - Force Upgrade Past Conflicts
 
 Adds a `--force` flag to the `upgrade` command so you can advance a project to the latest template commit even when files conflict, without losing your local edits.

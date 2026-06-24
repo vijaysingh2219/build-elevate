@@ -7,6 +7,9 @@ import {
   readManifest,
   writeManifest,
   manifestExists,
+  resolveFeatures,
+  MANIFEST_VERSION,
+  type ManifestFeatures,
 } from "./manifest.js";
 import {
   applyTurboLintEnv,
@@ -21,7 +24,7 @@ import {
   applyConfigMapCleanup,
   K8S_DOCKERHUB_FILES,
 } from "./update.js";
-import { applyProjectName } from "./utils.js";
+import { applyProjectName, internalContentFiles } from "./utils.js";
 
 const REPO = "vijaysingh2219/build-elevate";
 const RAW_BASE = `https://raw.githubusercontent.com/${REPO}`;
@@ -49,13 +52,13 @@ const SKIP_PREFIXES = [
 ];
 
 const SKIP_EXACT = new Set([
+  // Files that only belong to this repo and get deleted when a project is
+  // created (for example CONTRIBUTING.md, SECURITY.md, CHANGELOG.md). We reuse
+  // the shared list so this set and the delete step can't fall out of sync.
+  ...internalContentFiles,
   ".build-elevate.json",
   "README.md",
-  "SCREENSHOTS.md",
   "LICENSE",
-  ".npmignore",
-  "tsup.config.ts",
-  "tsconfig.scripts.json",
   "pnpm-lock.yaml",
   "bun.lockb",
   "package-lock.json",
@@ -142,6 +145,41 @@ const isExcludedByTemplate = (filePath: string, template: string): boolean => {
   );
 };
 
+/**
+ * The files and folders that belong to each optional feature. This matches what
+ * init.ts deletes when a feature is turned down (removeDockerFiles,
+ * removeKubernetesFiles, and the studio cleanup). Each entry is treated either
+ * as an exact file path or as a folder prefix.
+ */
+const FEATURE_PATHS: Record<keyof ManifestFeatures, string[]> = {
+  docker: [
+    "docker-compose.prod.yml",
+    "apps/api/Dockerfile.prod",
+    "apps/web/Dockerfile.prod",
+    ".dockerignore",
+  ],
+  kubernetes: ["k8s", "deploy.sh"],
+  studio: ["apps/studio"],
+};
+
+/**
+ * Returns true when a file belongs to a feature the user chose not to include.
+ * This keeps the upgrade from bringing back Docker, Kubernetes, or Studio files
+ * that were removed when the project was first created.
+ */
+const isExcludedByFeatures = (
+  filePath: string,
+  features: ManifestFeatures,
+): boolean => {
+  return (Object.keys(FEATURE_PATHS) as Array<keyof ManifestFeatures>).some(
+    (feature) =>
+      !features[feature] &&
+      FEATURE_PATHS[feature].some(
+        (p) => filePath === p || filePath.startsWith(p + "/"),
+      ),
+  );
+};
+
 export const getLatestCommit = async (): Promise<string> => {
   const res = await fetch(`${API_BASE}/commits/main`, {
     headers: { Accept: "application/vnd.github.sha" },
@@ -206,6 +244,7 @@ const applyInitTransforms = (
   content: string,
   template: string,
   projectName: string,
+  features: ManifestFeatures,
   packageManager: string = "pnpm",
 ): string => {
   // 1. Apply project name replacement first (all case formats)
@@ -219,7 +258,12 @@ const applyInitTransforms = (
   if (filePath === "turbo.json") {
     result = applyTurboLintEnv(result, template);
   } else if (filePath === "package.json") {
-    result = applyPackageJsonCleanup(result, template);
+    result = applyPackageJsonCleanup(
+      result,
+      template,
+      features.docker,
+      features.kubernetes,
+    );
   } else if (filePath === "pnpm-workspace.yaml") {
     result = applyPnpmCatalogCleanup(result, template);
   } else if (filePath === "docker-compose.prod.yml") {
@@ -264,6 +308,11 @@ export const upgrade = async (
     }
 
     const baseCommit = manifest.commit;
+
+    // Find out which optional features this project includes. Older manifests
+    // don't store this, so in that case we work it out from the files on disk,
+    // which keeps the upgrade from re-adding features the user left out.
+    const features = await resolveFeatures(manifest);
 
     // 2. Fetch latest commit SHA from GitHub
     const s = spinner();
@@ -314,6 +363,8 @@ export const upgrade = async (
       if (shouldSkip(filePath)) continue;
       // Never add/update files that don't belong to this template
       if (isExcludedByTemplate(filePath, manifest.template)) continue;
+      // Don't bring back files for optional features the user chose to skip
+      if (isExcludedByFeatures(filePath, features)) continue;
 
       const rawContent = await getFileAtCommit(latestCommit, filePath);
 
@@ -327,6 +378,7 @@ export const upgrade = async (
         rawContent,
         manifest.template,
         manifest.projectName,
+        features,
       );
 
       const newHash = hashContent(newContent);
@@ -387,6 +439,7 @@ export const upgrade = async (
               rawOldContent,
               manifest.template,
               manifest.projectName,
+              features,
             )
           : null;
       const templateDiff =
@@ -432,6 +485,10 @@ export const upgrade = async (
 
     // 5. Update manifest commit to latest (even if there are conflicts)
     if (!options.dry) {
+      // Save the version and features we just worked out, so that older
+      // manifests get updated and we only have to look at the disk once.
+      manifest.version = MANIFEST_VERSION;
+      manifest.features = features;
       // Only advance the commit pointer if all conflicts are resolved.
       // If conflicts remain, keep manifest.commit at the base so
       // `build-elevate diff <file>` can still show what needs to be applied.
