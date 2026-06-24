@@ -4,6 +4,7 @@
 <div align="center">
 
 [![Quick Start](https://img.shields.io/badge/Quick_Start-blue?style=for-the-badge)](./README.md#-quick-start)
+[![CI](https://img.shields.io/github/actions/workflow/status/vijaysingh2219/build-elevate/ci.yml?style=for-the-badge&logo=githubactions&logoColor=white&label=CI)](https://github.com/vijaysingh2219/build-elevate/actions/workflows/ci.yml)
 [![npm version](https://img.shields.io/npm/v/build-elevate?style=for-the-badge&color=CB3837&logo=npm)](https://www.npmjs.com/package/build-elevate)
 [![npm downloads](https://img.shields.io/npm/dy/build-elevate?style=for-the-badge&color=20c997)](https://www.npmjs.com/package/build-elevate)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](https://opensource.org/licenses/MIT)
@@ -34,6 +35,28 @@
 build-elevate is a production-ready monorepo starter that bundles everything you need — authentication, database, email templates, UI components, rate limiting, and deployment configs — into a single, cohesive foundation.
 
 Built with **Turborepo**, **Next.js 16**, **Express**, **Better Auth**, **Prisma**, and **shadcn/ui**, it's designed for teams that want to focus on their product, not boilerplate. **Launch in days. Deploy with confidence.**
+
+---
+
+## 📑 Table of Contents
+
+- [Who is this for?](#-who-is-this-for)
+- [What's Included](#-whats-included)
+- [Quick Start](#-quick-start)
+- [Project Structure](#-project-structure)
+- [Applications](#-applications)
+- [Packages](#-packages)
+- [Technology Stack](#-technology-stack)
+- [Development](#-development)
+- [Docker](#-docker)
+- [Kubernetes](#-kubernetes)
+- [Documentation](#-documentation)
+- [Deployment](#-deployment)
+- [Contributing](#-contributing)
+- [Security](#-security)
+- [Support](#-support)
+- [License](#-license)
+- [Acknowledgments](#-acknowledgments)
 
 ---
 
@@ -151,7 +174,7 @@ That's it. No more setup. Start building features.
 
 ---
 
-## 🏗️ Project Structure
+## 📂 Project Structure
 
 ```txt
 build-elevate/
@@ -205,7 +228,7 @@ build-elevate/
 - **[@workspace/typescript-config](packages/typescript-config/)** - Shared TypeScript compiler options
 - **[@workspace/vitest-presets](packages/vitest-presets/)** - Testing configuration for Node.js and React
 
-## 🛠️ Technology Stack
+## 🧰 Technology Stack
 
 | Layer                | Technology                                                         | Purpose                                       |
 | -------------------- | ------------------------------------------------------------------ | --------------------------------------------- |
@@ -330,110 +353,18 @@ Services include:
 
 See [Docker Documentation](https://build-elevate.vercel.app/docs/configuration/docker) for more details.
 
-## Kubernetes
+## ⛵ Kubernetes
 
-Deploy both the Next.js frontend and Express API to any Kubernetes cluster using the manifests in the `k8s/` directory.
+Production-ready manifests for deploying both the Next.js frontend and Express API to any Kubernetes cluster (EKS, GKE, AKS, k3s, minikube) live in the [`k8s/`](k8s/) directory — Deployments, Services, nginx Ingress, HorizontalPodAutoscalers (2 → 10 pods), and a post-deploy health-check script.
 
-### What's included
-
-| Manifest                 | Purpose                                                                                |
-| ------------------------ | -------------------------------------------------------------------------------------- |
-| `k8s/namespace.yml`      | Dedicated `build-elevate` namespace                                                    |
-| `k8s/configmap.yml`      | Non-secret config (e.g. cluster-internal `API_INTERNAL_URL`)                           |
-| `k8s/api-deployment.yml` | API Deployment — replicas owned by the HPA, resource limits, liveness/readiness probes |
-| `k8s/api-service.yml`    | ClusterIP Service for the API                                                          |
-| `k8s/web-deployment.yml` | Web (Next.js) Deployment — replicas owned by the HPA, resource limits, probes          |
-| `k8s/web-service.yml`    | ClusterIP Service for the web app                                                      |
-| `k8s/api-ingress.yml`    | nginx Ingress — `/api/v1/*` → API (prefix rewritten to `/api`)                         |
-| `k8s/web-ingress.yml`    | nginx Ingress — everything else → web                                                  |
-| `k8s/api-hpa.yml`        | HorizontalPodAutoscaler for the API (scales 2 → 10 pods)                               |
-| `k8s/web-hpa.yml`        | HorizontalPodAutoscaler for the web app (scales 2 → 10 pods)                           |
-| `k8s/verify.sh`          | Post-deploy health check (pods, endpoints, in-cluster HTTP, ingress, HPA)              |
-
-### Cluster Requirements
-
-Before deploying, ensure the following are available on your cluster.
-
-**1. A running Kubernetes cluster** (EKS, GKE, AKS, k3s, etc.)
-
-**2. nginx Ingress controller:**
+Once your cluster has an nginx Ingress controller and the Metrics Server installed, deploy and verify with:
 
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.10.1/deploy/static/provider/cloud/deploy.yaml
+pnpm k8s:deploy   # build & push images, create secrets, apply manifests, wait for rollout
+pnpm k8s:verify   # check pods, endpoints, in-cluster HTTP, ingress, and HPA metrics
 ```
 
-**3. Metrics Server** (required for HPA — without it the HPAs read `<unknown>` and cannot scale):
-
-```bash
-kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
-```
-
-On minikube, enable the bundled addon instead:
-
-```bash
-minikube addons enable metrics-server
-```
-
-**4.** Create `.env.production` files at `apps/api/.env.production` and `apps/web/.env.production`
-
-**5.** (Optional) For a real domain, add a `host:` to each rule in the ingress files (`k8s/api-ingress.yml`, `k8s/web-ingress.yml`) and uncomment the `tls:` block plus the `cert-manager.io/cluster-issuer` annotation. The manifests ship hostless (catch-all) so they work as-is against the ingress controller's IP.
-
-### Deploy
-
-```bash
-pnpm k8s:deploy
-```
-
-This script will:
-
-1. Build and push Docker images for both API and web to Docker Hub
-2. Create the namespace and apply the ConfigMap
-3. Create K8s Secrets from your `.env.production` files
-4. Apply all manifests (Deployments, Services, Ingress, HPA)
-5. Wait for both rollouts to complete
-
-### Verify
-
-```bash
-pnpm k8s:verify
-```
-
-Checks pods, service endpoints, in-cluster HTTP to the apps, the ingress, and that the HPAs are reading metrics. Exits non-zero (CI-friendly) if anything is unhealthy.
-
-### Traffic flow
-
-```txt
-Internet → nginx Ingress (:80/:443)
-         ├─ /api/v1/*  → rewrite /api/v1/* → /api/* → build-elevate-api-service (:4000) → Express API
-         └─ /*         → build-elevate-web-service (:3000) → Next.js pages
-
-Next.js server-side fetches (SSR) reach the API in-cluster via
-API_INTERNAL_URL → build-elevate-api-service (:4000), bypassing the ingress.
-```
-
-### TLS (HTTPS)
-
-The Ingress includes commented-out cert-manager annotations. To enable TLS:
-
-1. Install [cert-manager](https://cert-manager.io/docs/installation/)
-2. Uncomment the `cert-manager.io/cluster-issuer` annotation and `tls` block in the ingress files (`k8s/api-ingress.yml`, `k8s/web-ingress.yml`)
-
-### Useful commands
-
-```bash
-kubectl get pods -n build-elevate
-kubectl get services -n build-elevate
-kubectl get ingress -n build-elevate
-kubectl get hpa -n build-elevate
-kubectl logs -n build-elevate -l app=build-elevate-api
-kubectl logs -n build-elevate -l app=build-elevate-web
-
-# Inspect an app in your browser (Ctrl+C to stop the tunnel).
-# The API health endpoints (/health, /healthz, /readyz) live at the API root and
-# are not exposed via the ingress, so port-forward is how you reach them locally.
-kubectl port-forward -n build-elevate svc/build-elevate-api-service 4000:4000  # → http://localhost:4000/health
-kubectl port-forward -n build-elevate svc/build-elevate-web-service 3000:3000  # → http://localhost:3000
-```
+See the [Kubernetes Deployment Guide](https://build-elevate.vercel.app/docs/deployment/kubernetes) for cluster requirements, TLS/cert-manager setup, traffic flow, and troubleshooting.
 
 ## 📖 Documentation
 
@@ -456,6 +387,33 @@ The modular structure makes it easy to deploy to any platform:
 - **Web (Next.js)**: Vercel, Netlify, Railway, Heroku
 - **API (Express)**: Railway, Heroku, AWS, DigitalOcean
 - **Database (PostgreSQL)**: AWS RDS, Heroku Postgres, Railway, Neon
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Whether it's a bug fix, a new feature, or a documentation improvement, we'd love your help.
+
+1. Fork the repository and create your branch from `main`.
+2. Install dependencies with `pnpm install`.
+3. Make your changes, then run `pnpm lint`, `pnpm check-types`, and `pnpm test`.
+4. Open a pull request with a clear description of what and why.
+
+Please read [CONTRIBUTING.md](./CONTRIBUTING.md) for the full guidelines and development workflow.
+
+## 🔒 Security
+
+If you discover a security vulnerability, please **do not** open a public issue. Review our [Security Policy](./SECURITY.md) for instructions on reporting it responsibly.
+
+## 💬 Support
+
+- 📖 **Documentation** — [build-elevate.vercel.app/docs](https://build-elevate.vercel.app/docs)
+- 🐛 **Bugs & feature requests** — [open an issue](https://github.com/vijaysingh2219/build-elevate/issues)
+- 💡 **Questions & ideas** — [start a discussion](https://github.com/vijaysingh2219/build-elevate/discussions)
+- 📸 **Screenshots** — see [SCREENSHOTS.md](./SCREENSHOTS.md)
+- 📝 **Release notes** — see [CHANGELOG.md](./CHANGELOG.md)
+
+If build-elevate saves you time, consider giving it a ⭐ — it helps others discover the project.
 
 ---
 

@@ -39,7 +39,22 @@ The manifests are template-aware: a **full-stack** project gets both web and API
 - [`kubectl`](https://kubernetes.io/docs/tasks/tools/) configured to talk to your cluster
 - A container registry account (the scripts assume [Docker Hub](https://hub.docker.com/))
 - An [ingress-nginx controller](https://kubernetes.github.io/ingress-nginx/) installed in the cluster
-- [metrics-server](https://github.com/kubernetes-sigs/metrics-server) installed (required for the HPAs to scale; on minikube: `minikube addons enable metrics-server`)
+- [metrics-server](https://github.com/kubernetes-sigs/metrics-server) installed (required for the HPAs to scale)
+
+If your cluster doesn't already have them, install the ingress controller and metrics-server:
+
+```bash
+# nginx Ingress controller
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.10.1/deploy/static/provider/cloud/deploy.yaml
+
+# Metrics Server (required for HPA — without it the HPAs read <unknown> and cannot scale)
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+```
+
+<Callout type="info">
+  On minikube, enable the bundled metrics-server addon instead: `minikube addons
+  enable metrics-server`.
+</Callout>
 
 ## Step 1: Set your registry username
 
@@ -112,11 +127,49 @@ The Deployments intentionally **omit** `replicas`. The per-app `HorizontalPodAut
 
 ### Ingress routing
 
-The ingress mirrors the local dev rewrite: requests to `/api/v1/*` are stripped to `/api/*` and routed to the API service (`k8s/api-ingress.yml`), while everything else goes to the web app (`k8s/web-ingress.yml`). To enable TLS, install [cert-manager](https://cert-manager.io/), then uncomment the `tls:` block and `cert-manager.io/cluster-issuer` annotation in those ingress files.
+The ingress mirrors the local dev rewrite: requests to `/api/v1/*` are stripped to `/api/*` and routed to the API service (`k8s/api-ingress.yml`), while everything else goes to the web app (`k8s/web-ingress.yml`).
+
+```txt
+Internet → nginx Ingress (:80/:443)
+         ├─ /api/v1/*  → rewrite /api/v1/* → /api/* → build-elevate-api-service (:4000) → Express API
+         └─ /*         → build-elevate-web-service (:3000) → Next.js pages
+
+Next.js server-side fetches (SSR) reach the API in-cluster via
+API_INTERNAL_URL → build-elevate-api-service (:4000), bypassing the ingress.
+```
+
+Next.js server-side fetches (SSR) don't go back out through the ingress — they reach the API directly over the cluster network via `API_INTERNAL_URL` (set in `k8s/configmap.yml`), pointed at the API's ClusterIP service.
+
+### Custom domain and TLS
+
+The manifests ship **hostless** (catch-all), so they work as-is against the ingress controller's external IP. For a real domain, add a `host:` to each rule in `k8s/api-ingress.yml` and `k8s/web-ingress.yml`.
+
+To enable TLS, install [cert-manager](https://cert-manager.io/docs/installation/), then uncomment the `tls:` block and the `cert-manager.io/cluster-issuer` annotation in those ingress files.
 
 ### Health probes
 
 The API uses `/readyz` (readiness) and `/healthz` (liveness); the web app probes `/`. These match the endpoints exposed by the Express API (`/healthz`, `/readyz`, `/health`).
+
+## Useful commands
+
+Inspect the running deployment (replace `[your-project]` with your namespace):
+
+```bash
+kubectl get pods -n [your-project]
+kubectl get services -n [your-project]
+kubectl get ingress -n [your-project]
+kubectl get hpa -n [your-project]
+kubectl logs -n [your-project] -l app=[your-project]-api
+kubectl logs -n [your-project] -l app=[your-project]-web
+```
+
+The API health endpoints (`/health`, `/healthz`, `/readyz`) live at the API root and are **not** exposed through the ingress, so port-forwarding is how you reach them locally:
+
+```bash
+# Ctrl+C to stop the tunnel
+kubectl port-forward -n [your-project] svc/[your-project]-api-service 4000:4000  # → http://localhost:4000/health
+kubectl port-forward -n [your-project] svc/[your-project]-web-service 3000:3000  # → http://localhost:3000
+```
 
 ## Troubleshooting
 
