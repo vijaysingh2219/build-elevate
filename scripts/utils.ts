@@ -268,6 +268,8 @@ export const envsByTemplate: Record<string, string[]> = {
     "RESEND_EMAIL_FROM",
     "UPSTASH_REDIS_REST_URL",
     "UPSTASH_REDIS_REST_TOKEN",
+    "LOG_LEVEL",
+    "POD_NAME",
   ],
   web: [
     "GOOGLE_CLIENT_ID",
@@ -280,6 +282,8 @@ export const envsByTemplate: Record<string, string[]> = {
     "RESEND_EMAIL_FROM",
     "UPSTASH_REDIS_REST_URL",
     "UPSTASH_REDIS_REST_TOKEN",
+    "LOG_LEVEL",
+    "POD_NAME",
   ],
   api: [
     "GOOGLE_CLIENT_ID",
@@ -293,5 +297,7 @@ export const envsByTemplate: Record<string, string[]> = {
     "RESEND_EMAIL_FROM",
     "UPSTASH_REDIS_REST_URL",
     "UPSTASH_REDIS_REST_TOKEN",
+    "LOG_LEVEL",
+    "POD_NAME",
   ],
 };

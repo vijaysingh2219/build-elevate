@@ -104,9 +104,31 @@ export type ReleaseTag =
  */
 export const changelog: ChangelogEntry[] = [
   {
+    version: "1.5.2",
+    date: "2026-07-20",
+    tag: "latest",
+    title: "Dynamic Kubernetes Configuration & Environment Template Fixes",
+    summary:
+      "Enhances the Kubernetes scaffolding option with interactive prompts for Docker Hub username and domain name, and ensures LOG_LEVEL and POD_NAME are preserved in environment templates.",
+    changes: [
+      {
+        category: "added",
+        text: "Interactive prompts for Docker Hub username and production domain name when scaffolding Kubernetes manifests",
+      },
+      {
+        category: "changed",
+        text: "Configured dynamic replacements for the domain in Ingress manifests and uncommented TLS cert-manager configurations",
+      },
+      {
+        category: "fixed",
+        text: "Updated environment templates to properly retain `LOG_LEVEL` and `POD_NAME` across scaffolding options",
+      },
+    ],
+  },
+  {
     version: "1.5.1",
     date: "2026-06-25",
-    tag: "latest",
+    tag: "patch",
     title: "Respect Opted-Out Features on Upgrade",
     summary:
       "Fixes the `upgrade` command re-adding files for optional features that were declined when the project was created, and stops repo-only contributor guides from leaking into scaffolded projects.",

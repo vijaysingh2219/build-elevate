@@ -9,6 +9,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com).
 
 Nothing yet.
 
+## [1.5.2] - 2026-07-20 [Minor] - Dynamic Kubernetes Configuration & Environment Template Fixes
+
+Enhances the Kubernetes scaffolding option with interactive prompts for Docker Hub username and domain name, and ensures LOG_LEVEL and POD_NAME are preserved in environment templates.
+
+### Added
+
+- **CLI:** Interactive prompts for Docker Hub username and production domain name when scaffolding Kubernetes manifests
+
+### Changed
+
+- **Kubernetes:** Configured dynamic replacements for the domain in Ingress manifests and uncommented TLS cert-manager configurations
+
+### Fixed
+
+- **CLI:** Updated environment templates to properly retain `LOG_LEVEL` and `POD_NAME` across scaffolding options
+
 ## [1.5.1] - 2026-06-25 [Patch] - Respect Opted-Out Features on Upgrade
 
 Fixes the `upgrade` command re-adding files for optional features that were declined when the project was created, and stops repo-only contributor guides from leaking into scaffolded projects.

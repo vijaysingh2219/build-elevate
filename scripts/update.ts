@@ -217,11 +217,43 @@ export const K8S_DOCKERHUB_FILES = [
   "k8s/web-deployment.yml",
 ];
 
-export const applyDockerHubUsernameCleanup = (content: string): string =>
-  content.replaceAll(
-    TEMPLATE_DOCKERHUB_USERNAME,
-    DOCKERHUB_USERNAME_PLACEHOLDER,
+export const applyDockerHubUsernameCleanup = (
+  content: string,
+  username: string = DOCKERHUB_USERNAME_PLACEHOLDER,
+): string => content.replaceAll(TEMPLATE_DOCKERHUB_USERNAME, username);
+
+export const applyDomainName = (
+  content: string,
+  domainName: string,
+): string => {
+  let updated = content;
+  if (!domainName) return updated;
+
+  // Uncomment TLS setup
+  updated = updated.replace(
+    /^\s*#\s*cert-manager\.io\/cluster-issuer:\s*"letsencrypt-prod"/m,
+    '    cert-manager.io/cluster-issuer: "letsencrypt-prod"',
   );
+  updated = updated.replace(/^\s*#\s*tls:/m, "  tls:");
+  updated = updated.replace(/^\s*#\s*-\s*hosts:/m, "    - hosts:");
+  updated = updated.replace(
+    /^\s*#\s*-\s*yourdomain\.com/m,
+    `        - ${domainName}`,
+  );
+  updated = updated.replace(
+    /^\s*#\s*secretName:\s*build-elevate-tls/m,
+    "      secretName: build-elevate-tls",
+  );
+
+  // Add host to rules
+  // Find the 'rules:' section and the '- http:' part under it, and inject 'host: domainName'
+  updated = updated.replace(
+    /rules:\s*\n\s*-\s*http:/m,
+    `rules:\n    - host: ${domainName}\n      http:`,
+  );
+
+  return updated;
+};
 
 export const applyConfigMapCleanup = (
   content: string,

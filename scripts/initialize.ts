@@ -37,6 +37,7 @@ import {
   applyDockerComposeCleanup,
   applyDockerfilesPackageManagerCleanup,
   applyDockerHubUsernameCleanup,
+  applyDomainName,
   applyConfigMapCleanup,
   K8S_DOCKERHUB_FILES,
 } from "./update.js";
@@ -139,12 +140,30 @@ const removeKubernetesFiles = async () => {
   }
 };
 
-const replaceDockerHubUsername = async () => {
+const replaceDockerHubUsername = async (username: string) => {
   await Promise.all(
     K8S_DOCKERHUB_FILES.map(async (file) => {
       try {
         const content = await readFile(file, "utf8");
-        const updated = applyDockerHubUsernameCleanup(content);
+        const updated = applyDockerHubUsernameCleanup(content, username);
+        if (updated !== content) {
+          await writeFile(file, updated);
+        }
+      } catch {
+        // file doesn't exist - already removed by template pruning
+      }
+    }),
+  );
+};
+
+const replaceDomainName = async (domainName: string) => {
+  if (!domainName) return;
+  const ingressFiles = ["k8s/api-ingress.yml", "k8s/web-ingress.yml"];
+  await Promise.all(
+    ingressFiles.map(async (file) => {
+      try {
+        const content = await readFile(file, "utf8");
+        const updated = applyDomainName(content, domainName);
         if (updated !== content) {
           await writeFile(file, updated);
         }
@@ -820,6 +839,34 @@ const getKubernetesChoice = async () => {
   return value as boolean;
 };
 
+const getDockerHubUsername = async () => {
+  const value = await text({
+    message: "What is your Docker Hub username?",
+    placeholder: "your-dockerhub-username",
+  });
+
+  if (isCancel(value)) {
+    cancel("Operation cancelled.");
+    process.exit(0);
+  }
+
+  return value.toString() || "your-dockerhub-username";
+};
+
+const getDomainName = async () => {
+  const value = await text({
+    message: "What domain will you use for production? (Leave blank to skip)",
+    placeholder: "example.com",
+  });
+
+  if (isCancel(value)) {
+    cancel("Operation cancelled.");
+    process.exit(0);
+  }
+
+  return value.toString();
+};
+
 const getStudioChoice = async () => {
   const value = await select({
     message: "Include Prisma Studio app?",
@@ -942,6 +989,13 @@ export const initialize = async (
     const includeKubernetes =
       includeDocker && !options.yes ? await getKubernetesChoice() : false;
 
+    let dockerHubUsername = "your-dockerhub-username";
+    let domainName = "";
+    if (includeKubernetes) {
+      dockerHubUsername = await getDockerHubUsername();
+      domainName = await getDomainName();
+    }
+
     const includeStudio = options.yes ? true : await getStudioChoice();
 
     const s = spinner();
@@ -1030,7 +1084,8 @@ export const initialize = async (
       if (options.verbose) log.info("✓ Removed Kubernetes files");
     } else {
       s.message("Configuring Kubernetes manifests...");
-      await replaceDockerHubUsername();
+      await replaceDockerHubUsername(dockerHubUsername);
+      await replaceDomainName(domainName);
       if (template !== "fullstack") {
         await updateK8sForTemplate(template);
       }
