@@ -4,14 +4,14 @@ import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 import { Terminal } from "lucide-react";
 
-const COMMAND = "pnpm dlx build-elevate@latest init my-project";
+const COMMAND = "pnpm dlx build-elevate@latest init my-saas";
 
 const OUTPUT_LINES = [
   { text: "✓ Initializing project structure...", muted: true },
   { text: "✓ Setting up monorepo configuration...", muted: true },
   { text: "✓ Installing dependencies...", muted: true },
   { text: "✓ Configuring project settings...", muted: true },
-  { text: "🎉 Project ready! Run cd my-project && pnpm dev", muted: false },
+  { text: "🎉 Project ready! Run cd my-saas && pnpm dev", muted: false },
 ];
 
 const TYPING_MS = 38;
@@ -76,28 +76,45 @@ export function AnimatedTerminal() {
         <div className="space-y-2 p-5 text-left font-mono text-sm leading-relaxed sm:p-6">
           <div className="flex items-start gap-2">
             <span className="select-none text-primary">$</span>
-            <span className="break-all text-foreground">
-              {COMMAND.slice(0, typed)}
+            <span className="break-all">
+              <span className="text-foreground">{COMMAND.slice(0, typed)}</span>
               {!commandDone && (
                 <span className="ml-px inline-block h-4 w-2 translate-y-0.5 animate-pulse bg-foreground/70" />
               )}
+              <span className="invisible select-none" aria-hidden="true">
+                {COMMAND.slice(typed)}
+              </span>
             </span>
           </div>
 
           <div className="space-y-1">
-            {OUTPUT_LINES.slice(0, visibleLines).map((line) => (
-              <div
-                key={line.text}
-                className={
-                  line.muted ? "text-muted-foreground" : "text-foreground"
-                }
-              >
-                {line.text}
-              </div>
-            ))}
-            {commandDone && visibleLines < OUTPUT_LINES.length && (
-              <span className="inline-block h-4 w-2 animate-pulse bg-foreground/70" />
-            )}
+            {OUTPUT_LINES.map((line, index) => {
+              const isVisible = index < visibleLines;
+              const showLineCursor =
+                commandDone &&
+                index === visibleLines &&
+                visibleLines < OUTPUT_LINES.length;
+
+              return (
+                <div key={line.text} className="relative">
+                  <div
+                    className={
+                      isVisible
+                        ? line.muted
+                          ? "text-muted-foreground"
+                          : "text-foreground"
+                        : "invisible select-none"
+                    }
+                    aria-hidden={!isVisible}
+                  >
+                    {line.text}
+                  </div>
+                  {showLineCursor && (
+                    <span className="absolute left-0 top-0 inline-block h-4 w-2 translate-y-0.5 animate-pulse bg-foreground/70" />
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

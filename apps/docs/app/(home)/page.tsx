@@ -27,9 +27,11 @@ import { GridGlow } from "./_components/grid-glow";
 import { Reveal } from "./_components/reveal";
 import { AnimatedTerminal } from "./_components/animated-terminal";
 import { TechLogos } from "./_components/tech-logos";
+import { LifecycleSection } from "./_components/lifecycle-section";
+import { TypeFlowSection } from "./_components/typeflow-section";
 
 const GITHUB_URL = "https://github.com/vijaysingh2219/build-elevate";
-const INSTALL_COMMAND = "pnpm dlx build-elevate@latest init my-project";
+const INSTALL_COMMAND = "pnpm dlx build-elevate@latest init my-saas";
 
 export default function HomePage() {
   return (
@@ -43,15 +45,15 @@ export default function HomePage() {
           </Reveal>
           <Reveal delay={0.05}>
             <h1 className="mt-6 text-balance text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-              Ship production apps{" "}
+              The open-source foundation{" "}
               <span className="bg-linear-to-r from-primary to-primary/60 bg-clip-text">
-                in minutes
+                for modern monorepos
               </span>
             </h1>
           </Reveal>
           <Reveal delay={0.1}>
             <p className="mx-auto mt-6 max-w-2xl text-pretty text-lg text-muted-foreground sm:text-xl">
-              A CLI that scaffolds scalable monorepos with authentication,
+              A CLI that scaffolds scalable Turborepos with authentication,
               infrastructure, and best practices built in. Stop configuring.
               Start building.
             </p>
@@ -87,7 +89,7 @@ export default function HomePage() {
 
       {/* Tech stack strip */}
       <section className="border-y border-border/40 bg-muted/20 py-12">
-        <div className="mx-auto max-w-5xl px-4">
+        <div className="mx-auto max-w-6xl px-4">
           <Reveal>
             <p className="mb-8 text-center text-xs font-medium uppercase tracking-widest text-muted-foreground">
               Built on a modern, production-grade stack
@@ -120,6 +122,12 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* End-to-End Lifecycle */}
+      <LifecycleSection />
+
+      {/* End-to-End Type Safety */}
+      <TypeFlowSection />
+
       {/* What you get */}
       <section className="border-t border-border/40 bg-muted/20 py-24">
         <div className="mx-auto max-w-5xl px-4">
@@ -145,7 +153,7 @@ export default function HomePage() {
 
       {/* How it works */}
       <section className="py-24">
-        <div className="mx-auto max-w-3xl px-4">
+        <div className="mx-auto max-w-5xl px-4">
           <Reveal>
             <Eyebrow>How it works</Eyebrow>
             <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
@@ -171,7 +179,7 @@ export default function HomePage() {
 
       {/* CTA */}
       <section className="px-4 pb-24">
-        <div className="relative isolate mx-auto max-w-4xl overflow-hidden rounded-3xl border border-border/60 bg-muted/30 px-6 py-20 text-center">
+        <div className="relative isolate mx-auto max-w-5xl overflow-hidden rounded-3xl border border-border/60 bg-muted/30 px-6 py-20 text-center">
           <GridGlow />
           <Reveal>
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
