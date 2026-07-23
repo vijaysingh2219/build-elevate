@@ -63,6 +63,8 @@ catalogs:
     "@react-email/ui": ^6.1.4
     react-email: ^6.1.4
     resend: 6.9.4
+    "@aws-sdk/client-s3": ^3.758.0
+    "@aws-sdk/s3-request-presigner": ^3.758.0
 
   dev:
     typescript: ^5.9.3
