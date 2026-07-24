@@ -15,8 +15,10 @@
   "prettier": "@workspace/prettier-config",
   "dependencies": {
     "@workspace/auth": "workspace:*",
+    "@workspace/contracts": "workspace:*",
     "@workspace/logger": "workspace:*",
     "@workspace/rate-limit": "workspace:*",
+    "@workspace/storage": "workspace:*",
     "@workspace/utils": "workspace:*",
     "cors": "catalog:server",
     "dotenv": "catalog:core",

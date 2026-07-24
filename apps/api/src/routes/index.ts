@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { globalRateLimit } from '../middleware/rate-limit';
+import storageRoutes from './storage.routes';
 import userRoutes from './user.routes';
 
 /**
@@ -20,5 +21,12 @@ router.use(globalRateLimit);
  * Handles all user-related endpoints
  */
 router.use('/users', userRoutes);
+
+/**
+ * Storage Routes
+ * Mounted at: /api/storage
+ * Handles presigned URL generation and file management
+ */
+router.use('/storage', storageRoutes);
 
 export default router;
