@@ -12,7 +12,9 @@ export class ApiError extends Error {
     public status: number,
     public body: Record<string, unknown>,
   ) {
-    super((body.error as string) ?? `Request failed with status ${status}`);
+    super(
+      (body.message as string) ?? (body.error as string) ?? `Request failed with status ${status}`,
+    );
     this.name = 'ApiError';
   }
 }

@@ -2,6 +2,7 @@
 
 import { NameField } from '@/components/form';
 import { EmailField } from '@/components/form/email';
+import { AvatarUploader } from '@/components/profile/avatar-uploader';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import type { Session } from '@workspace/auth/client';
@@ -17,6 +18,8 @@ import {
   CardTitle,
 } from '@workspace/ui/components/card';
 import { Form } from '@workspace/ui/components/form';
+import { Label } from '@workspace/ui/components/label';
+import { Separator } from '@workspace/ui/components/separator';
 import { Spinner } from '@workspace/ui/components/spinner';
 import { User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -102,7 +105,14 @@ export function GeneralSettingsForm({ user }: GeneralSettingsFormProps) {
         </CardHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <Label>Profile Picture</Label>
+                <AvatarUploader user={user} />
+              </div>
+
+              <Separator />
+
               <NameField
                 control={form.control}
                 name="name"
