@@ -1,0 +1,178 @@
+---
+title: Storage
+description: Vendor-agnostic file storage for AWS S3, Cloudflare R2, and MinIO with direct client presigned uploads
+---
+
+# Storage Package
+
+The `@workspace/storage` package provides high-performance, vendor-agnostic file storage built on AWS SDK v3. It enables direct-to-cloud presigned uploads, saving backend bandwidth and compute while supporting **AWS S3, Cloudflare R2, MinIO, and Supabase Storage** through environment variables.
+
+## Overview
+
+- **Package:** `@workspace/storage`
+- **Location:** `packages/storage`
+- **Engine:** AWS SDK v3 (`@aws-sdk/client-s3`, `@aws-sdk/s3-request-presigner`)
+- **Compatibility:** AWS S3, Cloudflare R2, MinIO, Supabase Storage
+- **Upload Pattern:** Direct-to-bucket presigned PUT URLs with MIME type & size constraints
+- **UI Components:** Reusable `<FileUploader />` and `<AvatarUploader />`
+
+## Architecture
+
+The storage system uses a direct-to-cloud upload pattern:
+
+```
+[Browser / Client] --(1. Request Presigned URL)--> [Express API]
+[Browser / Client] <--(2. Returns uploadUrl & publicUrl)-- [Express API]
+[Browser / Client] --(3. Direct HTTP PUT file)--> [S3 / Cloudflare R2 / MinIO]
+[Browser / Client] --(4. Save publicUrl to DB)--> [Better Auth / Prisma]
+```
+
+1. The client requests an upload ticket with file metadata (`filename`, `contentType`, `size`, `folder`).
+2. The API authenticates the user, enforces file size/type constraints, generates a scoped storage key (`avatars/{userId}/{hash}.png`), and returns a signed PUT URL.
+3. The browser uploads directly to the object store with zero proxying overhead.
+4. The database is updated with the returned public URL.
+
+## Configuration & Environment Variables
+
+Add the following variables to your environment (`.env.local` or `.env.production`):
+
+```bash
+# S3 / Cloudflare R2 / MinIO Storage Configuration
+S3_BUCKET=my-app-bucket
+S3_REGION=us-east-1
+S3_ACCESS_KEY_ID=your-access-key-id
+S3_SECRET_ACCESS_KEY=your-secret-access-key
+
+# Optional: Custom endpoint for Cloudflare R2, MinIO, or LocalStack
+# For Cloudflare R2: https://<accountid>.r2.cloudflarestorage.com
+# For MinIO / Local: http://localhost:9000
+# S3_ENDPOINT=
+
+# Optional: Custom CDN or public URL for assets (e.g., https://cdn.yourdomain.com)
+# S3_PUBLIC_URL=
+
+# Optional: Enable path-style URLs (required for MinIO)
+# S3_FORCE_PATH_STYLE=false
+```
+
+#### AWS S3 (with optional CloudFront CDN)
+
+```bash
+S3_BUCKET=my-production-bucket
+S3_REGION=us-east-1
+S3_ACCESS_KEY_ID=your-s3-access-key-id
+S3_SECRET_ACCESS_KEY=your-s3-secret-access-key
+
+# Optional: CloudFront CDN distribution domain or custom domain
+S3_PUBLIC_URL=https://<distribution-id>.cloudfront.net # or https://cdn.yourdomain.com
+```
+
+> **AWS Best Practice**: Use **CloudFront with Origin Access Control (OAC)** in front of S3 so your bucket stays 100% private. In your S3 bucket policy, allow `s3:GetObject` only for your CloudFront distribution ARN.
+
+#### Cloudflare R2
+
+```bash
+S3_BUCKET=my-r2-bucket
+S3_REGION=auto
+S3_ENDPOINT=https://<account_id>.r2.cloudflarestorage.com
+S3_ACCESS_KEY_ID=<r2_access_key_id>
+S3_SECRET_ACCESS_KEY=<r2_secret_access_key>
+S3_PUBLIC_URL=https://pub-<hash>.r2.dev # or custom domain
+```
+
+#### MinIO (Local Development)
+
+```bash
+S3_BUCKET=local-bucket
+S3_REGION=us-east-1
+S3_ENDPOINT=http://localhost:9000
+S3_ACCESS_KEY_ID=minioadmin
+S3_SECRET_ACCESS_KEY=minioadmin
+S3_FORCE_PATH_STYLE=true
+```
+
+## Bucket CORS Configuration
+
+To allow direct browser uploads, your storage bucket must have a CORS policy allowing `PUT` requests from your frontend origin:
+
+```json
+[
+  {
+    "AllowedHeaders": ["*"],
+    "AllowedMethods": ["PUT", "GET", "HEAD"],
+    "AllowedOrigins": ["http://localhost:3000", "https://yourdomain.com"],
+    "ExposeHeaders": ["ETag"]
+  }
+]
+```
+
+## API Usage
+
+### Server-Side Operations
+
+```typescript
+import { storage, generateStorageKey } from "@workspace/storage";
+
+// 1. Generate presigned PUT URL for upload
+const key = generateStorageKey("avatars/user-123", "photo.png");
+const presigned = await storage.getUploadPresignedUrl({
+  key,
+  contentType: "image/png",
+  expiresIn: 300, // 5 minutes
+});
+
+// 2. Generate presigned GET URL for private downloads
+const { downloadUrl } = await storage.getDownloadPresignedUrl({
+  key: "documents/confidential.pdf",
+  expiresIn: 900, // 15 minutes
+});
+
+// 3. Delete a file
+await storage.deleteFile({ key });
+
+// 4. Get metadata (size, mime type, last modified)
+const metadata = await storage.getFileMetadata({ key });
+```
+
+### Express Storage Endpoints
+
+The API includes pre-configured, authenticated routes:
+
+- `POST /api/storage/presigned-upload`: Scopes key to the authenticated `req.user.id` and validates against `@workspace/contracts`.
+- `DELETE /api/storage/file`: Verifies that the authenticated user owns the key before deletion.
+
+## UI Components
+
+### File Uploader Component
+
+A versatile drag-and-drop dropzone in `@workspace/ui/components/file-uploader`:
+
+```tsx
+import { FileUploader } from "@workspace/ui/components/file-uploader";
+
+export function DocumentUpload() {
+  const [progress, setProgress] = useState(0);
+  const [uploading, setUploading] = useState(false);
+
+  const handleFileSelect = async (file: File) => {
+    setUploading(true);
+    // 1. Fetch presigned URL
+    // 2. PUT file with XMLHttpRequest / fetch to track progress
+    setUploading(false);
+  };
+
+  return (
+    <FileUploader
+      accept="application/pdf,image/*"
+      maxSize={25 * 1024 * 1024} // 25MB
+      onFileSelect={handleFileSelect}
+      uploading={uploading}
+      progress={progress}
+    />
+  );
+}
+```
+
+### Profile Avatar Uploader
+
+An interactive avatar editor is integrated into **General Settings** (`apps/web/components/profile/avatar-uploader.tsx`), allowing users to click or drag a new profile picture, upload directly to cloud storage, and immediately sync with Better Auth.

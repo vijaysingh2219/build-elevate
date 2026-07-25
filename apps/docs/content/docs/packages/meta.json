@@ -8,6 +8,7 @@
     "rate-limit",
     "ui",
     "contracts",
+    "storage",
     "utils",
     "logger",
     "eslint-config",

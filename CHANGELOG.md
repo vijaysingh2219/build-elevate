@@ -7,7 +7,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com).
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+- **Storage:** New `@workspace/storage` package providing vendor-agnostic S3-compatible cloud storage (AWS S3, Cloudflare R2, MinIO, Supabase Storage) with direct client presigned PUT/GET URLs, object deletion, and collision-safe key generation
+- **Contracts:** Storage schemas and MIME/size limits (`getPresignedUploadUrlSchema`, `deleteStorageFileSchema`) in `@workspace/contracts`
+- **API:** Authenticated `/api/storage/presigned-upload` and `/api/storage/file` endpoints with user-scoped access control
+- **UI:** Reusable `<FileUploader />` dropzone component in `@workspace/ui` with drag-and-drop, progress bar, and file validation
+- **Web:** Interactive avatar upload and removal in General Settings (`apps/web/components/profile/avatar-uploader.tsx`) syncing directly with Better Auth
+- **Docs:** Complete storage guide at `apps/docs/content/docs/packages/storage.mdx` covering S3/R2/MinIO setup and CORS configuration
 
 ## [1.5.2] - 2026-07-20 [Minor] - Dynamic Kubernetes Configuration & Environment Template Fixes
 
