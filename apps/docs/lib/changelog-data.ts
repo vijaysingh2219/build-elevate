@@ -104,9 +104,51 @@ export type ReleaseTag =
  */
 export const changelog: ChangelogEntry[] = [
   {
+    version: "1.6.0",
+    date: "2026-08-29",
+    tag: "latest",
+    title: "Cloud File Storage, Interactive DX & Storage Scaffolding",
+    summary:
+      "Adds vendor-agnostic S3-compatible cloud storage (@workspace/storage) with presigned URLs, contracts, API endpoints, and FileUploader UI dropzone, alongside an interactive DX lifecycle and TypeFlow architecture trace in docs, with full CLI scaffolding integration.",
+    changes: [
+      {
+        category: "added",
+        text: "New `@workspace/storage` package providing vendor-agnostic S3-compatible cloud storage (AWS S3, Cloudflare R2, MinIO, Supabase Storage) with direct client presigned PUT/GET URLs, object deletion, and collision-safe key generation",
+      },
+      {
+        category: "added",
+        text: "Storage schemas and MIME/size limits (`getPresignedUploadUrlSchema`, `deleteStorageFileSchema`) in `@workspace/contracts`",
+      },
+      {
+        category: "added",
+        text: "Authenticated `/api/storage/presigned-upload` and `/api/storage/file` endpoints with user-scoped access control",
+      },
+      {
+        category: "added",
+        text: "Reusable `<FileUploader />` dropzone component in `@workspace/ui` with drag-and-drop, progress bar, and file validation",
+      },
+      {
+        category: "added",
+        text: "Interactive avatar upload and removal in General Settings (`apps/web/components/profile/avatar-uploader.tsx`) syncing directly with Better Auth",
+      },
+      {
+        category: "added",
+        text: "Interactive 4-step DX lifecycle simulation and interactive TypeFlow architecture trace with syntax-highlighted IDE view",
+      },
+      {
+        category: "added",
+        text: "Complete storage guide at `apps/docs/content/docs/packages/storage.mdx` covering S3/R2/MinIO setup and CORS configuration",
+      },
+      {
+        category: "added",
+        text: "Updated CLI scaffolding, Turbo lint envs, and project readme generation to include storage environment variables and packages",
+      },
+    ],
+  },
+  {
     version: "1.5.2",
     date: "2026-07-20",
-    tag: "latest",
+    tag: "minor",
     title: "Dynamic Kubernetes Configuration & Environment Template Fixes",
     summary:
       "Enhances the Kubernetes scaffolding option with interactive prompts for Docker Hub username and domain name, and ensures LOG_LEVEL and POD_NAME are preserved in environment templates.",

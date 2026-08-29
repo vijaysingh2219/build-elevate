@@ -5,7 +5,9 @@ All changes, fixes and updates to build-elevate.
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 `Latest` is derived from position and is not stored here.
 
-## [Unreleased]
+## [1.6.0] - 2026-08-29 [Minor] - Cloud File Storage, Interactive DX & Storage Scaffolding
+
+Adds vendor-agnostic S3-compatible cloud storage (`@workspace/storage`) with presigned URLs, contracts, API endpoints, and FileUploader UI dropzone, alongside an interactive DX lifecycle and TypeFlow architecture trace in docs, with full CLI scaffolding integration.
 
 ### Added
 
@@ -14,7 +16,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com).
 - **API:** Authenticated `/api/storage/presigned-upload` and `/api/storage/file` endpoints with user-scoped access control
 - **UI:** Reusable `<FileUploader />` dropzone component in `@workspace/ui` with drag-and-drop, progress bar, and file validation
 - **Web:** Interactive avatar upload and removal in General Settings (`apps/web/components/profile/avatar-uploader.tsx`) syncing directly with Better Auth
+- **Docs:** Interactive 4-step DX lifecycle simulation and interactive TypeFlow architecture trace with syntax-highlighted IDE view
 - **Docs:** Complete storage guide at `apps/docs/content/docs/packages/storage.mdx` covering S3/R2/MinIO setup and CORS configuration
+- **CLI:** Updated scaffolding, Turbo lint envs, and project readme generation to include storage environment variables and packages
 
 ## [1.5.2] - 2026-07-20 [Minor] - Dynamic Kubernetes Configuration & Environment Template Fixes
 

@@ -113,14 +113,18 @@ const buildStructureSection = ({
     "│   └── studio/",
     "├── packages/",
     "│   ├── auth/",
+    "│   ├── contracts/",
     "│   ├── db/",
     "│   ├── email/",
-    "│   ├── vitest-presets/",
+    "│   ├── eslint-config/",
+    "│   ├── logger/",
     "│   ├── prettier-config/",
     "│   ├── rate-limit/",
+    "│   ├── storage/",
     "│   ├── typescript-config/",
     template !== "api" ? "│   ├── ui/" : "",
-    template !== "api" ? "│   ├── utils/" : "│   └── utils/",
+    "│   ├── utils/",
+    "│   └── vitest-presets/",
     "└── turbo.json",
   ]
     .filter(Boolean)
@@ -166,6 +170,7 @@ const buildBuiltWithSection = ({
     links.push(
       "[Prisma](https://www.prisma.io/)",
       "[PostgreSQL](https://www.postgresql.org/)",
+      "[AWS S3 / Cloudflare R2](https://aws.amazon.com/s3/)",
     );
   }
 
@@ -199,6 +204,9 @@ const buildDocumentationSection = ({ template }: ReadmeContext): string => {
   }
   if (template !== "web") {
     docs.push("- [API Documentation](apps/api/README.md) - Express server");
+    docs.push(
+      "- [Storage Package Documentation](packages/storage/README.md) - S3/R2/MinIO storage client",
+    );
   }
   if (template === "api") {
     docs.push(

@@ -653,6 +653,7 @@ const setupEnvironmentVariables = async (includeDocker: boolean) => {
     { source: join("packages", "db"), target: ".env" },
     { source: join("packages", "rate-limit"), target: ".env" },
     { source: join("packages", "email"), target: ".env" },
+    { source: join("packages", "storage"), target: ".env" },
   ];
 
   // Generate a single auth secret to share across all env files
@@ -679,6 +680,7 @@ const setupEnvironmentVariables = async (includeDocker: boolean) => {
       { source: join("packages", "db"), target: ".env.production" },
       { source: join("packages", "rate-limit"), target: ".env.production" },
       { source: join("packages", "email"), target: ".env.production" },
+      { source: join("packages", "storage"), target: ".env.production" },
     ];
 
     // Parallelize production env file creation
