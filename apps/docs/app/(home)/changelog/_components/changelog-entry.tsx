@@ -1,18 +1,10 @@
-import {
-  categoryMeta,
-  CATEGORY_ORDER,
-  formatDate,
-  versionAnchor,
-} from "@/lib/changelog-data";
-import type {
-  ChangelogEntry,
-  ReleaseTag,
-  ChangeCategory,
-} from "@/lib/changelog-data";
-import { Dot, Link as LinkIcon } from "lucide-react";
+import { formatDate, versionAnchor, type ReleaseTag } from "@/lib/changelog";
+import type { ChangelogPage } from "@/lib/source";
+import { Link as LinkIcon } from "lucide-react";
+import { getMDXComponents } from "@/mdx-components";
 
 // ---------------------------------------------------------------------------
-// Presentation config (UI-only; category colors live in changelog-data.ts)
+// Presentation config
 // ---------------------------------------------------------------------------
 
 const TAG_CONFIG: Record<ReleaseTag, { label: string; cls: string }> = {
@@ -42,32 +34,6 @@ const TAG_CONFIG: Record<ReleaseTag, { label: string; cls: string }> = {
   },
 };
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-function groupBy<T>(items: T[], key: (item: T) => string): Record<string, T[]> {
-  return items.reduce<Record<string, T[]>>((acc, item) => {
-    (acc[key(item)] ??= []).push(item);
-    return acc;
-  }, {});
-}
-
-/**
- * Orders the present section keys: known keys first (in `order`), then any
- * remaining keys in their original insertion order. Ensures no section is
- * ever silently dropped.
- */
-function orderedKeys(present: string[], order: readonly string[]): string[] {
-  const known = order.filter((k) => present.includes(k));
-  const rest = present.filter((k) => !order.includes(k));
-  return [...known, ...rest];
-}
-
-// ---------------------------------------------------------------------------
-// Sub-components
-// ---------------------------------------------------------------------------
-
 function Badge({ tag }: { tag: ReleaseTag }) {
   const { label, cls } = TAG_CONFIG[tag] ?? TAG_CONFIG.patch;
   return (
@@ -79,70 +45,13 @@ function Badge({ tag }: { tag: ReleaseTag }) {
   );
 }
 
-function ChangeList({ items }: { items: string[] }) {
-  return (
-    <ul className="space-y-1.5 ml-4">
-      {items.map((text) => (
-        <li
-          key={text}
-          className="flex items-start gap-1 text-base text-fd-foreground/80 leading-relaxed"
-        >
-          <Dot aria-hidden className="text-fd-foreground/25 shrink-0 -ml-1" />
-          <span>{text}</span>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-function SectionHeader({
-  label,
-  text,
-  dot,
-}: {
-  label: string;
-  text: string;
-  dot: string;
-}) {
-  return (
-    <div className="flex items-center gap-2 mb-2">
-      <span
-        aria-hidden
-        className={`w-1.5 h-1.5 rounded-full shrink-0 ${dot}`}
-      />
-      <span
-        className={`text-xs font-semibold uppercase tracking-widest ${text}`}
-      >
-        {label}
-      </span>
-    </div>
-  );
-}
-
-function Changes({ changes }: { changes: ChangelogEntry["changes"] }) {
-  const grouped = groupBy(changes, (c) => c.category);
-  return (
-    <div className="space-y-4">
-      {orderedKeys(Object.keys(grouped), CATEGORY_ORDER).map((k) => {
-        const meta = categoryMeta[k as ChangeCategory];
-        return (
-          <div key={k}>
-            <SectionHeader label={meta.label} text={meta.text} dot={meta.dot} />
-            <ChangeList items={grouped[k].map((c) => c.text)} />
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
 // ---------------------------------------------------------------------------
-// Entry — Linear-style two-column row: sticky version/date rail + content
+// Entry — Linear-style two-column row: sticky version/date rail + MDX content
 // ---------------------------------------------------------------------------
 
-export function Entry({ entry }: { entry: ChangelogEntry }) {
-  const hasChanges = entry.changes.length > 0;
-  const anchor = versionAnchor(entry.version);
+export function Entry({ page }: { page: ChangelogPage }) {
+  const anchor = versionAnchor(page.data.version);
+  const MDX = page.data.body;
 
   return (
     <article
@@ -155,41 +64,39 @@ export function Entry({ entry }: { entry: ChangelogEntry }) {
           href={`#${anchor}`}
           className="group/anchor inline-flex items-center gap-1.5 font-mono font-bold text-sm tracking-tight text-fd-foreground hover:text-fd-primary transition-colors"
         >
-          v{entry.version}
+          v{page.data.version}
           <LinkIcon
             aria-hidden
             className="w-3 h-3 opacity-0 group-hover/anchor:opacity-100 transition-opacity text-fd-muted-foreground"
           />
-          <span className="sr-only">Link to v{entry.version}</span>
+          <span className="sr-only">Link to v{page.data.version}</span>
         </a>
         <time
-          dateTime={entry.date}
+          dateTime={page.data.date}
           className="mt-1 block text-xs text-fd-muted-foreground font-mono"
         >
-          {formatDate(entry.date)}
+          {formatDate(page.data.date)}
         </time>
         <div className="mt-3">
-          <Badge tag={entry.tag} />
+          <Badge tag={page.data.tag as ReleaseTag} />
         </div>
       </aside>
 
       {/* Content */}
       <div className="flex-1 min-w-0">
         <h2 className="text-xl font-semibold tracking-tight text-fd-foreground">
-          {entry.title}
+          {page.data.title}
         </h2>
 
-        {entry.summary && (
+        {page.data.summary && (
           <p className="mt-2 text-base leading-relaxed text-fd-foreground/80">
-            {entry.summary}
+            {page.data.summary}
           </p>
         )}
 
-        {hasChanges && (
-          <div className="mt-6">
-            <Changes changes={entry.changes} />
-          </div>
-        )}
+        <div className="mt-6 prose prose-fd dark:prose-invert max-w-none [&_h3]:text-xs [&_h3]:font-semibold [&_h3]:uppercase [&_h3]:tracking-widest [&_h3]:text-fd-muted-foreground [&_h3]:mt-6 [&_h3]:mb-3 [&_ul]:space-y-1.5 [&_ul]:ml-4 [&_li]:text-base [&_li]:text-fd-foreground/80 [&_li]:leading-relaxed">
+          <MDX components={getMDXComponents()} />
+        </div>
       </div>
     </article>
   );

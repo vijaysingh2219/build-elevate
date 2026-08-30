@@ -1,0 +1,46 @@
+---
+version: "1.0.2"
+date: "2026-01-05"
+tag: "major"
+title: "Foundation Release"
+summary: "The effective initial release. Includes the full monorepo foundation, Better-Auth migration, email system, 2FA, session management, and account security suite."
+---
+
+### Added
+
+- Turborepo monorepo with apps/ and packages/ structure
+- Next.js web app with App Router, Tailwind CSS, and shadcn/ui
+- Express API server with TypeScript, structured routing, and a 404 catch-all
+- Shared packages: ui, utils, auth, db, email, eslint-config, typescript-config
+- Docker Compose setup for local development and production deployments
+- GitHub Actions CI with lint, type-check, and test jobs
+- Jest testing setup with shared workspace presets
+- Better-Auth with email/password sign-in and sign-up flows
+- Dedicated @workspace/auth package with centralized auth logic and TypeScript support
+- Authentication middleware for the Express API with protected route support
+- Rate limiting for API calls and verification email requests with configurable strategies
+- Email verification on sign-up
+- Two-factor authentication (2FA) with TOTP support, including setup flow for OAuth users
+- Forgot/reset password flow with secure token-based email links
+- Email change flow with a verification step
+- Social login connect/disconnect cards in account settings
+- Session activity UI and API — view and manage active sessions across devices
+- Revoke all sessions from the security settings page
+- User profile, account settings, and security settings pages
+- Account deletion with a post-deletion goodbye page
+- Light/dark/system theme switcher
+- React Email + Resend email package with in-app preview
+- Refreshed email templates with a modern design
+- Responsive layout across auth and settings pages
+- Prisma ORM with PostgreSQL support and auto-generated client
+- Prisma Studio as a standalone app in the monorepo
+- Environment validation using @t3-oss/env for fail-fast startup errors
+- Husky git hooks for pre-commit linting and formatting enforcement
+
+### Fixed
+
+- Fixed hydration error on authentication pages
+
+### Security
+
+- Prevented client-side access to server-only environment variables

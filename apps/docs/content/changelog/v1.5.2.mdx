@@ -1,0 +1,19 @@
+---
+version: "1.5.2"
+date: "2026-07-20"
+tag: "minor"
+title: "Dynamic Kubernetes Configuration & Environment Template Fixes"
+summary: "Enhances the Kubernetes scaffolding option with interactive prompts for Docker Hub username and domain name, and ensures LOG_LEVEL and POD_NAME are preserved in environment templates."
+---
+
+### Added
+
+- Interactive prompts for Docker Hub username and production domain name when scaffolding Kubernetes manifests
+
+### Changed
+
+- Configured dynamic replacements for the domain in Ingress manifests and uncommented TLS cert-manager configurations
+
+### Fixed
+
+- Updated environment templates to properly retain `LOG_LEVEL` and `POD_NAME` across scaffolding options

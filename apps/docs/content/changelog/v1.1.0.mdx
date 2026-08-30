@@ -1,0 +1,25 @@
+---
+version: "1.1.0"
+date: "2026-03-12"
+tag: "minor"
+title: "Auth Forms, UI Improvements & Fixes"
+summary: "Introduced reusable form field components, improved authentication UI structure, upgraded core dependencies, and fixed CI and documentation issues while strengthening auth configuration security."
+---
+
+### Added
+
+- Reusable, composable form field components added to the shared UI package
+
+### Changed
+
+- Split the unified CredentialsForm into separate SignInForm and SignUpForm components for a cleaner auth UI
+- Updated shadcn/ui components to use unified @radix-ui primitives
+- Upgraded Zod to v4 for improved schema validation performance and API
+
+### Fixed
+
+- Fixed missing environment variables in the CI build job
+
+### Security
+
+- Shared a single auth secret across all environment files to prevent secret drift

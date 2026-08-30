@@ -1,0 +1,13 @@
+---
+version: "1.2.1"
+date: "2026-03-26"
+tag: "minor"
+title: "CLI Template Transformations Refactoring"
+summary: "Refactors the scaffolding CLI by extracting and composing template transformations into modular, reusable units for improved maintainability and easier future enhancements."
+---
+
+### Changed
+
+- Extracted template transformation logic into separate, composable modules for better code organization
+- Refactored scaffold initialization, readme generation, and upgrade workflows to use composed transformations
+- Added `lint:fix` script and turbo task for automated code style corrections across the monorepo

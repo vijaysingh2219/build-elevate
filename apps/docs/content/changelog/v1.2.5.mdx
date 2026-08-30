@@ -1,0 +1,14 @@
+---
+version: "1.2.5"
+date: "2026-05-25"
+tag: "latest"
+title: "Contracts Package Split & Workspace Config Updates"
+summary: "Adds a new shared contracts package for validation schemas and refreshes workspace package configuration to match the updated monorepo layout."
+---
+
+### Changed
+
+- Introduced `@workspace/contracts` for shared Zod schemas and moved auth validation out of `@workspace/utils`
+- Updated web auth and security flows to import schemas from `@workspace/contracts`
+- Refreshed workspace package configs, dependencies, and lockfile entries.
+- Updated docs content for the utils and contracts packages to describe the new split

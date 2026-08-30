@@ -1,0 +1,16 @@
+---
+version: "1.2.6"
+date: "2026-05-26"
+tag: "minor"
+title: "Vitest Migration Complete & Jest Removal"
+summary: "Completes the monorepo migration to Vitest, removes Jest dependencies and presets, and updates docs and workspace configuration to match the new test stack."
+---
+
+### Changed
+
+- Migrated the API app from Jest to Vitest and aligned test scripts, config, and setup with the shared workspace preset
+- Updated docs, package metadata, and workspace configuration to remove Jest references and reflect the Vitest-based test setup
+
+### Removed
+
+- Removed Jest dependencies, presets, and config files now that the workspace test suite runs on Vitest

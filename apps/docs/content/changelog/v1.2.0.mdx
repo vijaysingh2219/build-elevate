@@ -1,0 +1,19 @@
+---
+version: "1.2.0"
+date: "2026-03-23"
+tag: "minor"
+title: "Upgrade Command & Template Diffing"
+summary: "Adds an upgrade workflow that keeps scaffolded projects in sync with the latest build-elevate template. Files that haven't been modified locally are updated automatically, while modified files are flagged as conflicts and can be inspected with a built-in diff command."
+---
+
+### Added
+
+- Introduced the `upgrade` command to automatically update files that remain unchanged since scaffolding, while marking modified files as conflicts for manual review.
+- Added a `diff` command that shows a colored, line-by-line comparison between your scaffolded version of a file and the latest template version.
+- Created a `.build-elevate.json` manifest during initialization to store the scaffolded commit SHA, template name, project metadata, and per-file hashes used during upgrades.
+- Template-aware upgrade filtering ensures projects only receive updates for files that were included during scaffolding (e.g., web projects will not receive api-specific files).
+
+### Fixed
+
+- Upgrade now applies initialization-time transformations before comparing template files, preventing false conflicts in files like `package.json`, `turbo.json`, and `pnpm-workspace.yaml`.
+- Normalized line endings (CRLF → LF) before hashing to prevent false conflicts on Windows environments.

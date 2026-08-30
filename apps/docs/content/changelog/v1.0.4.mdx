@@ -1,0 +1,21 @@
+---
+version: "1.0.4"
+date: "2026-01-07"
+tag: "patch"
+title: "Scaffolding script improvements"
+summary: "Improved project scaffolding scripts, optimized Docker Compose for production, refined GitHub workflow triggers, reorganized monorepo dependencies, and fixed the Prisma Studio script."
+---
+
+### Changed
+
+- Update scripts to update pnpm catalog, docker-compose file on scaffolding new projects
+- Optimized Docker Compose configuration for production environments
+- Ignore .md changes in GitHub workflows to prevent unnecessary CI runs on documentation updates
+- Use explicit paths filter to trigger the github workflows
+- Updated Documentation and Getting Started guide on README.md
+- Moved better-auth from the web app to the core workspace package for better reuse
+- Moved shared dependencies to the core catalog to reduce duplication across packages
+
+### Fixed
+
+- Fixed Prisma Studio app script after a Prisma version bump

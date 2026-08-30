@@ -1,0 +1,18 @@
+---
+version: "1.6.0"
+date: "2026-08-29"
+tag: "latest"
+title: "Cloud File Storage, Interactive DX & Storage Scaffolding"
+summary: "Adds vendor-agnostic S3-compatible cloud storage (@workspace/storage) with presigned URLs, contracts, API endpoints, and FileUploader UI dropzone, alongside an interactive DX lifecycle and TypeFlow architecture trace in docs, with full CLI scaffolding integration."
+---
+
+### Added
+
+- New `@workspace/storage` package providing vendor-agnostic S3-compatible cloud storage (AWS S3, Cloudflare R2, MinIO, Supabase Storage) with direct client presigned PUT/GET URLs, object deletion, and collision-safe key generation
+- Storage schemas and MIME/size limits (`getPresignedUploadUrlSchema`, `deleteStorageFileSchema`) in `@workspace/contracts`
+- Authenticated `/api/storage/presigned-upload` and `/api/storage/file` endpoints with user-scoped access control
+- Reusable `<FileUploader />` dropzone component in `@workspace/ui` with drag-and-drop, progress bar, and file validation
+- Interactive avatar upload and removal in General Settings (`apps/web/components/profile/avatar-uploader.tsx`) syncing directly with Better Auth
+- Interactive 4-step DX lifecycle simulation and interactive TypeFlow architecture trace with syntax-highlighted IDE view
+- Complete storage guide at `apps/docs/content/docs/packages/storage.mdx` covering S3/R2/MinIO setup and CORS configuration
+- Updated CLI scaffolding, Turbo lint envs, and project readme generation to include storage environment variables and packages

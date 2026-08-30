@@ -1,0 +1,17 @@
+---
+version: "1.0.7"
+date: "2026-02-03"
+tag: "patch"
+title: "Monorepo Fixes & Environment Improvements"
+summary: "Improved development environment loading, resolved monorepo dependency resolution issues, fixed lint errors in scaffolded apps, and added metadataBase to eliminate configuration warnings."
+---
+
+### Changed
+
+- Load package env vars in development
+
+### Fixed
+
+- Fixed a lint error present in newly scaffolded apps
+- Resolved package resolution errors for pg and prettier in monorepo installs
+- Added metadataBase to site config to remove the warn log

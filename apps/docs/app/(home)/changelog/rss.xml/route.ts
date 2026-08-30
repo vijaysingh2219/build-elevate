@@ -1,11 +1,5 @@
-import {
-  changelog,
-  categoryMeta,
-  CATEGORY_ORDER,
-  SITE_URL,
-  versionAnchor,
-} from "@/lib/changelog-data";
-import type { ChangelogEntry } from "@/lib/changelog-data";
+import { SITE_URL, versionAnchor } from "@/lib/changelog";
+import { getSortedChangelogPages, type ChangelogPage } from "@/lib/source";
 
 const FEED_TITLE = "build-elevate Changelog";
 const FEED_DESC = "All changes, fixes and updates to build-elevate.";
@@ -22,48 +16,45 @@ function escapeXml(value: string): string {
     .replace(/'/g, "&apos;");
 }
 
-/** Renders a release's changes as an HTML fragment for the item description. */
-function renderDescription(entry: ChangelogEntry): string {
-  const parts: string[] = [];
-  if (entry.summary) parts.push(`<p>${escapeXml(entry.summary)}</p>`);
-
-  const byCategory = new Map<string, string[]>();
-  for (const change of entry.changes) {
-    const list = byCategory.get(change.category) ?? [];
-    list.push(change.text);
-    byCategory.set(change.category, list);
-  }
-
-  for (const category of CATEGORY_ORDER) {
-    const items = byCategory.get(category);
-    if (!items?.length) continue;
-    const lis = items.map((t) => `<li>${escapeXml(t)}</li>`).join("");
-    parts.push(`<h3>${categoryMeta[category].label}</h3><ul>${lis}</ul>`);
-  }
-
-  return parts.join("");
+/** Converts inline markdown (code, links, bold, italic) to safe HTML for RSS. */
+function markdownToHtml(text: string): string {
+  const escaped = escapeXml(text);
+  return escaped
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*([^*]+)\*/g, "<em>$1</em>");
 }
 
-function renderItem(entry: ChangelogEntry): string {
-  const url = `${CHANGELOG_URL}#${versionAnchor(entry.version)}`;
-  const pubDate = new Date(`${entry.date}T00:00:00Z`).toUTCString();
-  const title = escapeXml(`v${entry.version} — ${entry.title}`);
+/** Renders a release's description for RSS readers. */
+function renderDescription(page: ChangelogPage): string {
+  if (page.data.summary) {
+    return `<p>${markdownToHtml(page.data.summary)}</p>`;
+  }
+  return `<p>${escapeXml(page.data.title)}</p>`;
+}
+
+function renderItem(page: ChangelogPage): string {
+  const url = `${CHANGELOG_URL}#${versionAnchor(page.data.version)}`;
+  const pubDate = new Date(`${page.data.date}T00:00:00Z`).toUTCString();
+  const title = escapeXml(`v${page.data.version} — ${page.data.title}`);
 
   return `    <item>
       <title>${title}</title>
       <link>${url}</link>
       <guid isPermaLink="true">${url}</guid>
       <pubDate>${pubDate}</pubDate>
-      <description><![CDATA[${renderDescription(entry)}]]></description>
+      <description><![CDATA[${renderDescription(page)}]]></description>
     </item>`;
 }
 
 export const dynamic = "force-static";
 
 export function GET(): Response {
-  const latest = changelog[0];
+  const pages = getSortedChangelogPages();
+  const latest = pages[0];
   const lastBuildDate = latest
-    ? new Date(`${latest.date}T00:00:00Z`).toUTCString()
+    ? new Date(`${latest.data.date}T00:00:00Z`).toUTCString()
     : new Date().toUTCString();
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -75,7 +66,7 @@ export function GET(): Response {
     <language>en</language>
     <lastBuildDate>${lastBuildDate}</lastBuildDate>
     <atom:link href="${FEED_URL}" rel="self" type="application/rss+xml" />
-${changelog.map(renderItem).join("\n")}
+${pages.map(renderItem).join("\n")}
   </channel>
 </rss>`;
 

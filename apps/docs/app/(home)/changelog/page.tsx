@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { changelog, SITE_URL } from "@/lib/changelog-data";
+import { SITE_URL } from "@/lib/changelog";
+import { getSortedChangelogPages } from "@/lib/source";
 import { Rss } from "lucide-react";
 import { SiGithub } from "react-icons/si";
 import Link from "next/link";
@@ -35,9 +36,11 @@ const NAV_LINKS = [
 ] as const;
 
 export default function ChangelogPage() {
+  const pages = getSortedChangelogPages();
+
   return (
     <div>
-      <div className="relative max-w-4xl mx-auto px-6 py-16">
+      <div className="relative max-w-5xl mx-auto px-4 py-16">
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-3xl font-bold tracking-tight text-fd-foreground mb-2">
@@ -66,8 +69,8 @@ export default function ChangelogPage() {
 
         {/* Entries */}
         <div>
-          {changelog.map((entry) => (
-            <Entry key={entry.version} entry={entry} />
+          {pages.map((page) => (
+            <Entry key={page.data.version} page={page} />
           ))}
         </div>
       </div>

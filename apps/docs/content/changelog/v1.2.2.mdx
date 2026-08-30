@@ -1,0 +1,11 @@
+---
+version: "1.2.2"
+date: "2026-04-02"
+tag: "patch"
+title: "Manifest Path Fix for Generated Prisma Client"
+summary: "Fixes manifest generation by correcting the skipped generated Prisma client directory path so internal generated artifacts are excluded consistently during hashing."
+---
+
+### Fixed
+
+- Updated manifest skip directory from `generated/prisma` to `packages/db/generated` to correctly exclude generated Prisma client files

@@ -1,0 +1,24 @@
+---
+version: "1.0.5"
+date: "2026-01-09"
+tag: "minor"
+title: "Developer experience improvements"
+summary: "Improved developer experience by enhancing the scaffolding CLI with multi-package-manager support, adding tooling for environment setup and code formatting, refining project initialization, and improving configuration consistency across templates."
+---
+
+### Added
+
+- Added support for multiple package managers (npm, pnpm, bun) in Scaffolding CLI
+- Format check on scaffolding to ensure new projects adhere to code style standards
+- Turbo environment variable setup script
+- generatePageMetadata utility for per-page SEO metadata generation
+
+### Changed
+
+- Improved project initialization flow and CLI prompts for a better developer experience
+- Update script to include environment variables required by each template for turbo tasks
+- Update eslint-config for nextjs web app to extend from the root config for better consistency
+
+### Removed
+
+- Removed auth/client.ts in api only scaffolded projects since it is only needed for the web app
